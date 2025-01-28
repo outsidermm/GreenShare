@@ -4,6 +4,7 @@
 
 # ignore node/grunt dependency directories
 node_modules/
+venv/
 
 # Ignore build directories.
 /build
