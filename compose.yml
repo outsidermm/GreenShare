@@ -9,7 +9,10 @@ services:
     ports:
       - 3000:3000
     environment:
-      - NEXT_PUBLIC_API_URL=http://localhost:4000
+      - NEXT_PUBLIC_API_URL=http://localhost:4000/
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
     depends_on:
       - flaskapp
   
@@ -24,6 +27,10 @@ services:
       - 4000:4000
     environment:
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres
+      - FLASK_ENV=development
+    command: flask run --host=0.0.0.0 --port=4000
+    volumes:
+      - ./backend:/app
     depends_on:
       - db
 
