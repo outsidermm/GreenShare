@@ -87,6 +87,7 @@ Thumbs.db
 
 # misc
 .DS_Store
+*.pyc
 
 # debug
 npm-debug.log*
