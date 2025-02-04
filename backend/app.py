@@ -19,7 +19,6 @@ def index():
 # POST API for user registration
 @app.route("/auth/register", methods=["POST"])
 async def register_user():
-    print("0")
     """
     Registers a new user with email, password, first name, and last name.
 
@@ -38,7 +37,6 @@ async def register_user():
             email, pwd, first_name, last_name
         )
 
-        print(session_token, " ", csrf_token)
 
         # Create a response with CSRF token and set the secure session cookie
         response = make_response(
@@ -74,12 +72,9 @@ async def login_user():
     On success, issues a session cookie and returns a CSRF token.
     """
     # Extract login credentials from request JSON
-    print("1")
     data = request.json
     email = data["email"]
     pwd = data["password"]
-
-    print(email, " ", pwd)
 
     try:
         # Authenticate user and obtain session and CSRF tokens
