@@ -4,8 +4,10 @@ import secrets
 import re
 from db.user_db import UserDB
 from config import db
+import os
+from typing import Optional
 
-user_key = Fernet.generate_key()
+user_key = os.getenv("USER_FERNET_KEY")
 user_cipher_suite = Fernet(user_key)
 
 
