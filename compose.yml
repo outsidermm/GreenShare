@@ -26,9 +26,11 @@ services:
     ports:
       - 4000:4000
     environment:
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres
+      - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
       - FLASK_ENV=development
-    command: flask run --host=0.0.0.0 --port=4000
+      - USER_FERNET_KEY=${USER_FERNET_KEY}
+      - SECRET_KEY=${SECRET_KEY}
+    command: ["python","app.py"]
     volumes:
       - ./backend:/app
     depends_on:
@@ -39,9 +41,9 @@ services:
     container_name: db
     image: postgres:17
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: postgres
+      - POSTGRES_USER = ${DB_USER}
+      - POSTGRES_PASSWORD = ${DB_PASSWORD}
+      - POSTGRES_DB = ${DB_NAME}
     ports:
       - "5432:5432"
     volumes:
