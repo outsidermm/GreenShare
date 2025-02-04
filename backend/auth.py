@@ -98,8 +98,12 @@ async def user_auth_register(
         409 Error: If the email already exists in the user database.
     """
     email = email.lower()  # Normalise the email to lowercase
-    first_name = first_name.capitalize() # Normalise the first name to start with a capital letter
-    last_name = last_name.capitalize() # Normalise the last name to start with a capital letter
+    first_name = (
+        first_name.capitalize()
+    )  # Normalise the first name to start with a capital letter
+    last_name = (
+        last_name.capitalize()
+    )  # Normalise the last name to start with a capital letter
 
     email_auth(email)
     name_auth(first_name)
@@ -215,7 +219,7 @@ async def user_auth_validate_csrf_token(csrf_token: str) -> bool:
     Raises:
         401 Error: If CSRF token does not match any active session.
     """
-    
+
     for user in users.values():
         if user.is_valid_csrf_token(csrf_token):
             return True

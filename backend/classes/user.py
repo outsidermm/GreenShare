@@ -20,9 +20,15 @@ class User:
 
     __session_token: str = None
     __csrf_token: str = None
-    __user_pk : str = None
+    __user_pk: str = None
 
-    def __init__(self, new_email: str, new_first_name: str, new_last_name: str, new_pwd_input: str):
+    def __init__(
+        self,
+        new_email: str,
+        new_first_name: str,
+        new_last_name: str,
+        new_pwd_input: str,
+    ):
         """
         Initialises the user with email, name, password, session, and CSRF tokens.
 
@@ -32,11 +38,16 @@ class User:
             new_last_name (str): User's last name.
             new_pwd_input (str): Plaintext password to be hashed and encrypted.
         """
-        new_user = UserDB(email=new_email, first_name=new_first_name, last_name=new_last_name, password=self.encrypt_pwd(self.hash_pwd(new_pwd_input)))
-        
+        new_user = UserDB(
+            email=new_email,
+            first_name=new_first_name,
+            last_name=new_last_name,
+            password=self.encrypt_pwd(self.hash_pwd(new_pwd_input)),
+        )
+
         db.session.add(new_user)
         db.session.commit()
-        
+
         self.set_user_pk(new_user.id)
         self.set_session_token(self.generate_session_token())
         self.set_csrf_token(self.generate_csrf_token())
@@ -144,9 +155,7 @@ class User:
             bool: True if passwords match, False otherwise.
         """
         encrypted_pwd = UserDB.query.filter_by(id=self.get_user_pk()).first().password
-        return self.decrypt_pwd(encrypted_pwd) == self.hash_pwd(
-            pwd_input
-        )
+        return self.decrypt_pwd(encrypted_pwd) == self.hash_pwd(pwd_input)
 
     def user_data(self) -> dict:
         """
@@ -203,19 +212,19 @@ class User:
             user_pk (str): User's primary key.
         """
         self.__user_pk = user_pk
-        
+
     def get_user_pk(self) -> str:
         """
         Returns the user's primary key.
         """
         return self.__user_pk
-    
+
     def get_first_name(self) -> str:
         """
         Returns the user's first name.
         """
         return UserDB.query.filter_by(id=self.get_user_pk()).first().first_name
-    
+
     def get_last_name(self) -> str:
         """
         Returns the user's last name.

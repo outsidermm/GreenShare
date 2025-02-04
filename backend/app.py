@@ -1,5 +1,5 @@
 from flask import request, jsonify, make_response
-from config import app,db
+from config import app, db
 from auth import (
     user_auth_register,
     user_auth_login,
@@ -8,6 +8,7 @@ from auth import (
     user_auth_validate_csrf_token,
 )
 import re
+
 
 @app.route("/")
 def index():
@@ -36,8 +37,8 @@ async def register_user():
         session_token, csrf_token = await user_auth_register(
             email, pwd, first_name, last_name
         )
-        
-        print(session_token, " ",csrf_token)
+
+        print(session_token, " ", csrf_token)
 
         # Create a response with CSRF token and set the secure session cookie
         response = make_response(
@@ -77,8 +78,8 @@ async def login_user():
     data = request.json
     email = data["email"]
     pwd = data["password"]
-    
-    print(email, " ",pwd)
+
+    print(email, " ", pwd)
 
     try:
         # Authenticate user and obtain session and CSRF tokens
@@ -160,11 +161,12 @@ async def validate_token():
         # Return error response if tokens are invalid
         return jsonify({"error": str(e)}), 401
 
+
 # Entry point to run the Flask app
-if __name__ == '__main__':
+if __name__ == "__main__":
     with app.app_context():
         db.drop_all()
         db.create_all()
 
     # Run Flask server in debug mode on port 4000 for local testing
-    app.run(host="0.0.0.0", port = 4000, debug=True)
+    app.run(host="0.0.0.0", port=4000, debug=True)

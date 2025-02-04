@@ -5,7 +5,7 @@ from os import environ, getenv
 
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = environ.get('DATABASE_URL')
+app.config["SQLALCHEMY_DATABASE_URI"] = environ.get("DATABASE_URL")
 # Set secret key for secure sessions and CSRF protection, fetched from environment variables
 app.config["SECRET_KEY"] = getenv("SECRET_KEY")
 # Enforce secure cookies for sessions
