@@ -52,6 +52,22 @@ class User:
         self.set_session_token(self.generate_session_token())
         self.set_csrf_token(self.generate_csrf_token())
 
+    @classmethod
+    def from_email(cls, user_email: str) -> Optional["User"]:
+        """
+        Loads an existing user from UserDB by user email.
+        """
+        user_record = UserDB.query.filter_by(email=user_email).first()
+        if not user_record:
+            return None
+
+        user_obj = cls.__new__(cls)  # Avoid calling __init__
+        user_obj.set_user_pk(user_record.id)
+        user_obj.set_session_token(user_obj.generate_session_token())
+        user_obj.set_csrf_token(user_obj.generate_csrf_token())
+
+        return user_obj
+
     def generate_session_token(self) -> str:
         """
         Generates a secure session token for the user.

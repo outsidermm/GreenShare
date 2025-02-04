@@ -1,8 +1,6 @@
 from classes.user import User
 from flask import abort
 import re
-from config import db
-from db.user_db import UserDB
 from data import users
 
 
@@ -148,13 +146,16 @@ async def user_auth_login(email: str, pwd_input: str) -> str:
     safe_pwd = re.escape(pwd_input)
 
     if safe_email not in users:
-        abort(401, description="Email does not exist")
+        potential_user = User.from_email(safe_email)
+        if not potential_user:
+            abort(401, description="Email does not exist")
+        else:
+            users[safe_email] = potential_user
 
     user: User = users[safe_email]
 
     if not user.verify_pwd(safe_pwd):
         abort(401, description="Invalid password")
-    print("1")
 
     # Generate new session and CSRF tokens and update the user's token attributes
     user.set_session_token(user.generate_session_token())
