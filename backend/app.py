@@ -37,7 +37,6 @@ async def register_user():
             email, pwd, first_name, last_name
         )
 
-
         # Create a response with CSRF token and set the secure session cookie
         response = make_response(
             jsonify(
