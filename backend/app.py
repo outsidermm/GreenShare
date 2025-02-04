@@ -160,7 +160,6 @@ async def validate_token():
 # Entry point to run the Flask app
 if __name__ == "__main__":
     with app.app_context():
-        db.drop_all()
         db.create_all()
 
     # Run Flask server in debug mode on port 4000 for local testing
