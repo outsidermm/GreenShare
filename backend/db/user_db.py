@@ -7,7 +7,7 @@ class UserDB(db.Model):
     first_name = db.Column(db.String(100), nullable=False)
     last_name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(512), nullable=False)
-    password = db.Column(db.String(512), nullable=False)
+    password = db.Column(db.LargeBinary(2048), nullable=False)
 
     def to_json(self) -> dict:
         return {
