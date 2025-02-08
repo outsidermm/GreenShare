@@ -67,13 +67,13 @@ def email_auth(email: str) -> bool:
         400 Error: If email does not meet required format.
     """
     # Regular expression for basic email validation.
-    email_pattern = r"^[0-9a-z]+([0-9a-z]*[-._+])*[0-9a-z]+@[0-9a-z]+([-.][0-9a-z]+)*([0-9a-z]*[.])[a-z]{2,6}$"
+    email_pattern = r"^[0-9a-z]+([0-9a-z]*[-._+])*[0-9a-z]+@[0-9a-z]+([-.][0-9a-z]+)*([0-9a-z]*[.])[a-z]{2,8}$"
 
-    if re.match(email_pattern, email) and 3 <= len(email) <= 255:
+    if re.match(email_pattern, email) and 3 <= len(email) <= 320:
         return True
     abort(
         400,
-        description="Email must start with letters or numbers, include @ and a valid domain, have a 2-6 character extension, and be 3-320 characters long.",
+        description="Email must start with letters or numbers, include @ and a valid domain, have a 2-8 character extension, and be 3-320 characters long.",
     )
 
 
