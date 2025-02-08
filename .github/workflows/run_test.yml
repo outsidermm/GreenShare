@@ -19,7 +19,7 @@ jobs:
           docker compose run --rm tests pytest --junitxml=reports/test-results.xml --tb=short --maxfail=5
 
       - name: Upload Test Results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: pytest-results
           path: reports/test-results.xml
