@@ -146,11 +146,7 @@ async def user_auth_login(email: str, pwd_input: str) -> str:
     safe_pwd = re.escape(pwd_input)
 
     if safe_email not in users:
-        potential_user = User.from_email(safe_email)
-        if not potential_user:
-            abort(401, description="Email does not exist")
-        else:
-            users[safe_email] = potential_user
+        abort(401, description="Email does not exist")
 
     user: User = users[safe_email]
 
