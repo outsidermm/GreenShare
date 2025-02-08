@@ -1,7 +1,7 @@
-from classes.user import User
+from backend.classes.user import User
 from flask import abort
 import re
-from data import users
+from backend.data import users
 
 
 def name_auth(name: str) -> bool:
