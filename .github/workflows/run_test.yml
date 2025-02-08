@@ -10,6 +10,14 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
+      - name: Set Up Environment Variables
+        run: |
+          echo "DB_USER=${{ secrets.DB_USER }}" >> .env
+          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
+          echo "DB_NAME=${{ secrets.DB_NAME }}" >> .env
+          echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> .env
+          echo "USER_FERNET_KEY=${{ secrets.USER_FERNET_KEY }}" >> .env
+
       - name: Build and Start Containers
         run: |
           docker compose up --build -d nextapp
