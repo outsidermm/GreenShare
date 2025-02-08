@@ -1,7 +1,7 @@
-from classes.user import User
+from backend.classes.user import User
 from flask import abort
 import re
-from data import users
+from backend.data import users
 
 
 def name_auth(name: str) -> bool:
@@ -67,13 +67,13 @@ def email_auth(email: str) -> bool:
         400 Error: If email does not meet required format.
     """
     # Regular expression for basic email validation.
-    email_pattern = r"^[0-9a-z]+([0-9a-z]*[-._+])*[0-9a-z]+@[0-9a-z]+([-.][0-9a-z]+)*([0-9a-z]*[.])[a-z]{2,6}$"
+    email_pattern = r"^[0-9a-z]+([0-9a-z]*[-._+])*[0-9a-z]+@[0-9a-z]+([-.][0-9a-z]+)*([0-9a-z]*[.])[a-z]{2,8}$"
 
-    if re.match(email_pattern, email) and 3 <= len(email) <= 255:
+    if re.match(email_pattern, email) and 3 <= len(email) <= 320:
         return True
     abort(
         400,
-        description="Email must start with letters or numbers, include @ and a valid domain, have a 2-6 character extension, and be 3-320 characters long.",
+        description="Email must start with letters or numbers, include @ and a valid domain, have a 2-8 character extension, and be 3-320 characters long.",
     )
 
 
@@ -146,11 +146,7 @@ async def user_auth_login(email: str, pwd_input: str) -> str:
     safe_pwd = re.escape(pwd_input)
 
     if safe_email not in users:
-        potential_user = User.from_email(safe_email)
-        if not potential_user:
-            abort(401, description="Email does not exist")
-        else:
-            users[safe_email] = potential_user
+        abort(401, description="Email does not exist")
 
     user: User = users[safe_email]
 

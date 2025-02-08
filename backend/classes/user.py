@@ -2,8 +2,8 @@ import hashlib
 from cryptography.fernet import Fernet
 import secrets
 import re
-from db.user_db import UserDB
-from config import db
+from backend.db.user_db import UserDB
+from backend.config import db
 import os
 from typing import Optional
 
@@ -55,18 +55,21 @@ class User:
         self.set_csrf_token(self.generate_csrf_token())
 
     @classmethod
-    def from_email(cls, user_email: str) -> Optional["User"]:
+    def backup(cls) -> dict["User"]:
         """
-        Loads an existing user from UserDB by user email.
+        Return a dictionary of existing user from UserDB.
         """
-        user_record = UserDB.query.filter_by(email=user_email).first()
+        user_record = UserDB.query.all()
         if not user_record:
             return None
 
-        user_obj = cls.__new__(cls)  # Avoid calling __init__
-        user_obj.set_user_pk(user_record.id)
-        user_obj.set_session_token(user_obj.generate_session_token())
-        user_obj.set_csrf_token(user_obj.generate_csrf_token())
+        user_dict = {}
+        for user in user_record:
+            user_obj = cls.__new__(cls)
+            user_obj.set_user_pk(user.id)
+            user_obj.set_session_token(user_obj.generate_session_token())
+            user_obj.set_csrf_token(user_obj.generate_csrf_token())
+            user_dict[user.email] = user_obj
 
         return user_obj
 
@@ -248,3 +251,45 @@ class User:
         Returns the user's last name.
         """
         return UserDB.query.filter_by(id=self.get_user_pk()).first().last_name
+
+    def get_email(self) -> str:
+        """
+        Returns the user's email.
+        """
+        return UserDB.query.filter_by(id=self.get_user_pk()).first().email
+
+    def get_password(self) -> str:
+        """
+        Returns the user's password.
+        """
+        return UserDB.query.filter_by(id=self.get_user_pk()).first().password
+
+    def set_password(self, new_pwd: str) -> None:
+        """
+        Sets the user's password.
+        """
+        UserDB.query.filter_by(id=self.get_user_pk()).first().password = new_pwd
+        db.session.commit()
+
+    def set_first_name(self, new_first_name: str) -> None:
+        """
+        Sets the user's first name.
+        """
+        UserDB.query.filter_by(id=self.get_user_pk()).first().first_name = (
+            new_first_name
+        )
+        db.session.commit()
+
+    def set_last_name(self, new_last_name: str) -> None:
+        """
+        Sets the user's last name.
+        """
+        UserDB.query.filter_by(id=self.get_user_pk()).first().last_name = new_last_name
+        db.session.commit()
+
+    def set_email(self, new_email: str) -> None:
+        """
+        Sets the user's email.
+        """
+        UserDB.query.filter_by(id=self.get_user_pk()).first().email = new_email
+        db.session.commit()

@@ -1,12 +1,13 @@
 from flask import request, jsonify, make_response
-from config import app, db
-from auth import (
+from backend.config import app, db
+from backend.auth import (
     user_auth_register,
     user_auth_login,
     user_auth_logout,
     user_auth_validate_session_token,
     user_auth_validate_csrf_token,
 )
+from backend.classes.user import User
 import re
 
 
@@ -160,6 +161,7 @@ async def validate_token():
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
+        User.backup()
 
     # Run Flask server in debug mode on port 4000 for local testing
     app.run(host="0.0.0.0", port=4000, debug=True)
