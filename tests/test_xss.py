@@ -13,9 +13,7 @@ from backend.db.user_db import UserDB
 @pytest.fixture(autouse=True)
 def clear_users():
     users.clear()
-    with app.app_context():
-        db.drop_all()
-        db.create_all()
+    db.session.query(UserDB).delete()
 
 
 @pytest.fixture(scope="module", autouse=True)
