@@ -16,7 +16,18 @@ jobs:
 
       - name: Run Tests Inside Docker
         run: |
-          docker-compose run --rm tests
+          docker compose run --rm tests pytest --junitxml=reports/test-results.xml --tb=short --maxfail=5
+
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v3
+        with:
+          name: pytest-results
+          path: reports/test-results.xml
+
+      - name: Generate Test Summary
+        run: |
+          echo "## 🛠 Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "$(docker compose run --rm tests pytest --tb=short --maxfail=5 --disable-warnings | tail -20)" >> $GITHUB_STEP_SUMMARY
 
       - name: Stop and Remove Containers
-        run: docker-compose down
+        run: docker compose down
