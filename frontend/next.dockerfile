@@ -3,7 +3,7 @@
 FROM node:18-alpine
 
 # Set the working directory
-WORKDIR /app
+WORKDIR /app/frontend
 
 # Copy only package.json and lock file(s) first to leverage Docker layer caching
 COPY package*.json ./
