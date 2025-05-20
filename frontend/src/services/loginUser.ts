@@ -22,6 +22,6 @@ export default async function loginUser(email: string, password: string) {
         return result.csrf_token;
     } catch (error) {
         console.error('Error during login:', error);
-        throw error; // Re-throw the error so it can be handled in handleSubmit
+        throw error; // Re-throw the error so it can be displayed in the UI
     }
 }
