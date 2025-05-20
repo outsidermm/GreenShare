@@ -18,4 +18,4 @@ ENV PYTHONPATH=/app
 
 EXPOSE 4000
 
-CMD [ "python","-u","backend/app.py" ]
+CMD [ "python","-u","backend/app.py","--host=0.0.0","--port=4000" ]
