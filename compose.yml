@@ -10,9 +10,12 @@ services:
       - 3000:3000
     environment:
       - NEXT_PUBLIC_API_URL=http://localhost:4000/
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true
     volumes:
       - ./frontend:/app/frontend
       - /app/node_modules
+    restart: unless-stopped
     depends_on:
       - flaskapp
   
@@ -41,9 +44,9 @@ services:
     container_name: db
     image: postgres:17
     environment:
-      - POSTGRES_USER = ${DB_USER}
-      - POSTGRES_PASSWORD = ${DB_PASSWORD}
-      - POSTGRES_DB = ${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
     ports:
       - "5432:5432"
     volumes:

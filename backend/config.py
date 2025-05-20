@@ -18,6 +18,6 @@ app.config["SESSION_COOKIE_SAMESITE"] = (
 )
 
 # Set up Cross-Origin Resource Sharing (CORS) to allow requests from a specific front-end origin
-CORS(app, supports_credentials=True, origins="http://127.0.0.1:3000")
+CORS(app, supports_credentials=True, origins=["http://127.0.0.1:3000", "http://nextapp:3000", "http://localhost:3000"])
 
 db = SQLAlchemy(app)

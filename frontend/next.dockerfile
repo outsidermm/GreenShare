@@ -1,9 +1,9 @@
 # syntax=docker/dockerfile:1
 
-FROM node:18-alpine
+FROM node:24-alpine
 
 # Set the working directory
-WORKDIR /app
+WORKDIR /app/frontend
 
 # Copy only package.json and lock file(s) first to leverage Docker layer caching
 COPY package*.json ./
