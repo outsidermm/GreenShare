@@ -10,8 +10,8 @@ export default function LoginForm() {
 
   const handleSubmit = async () => {
     try {
-      const data = await loginUser(email, password);
-      setMessage(data.message);
+      const csrf_token = await loginUser(email, password);
+      localStorage.setItem('csrfToken', csrf_token);
     } catch (err: any) {
       setMessage(err.message);
     }
