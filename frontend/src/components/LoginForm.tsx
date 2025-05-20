@@ -20,7 +20,7 @@ export default function LoginForm() {
   return (
     <div className="max-w-md m-auto shadow-slate-200 shadow-lg rounded-sm p-6 px-10 w-1/2 min-w-fit">
       <h1 className="text-4xl text-center text-slate-800 font-bold">Login</h1>
-      <div className="p-5 mt-5">
+      <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }} className="p-5 mt-5">
         <div>
           <label className="block mb-2 text-slate-800">Email Address</label>
           <input
@@ -46,21 +46,26 @@ export default function LoginForm() {
             className="border border-slate-500 text-slate-500 rounded py-2 px-3 w-full"
           />
         </div>
+        {message && (
+          <div className="text-red-500 text-sm text-center mb-2">
+            {message}
+          </div>
+        )}
         <div className="pt-2">
           <button
-            onClick={handleSubmit}
+            type="submit"
             className="w-full rounded bg-blue-300 hover:bg-blue-700 text-white font-bold py-2 px-4 border-solid border-2 border-blue-300">
             Login
           </button>
         </div>
         <div className="pt-5 text-center text-slate-500">
-          <p>Don't have an account?&nbsp;
+          <p>Don&apos;t have an account?&nbsp;
             <a href="/register" className="text-blue-500 hover:text-blue-700">
               Sign Up
             </a>
-          `</p>
+          </p>
         </div>
-      </div>
+      </form>
     </div>
   );
 }
