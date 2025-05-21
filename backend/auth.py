@@ -104,9 +104,9 @@ async def user_auth_register(
     )  # Normalise the last name to start with a capital letter
 
     email_auth(email)
+    pwd_auth(pwd)
     name_auth(first_name)
     name_auth(last_name)
-    pwd_auth(pwd)
 
     # Sanitise and secure input data
     safe_email = re.escape(email)
