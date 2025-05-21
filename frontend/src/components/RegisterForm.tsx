@@ -15,6 +15,10 @@ export default function RegisterForm() {
     try {
       const csrf_token = await registerUser(email, password , firstName, lastName);
       localStorage.setItem('csrfToken', csrf_token);
+      setPassword("");
+      setEmail("");
+      setFirstName("");
+      setLastName("");
     } catch (err: any) {
       setMessage(err.message);
     }
@@ -28,6 +32,7 @@ export default function RegisterForm() {
           <label className="block mb-2 text-slate-800">First Name</label>
           <input
             type="text"
+            placeholder='John'
             minLength={2}
             maxLength={50}
             required
@@ -40,6 +45,7 @@ export default function RegisterForm() {
           <label className="block mb-2 text-slate-800">Last Name</label>
           <input
             type="text"
+            placeholder='Smith'
             minLength={2}
             maxLength={50}
             required
@@ -65,6 +71,7 @@ export default function RegisterForm() {
           <label className="block mb-2 text-slate-800">Password</label>
           <input
             type="password"
+            placeholder='&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;'
             required
             minLength={8}
             maxLength={32}
