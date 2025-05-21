@@ -4,7 +4,7 @@ import re
 from backend.data import users
 
 
-def name_auth(name: str) -> bool:
+def name_auth(name: str, err_prefix :str) -> bool:
     """
     Validates a name to ensure it meets length and character requirements.
 
@@ -25,7 +25,7 @@ def name_auth(name: str) -> bool:
         return True
     abort(
         400,
-        description="Name must be 2 to 50 characters long and can only include letters, spaces, hyphens, apostrophes, and periods",
+        description= err_prefix + " name must be 2 to 50 characters long and can only include letters, spaces, hyphens, apostrophes, and periods",
     )
 
 
@@ -49,7 +49,7 @@ def pwd_auth(pwd: str) -> bool:
         return True
     abort(
         400,
-        description="Password must contain one digit from 1 to 9, one lowercase letter, one uppercase letter, one special character, no space, and it must be 8-32 characters long.",
+        description="Password must be 8-32 characters, include a digit, lowercase and uppercase letter, special character, and no spaces.",
     )
 
 
@@ -104,9 +104,9 @@ async def user_auth_register(
     )  # Normalise the last name to start with a capital letter
 
     email_auth(email)
-    name_auth(first_name)
-    name_auth(last_name)
     pwd_auth(pwd)
+    name_auth(first_name, "First")
+    name_auth(last_name, "Last")
 
     # Sanitise and secure input data
     safe_email = re.escape(email)

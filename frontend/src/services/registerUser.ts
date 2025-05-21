@@ -1,18 +1,24 @@
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
-interface loginResponse {
+interface registerResponse {
     csrf_token:string;
 }
 
-export default async function loginUser(email: string, password: string): Promise<string> {
+export default async function registerUser(email: string, password: string, firstName: string, lastName: string): Promise<string> {
+    const data = {
+        email: email,
+        password: password,
+        firstName: firstName,
+        lastName: lastName
+    };
     try {
-        const response = await fetch(`${API_BASE}/auth/login`, {
+        const response = await fetch(`${API_BASE}/auth/register`, {
             method: 'POST',
             credentials: 'include',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ email, password }),
+            body: JSON.stringify(data),
         });
 
         // Check if the response is not OK 
@@ -21,11 +27,11 @@ export default async function loginUser(email: string, password: string): Promis
             throw new Error(errorData.error || 'Unknown error occurred');
         }
 
-        const result: loginResponse = await response.json(); // Parse JSON response
+        const result : registerResponse = await response.json(); // Parse JSON response
         console.log('Response from server:', result);
         return result.csrf_token;
     } catch (error) {
-        console.error('Error during login:', error);
+        console.error('Error during registration:', error);
         throw error; // Re-throw the error so it can be displayed in the UI
     }
 }
