@@ -3,7 +3,7 @@
 import {useState} from 'react';
 import Link from 'next/link';
 import registerUser from '../services/registerUser';
-import {RiEyeFill, RiEyeOffFill} from "react-icons/ri";
+import AuthForm from './AuthForm';
 
 export default function RegisterForm() {
   const [email, setEmail] = useState('');
@@ -12,12 +12,11 @@ export default function RegisterForm() {
   const [lastName, setLastName] = useState('');
   const [message, setMessage] = useState('');
 
-  const [emailChanged, setEmailChanged] = useState(false);
-  const [pwdChanged, setPwdChanged] = useState(false);
   const [firstNameChanged, setFirstNameChanged] = useState(false);
   const [lastNameChanged, setLastNameChanged] = useState(false);
+  const [emailChanged, setEmailChanged] = useState(false);
+  const [pwdChanged, setPwdChanged] = useState(false);
 
-  const [isPwdHidden, setIsPwdHidden] = useState(true);
 
   const handleSubmit = async () => {
     try {
@@ -27,6 +26,12 @@ export default function RegisterForm() {
       setEmail("");
       setFirstName("");
       setLastName("");
+      setMessage("")
+      setFirstNameChanged(false);
+      setLastNameChanged(false);
+      setEmailChanged(false);
+      setPwdChanged(false);
+
     } catch (err: any) {
       setMessage(err.message);
     }
@@ -64,43 +69,16 @@ export default function RegisterForm() {
             className={`border-slate-500 text-slate-500 rounded py-2 px-3 w-full ${lastNameChanged ? 'invalid:border-red-500' : ''} border-2`}
           />
         </div>
-        <div className='pt-5'>
-          <label className="block mb-2 text-slate-800">Email Address</label>
-          <input
-            type="email"
-            placeholder="Enter your email"
-            minLength={3}
-            maxLength={320}
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            onFocus={() => setEmailChanged(true)}
-            className={`border-slate-500 text-slate-500 rounded py-2 px-3 w-full ${emailChanged ? 'invalid:border-red-500' : ''} border-2`}
-          />
-        </div>
-        <div className="pt-5">
-          <label className="block mb-2 text-slate-800">Password</label>
-          <div className='relative'>
-            <input
-              type={isPwdHidden ? "password" : "text"}
-              placeholder='Enter your password'
-              required
-              minLength={8}
-              maxLength={32}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              onFocus={() => setPwdChanged(true)}
-              className={`border-slate-500 text-slate-500 rounded py-2 px-3 w-full ${pwdChanged ? 'invalid:border-red-500' : ''} border-2`}
-            />
-            <button
-              type="button"
-              onClick={() => setIsPwdHidden(!isPwdHidden)}
-              className="text-sm text-slate-500 hover:underline mt-2 absolute top-1.5 right-3"
-            >
-              {isPwdHidden ? <RiEyeOffFill /> : <RiEyeFill />}
-            </button>
-          </div>
-        </div>
+        <AuthForm
+          email={email}
+          password={password}
+          setEmail={setEmail}
+          setPassword={setPassword}
+          emailChanged={emailChanged}
+          setEmailChanged={setEmailChanged}
+          pwdChanged={pwdChanged}
+          setPwdChanged={setPwdChanged}
+        />
         <div className='py-5'>
           <label htmlFor="agreement-box" className="inline-flex items-center text-slate-800">
             <input type="checkbox" id="agreement-box" value="yes" className="mr-2" required />
@@ -115,7 +93,7 @@ export default function RegisterForm() {
         <div className="pt-2">
           <button
             type="submit"
-            className="w-full rounded bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-solid border-2 border-blue-300 transition-all">
+            className="w-full rounded bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-solid border-2 border-blue-500 transition-all">
             Create an Account
           </button>
         </div>
