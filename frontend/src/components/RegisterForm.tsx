@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import {useState} from 'react';
 import Link from 'next/link';
 import registerUser from '../services/registerUser';
+import {RiEyeFill, RiEyeOffFill} from "react-icons/ri";
 
 export default function RegisterForm() {
   const [email, setEmail] = useState('');
@@ -10,6 +11,13 @@ export default function RegisterForm() {
   const[firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [message, setMessage] = useState('');
+
+  const [emailChanged, setEmailChanged] = useState(false);
+  const [pwdChanged, setPwdChanged] = useState(false);
+  const [firstNameChanged, setFirstNameChanged] = useState(false);
+  const [lastNameChanged, setLastNameChanged] = useState(false);
+
+  const [isPwdHidden, setIsPwdHidden] = useState(true);
 
   const handleSubmit = async () => {
     try {
@@ -25,60 +33,73 @@ export default function RegisterForm() {
   };
 
   return (
-    <div className="max-w-md m-auto shadow-slate-200 shadow-lg rounded-sm p-6 px-10 w-1/2 min-w-fit">
+    <div className="sm:max-w-xl shadow-slate-200 shadow-xl rounded-2xl p-6 px-10 sm:min-w-md w-11/12 bg-white">
       <h1 className="text-4xl text-center text-slate-800 font-bold">Registration</h1>
       <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }} className="p-5 mt-5">
         <div>
           <label className="block mb-2 text-slate-800">First Name</label>
           <input
             type="text"
-            placeholder='John'
+            placeholder='Enter your first name'
             minLength={2}
             maxLength={50}
             required
             value={firstName}
             onChange={(e) => setFirstName(e.target.value)}
-            className="border border-slate-500 text-slate-500 rounded py-2 px-3 w-full"
+            onFocus={() => setFirstNameChanged(true)}
+            className={`border-slate-500 text-slate-500 rounded py-2 px-3 w-full ${firstNameChanged ? 'invalid:border-red-500' : ''}  border-2`}
           />
         </div>
         <div className='pt-5'>
           <label className="block mb-2 text-slate-800">Last Name</label>
           <input
             type="text"
-            placeholder='Smith'
+            placeholder='Enter your last name'
             minLength={2}
             maxLength={50}
             required
             value={lastName}
             onChange={(e) => setLastName(e.target.value)}
-            className="border border-slate-500 text-slate-500 rounded py-2 px-3 w-full"
+            onFocus={() => setLastNameChanged(true)}
+            className={`border-slate-500 text-slate-500 rounded py-2 px-3 w-full ${lastNameChanged ? 'invalid:border-red-500' : ''} border-2`}
           />
         </div>
         <div className='pt-5'>
           <label className="block mb-2 text-slate-800">Email Address</label>
           <input
             type="email"
-            placeholder="example@example.com"
+            placeholder="Enter your email"
             minLength={3}
             maxLength={320}
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="border border-slate-500 text-slate-500 rounded py-2 px-3 w-full"
+            onFocus={() => setEmailChanged(true)}
+            className={`border-slate-500 text-slate-500 rounded py-2 px-3 w-full ${emailChanged ? 'invalid:border-red-500' : ''} border-2`}
           />
         </div>
         <div className="pt-5">
           <label className="block mb-2 text-slate-800">Password</label>
-          <input
-            type="password"
-            placeholder='&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;'
-            required
-            minLength={8}
-            maxLength={32}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="border border-slate-500 text-slate-500 rounded py-2 px-3 w-full"
-          />
+          <div className='relative'>
+            <input
+              type={isPwdHidden ? "password" : "text"}
+              placeholder='Enter your password'
+              required
+              minLength={8}
+              maxLength={32}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              onFocus={() => setPwdChanged(true)}
+              className={`border-slate-500 text-slate-500 rounded py-2 px-3 w-full ${pwdChanged ? 'invalid:border-red-500' : ''} border-2`}
+            />
+            <button
+              type="button"
+              onClick={() => setIsPwdHidden(!isPwdHidden)}
+              className="text-sm text-slate-500 hover:underline mt-2 absolute top-1.5 right-3"
+            >
+              {isPwdHidden ? <RiEyeOffFill /> : <RiEyeFill />}
+            </button>
+          </div>
         </div>
         <div className='py-5'>
           <label htmlFor="agreement-box" className="inline-flex items-center text-slate-800">
@@ -94,8 +115,8 @@ export default function RegisterForm() {
         <div className="pt-2">
           <button
             type="submit"
-            className="w-full rounded bg-blue-300 hover:bg-blue-700 text-white font-bold py-2 px-4 border-solid border-2 border-blue-300">
-            Register
+            className="w-full rounded bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-solid border-2 border-blue-300 transition-all">
+            Create an Account
           </button>
         </div>
         <div className="pt-5 text-center text-slate-500">
