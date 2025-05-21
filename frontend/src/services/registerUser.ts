@@ -1,6 +1,10 @@
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
-export default async function registerUser(email: string, password: string, firstName: string, lastName: string) {
+interface registerResponse {
+    csrf_token:string;
+}
+
+export default async function registerUser(email: string, password: string, firstName: string, lastName: string): Promise<string> {
     const data = {
         email: email,
         password: password,
@@ -23,7 +27,7 @@ export default async function registerUser(email: string, password: string, firs
             throw new Error(errorData.error || 'Unknown error occurred');
         }
 
-        const result = await response.json(); // Parse JSON response
+        const result : registerResponse = await response.json(); // Parse JSON response
         console.log('Response from server:', result);
         return result.csrf_token;
     } catch (error) {

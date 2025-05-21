@@ -1,6 +1,10 @@
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
-export default async function loginUser(email: string, password: string) {
+interface loginResponse {
+    csrf_token:string;
+}
+
+export default async function loginUser(email: string, password: string): Promise<string> {
     try {
         const response = await fetch(`${API_BASE}/auth/login`, {
             method: 'POST',
@@ -17,7 +21,7 @@ export default async function loginUser(email: string, password: string) {
             throw new Error(errorData.error || 'Unknown error occurred');
         }
 
-        const result = await response.json(); // Parse JSON response
+        const result: loginResponse = await response.json(); // Parse JSON response
         console.log('Response from server:', result);
         return result.csrf_token;
     } catch (error) {
