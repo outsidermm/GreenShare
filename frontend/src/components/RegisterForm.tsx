@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import registerUser from '../services/registerUser';
 
 export default function RegisterForm() {
@@ -92,9 +93,9 @@ export default function RegisterForm() {
         </div>
         <div className="pt-5 text-center text-slate-500">
           <p>Already have an account?&nbsp;
-            <a href="/login" className="text-blue-500 hover:text-blue-700">
+            <Link href="/login" className="text-blue-500 hover:text-blue-700">
               Log in
-            </a>
+            </Link>
           </p>
         </div>
       </form>
