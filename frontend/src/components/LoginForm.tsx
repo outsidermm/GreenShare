@@ -5,8 +5,10 @@ import Link from 'next/link';
 import loginUser from '../services/loginUser';
 import PasswordInput from './PasswordInput';
 import CredentialsInput from './CredentialsInput';
+import { useRouter} from 'next/navigation';
 
 export default function LoginForm() {
+  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorType, setErrorType] = useState('');
@@ -14,15 +16,25 @@ export default function LoginForm() {
   const [emailChanged, setEmailChanged] = useState(false);
   const [pwdChanged, setPwdChanged] = useState(false);
 
+  const [showSuccess, setShowSuccess] = useState(false);
+
+
   const handleSubmit = async () => {
     try {
       const csrf_token = await loginUser(email, password);
       localStorage.setItem('csrfToken', csrf_token);
       setPassword("");
       setEmail("");
-      setErrorType("")
+      setErrorType("");
+
       setEmailChanged(false);
       setPwdChanged(false);
+
+      setShowSuccess(true);
+      setTimeout(() => {
+        router.replace("/");
+      }, 500);
+
     } catch (err: unknown) {
       if (err instanceof Error) {
         if (err.message.toLowerCase().includes("email")) {
@@ -42,6 +54,11 @@ export default function LoginForm() {
   return (
     <div className="sm:max-w-xl shadow-slate-200 shadow-xl rounded-2xl p-6 px-10 sm:min-w-md w-11/12 bg-white">
       <h1 className="text-4xl text-center text-slate-800 font-bold">Login</h1>
+      {showSuccess && (
+        <div className="text-white text-sm text-center mb-2 bg-green-500 rounded-lg py-2 px-4 mt-5 transition-all">
+          Login successful! Redirecting to homepage...
+        </div>
+      )}
       {!["", "email", "password"].includes(errorType) && (
         <div className="text-white text-sm text-center mb-2 bg-red-500 rounded-lg py-2 px-4 mt-5 transition-all">
           {errorType}

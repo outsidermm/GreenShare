@@ -1,15 +1,17 @@
 'use client';
 
-import {useState} from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import registerUser from '../services/registerUser';
 import PasswordInput from './PasswordInput';
 import CredentialsInput from './CredentialsInput';
+import { useRouter } from 'next/navigation';
 
 export default function RegisterForm() {
+  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const[firstName, setFirstName] = useState('');
+  const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
 
   const [firstNameChanged, setFirstNameChanged] = useState(false);
@@ -18,10 +20,11 @@ export default function RegisterForm() {
   const [pwdChanged, setPwdChanged] = useState(false);
 
   const [errorType, setErrorType] = useState('');
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const handleSubmit = async () => {
     try {
-      const csrf_token = await registerUser(email, password , firstName, lastName);
+      const csrf_token = await registerUser(email, password, firstName, lastName);
       localStorage.setItem('csrfToken', csrf_token);
       setPassword("");
       setEmail("");
@@ -35,12 +38,17 @@ export default function RegisterForm() {
 
       setErrorType("")
 
+      setShowSuccess(true);
+      setTimeout(() => {
+        router.replace("/");
+      }, 500);
+
     } catch (err: unknown) {
       if (err instanceof Error) {
-        if(err.message.toLowerCase().includes("exist")) {
+        if (err.message.toLowerCase().includes("exist")) {
           setErrorType("email-exists");
         }
-        else if(err.message.toLowerCase().includes("email")) {
+        else if (err.message.toLowerCase().includes("email")) {
           setErrorType("email");
         }
         else if (err.message.toLowerCase().includes("first name")) {
@@ -63,6 +71,11 @@ export default function RegisterForm() {
   return (
     <div className="sm:max-w-xl shadow-slate-200 shadow-xl rounded-2xl p-6 px-10 sm:min-w-md w-11/12 bg-white">
       <h1 className="text-4xl text-center text-slate-800 font-bold">Registration</h1>
+      {showSuccess && (
+        <div className="text-white text-sm text-center mb-2 bg-green-500 rounded-lg py-2 px-4 mt-5 transition-all">
+          Registration successful! Redirecting to homepage...
+        </div>
+      )}
       {!["", "email", "password", "first name", "last name", "email-exists"].includes(errorType) && (
         <div className="text-white text-sm text-center mb-2 bg-red-500 rounded-lg py-2 px-4 mt-5 transition-all">
           {errorType}
