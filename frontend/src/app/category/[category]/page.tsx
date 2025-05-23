@@ -2,14 +2,15 @@
 import { MdOutlineShoppingCart } from "react-icons/md";
 import { FaRegHeart } from "react-icons/fa";
 import { IoMdNotificationsOutline } from "react-icons/io";
-import useAuth from "../hooks/useAuth";
-import { useRouter } from "next/navigation";
-import NavBar from "@/components/NavBar";
+import useAuth from "@/hooks/useAuth";
+import { useRouter, usePathname } from "next/navigation";
 import logoutUser from "@/services/logoutUser";
+import NavBar from "@/components/NavBar";
 
 export default function Home() {
   const { isAuthenticated, refreshAuth } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
 
   const categories = [
     { label: "Essentials", path: "/category/essentials" },
@@ -32,7 +33,7 @@ export default function Home() {
   return (
     <div className="bg-slate-100 w-screen min-h-screen pt-16">
       <div className="fixed top-0 left-0 w-full bg-slate-900 shadow z-50 px-6 py-4 flex items-center justify-between gap-4 sm:gap-10">
-        <div className="text-lg font-bold text-green-600">GreenShare</div>
+        <div className="text-2xl font-bold text-green-600">GreenShare</div>
 
         <div className="flex items-center gap-4 flex-grow px-4">
           <input
@@ -69,25 +70,12 @@ export default function Home() {
         <NavBar
           categories={categories}
           handleLogout={handleLogout}
-          pathname="/"
+          pathname={pathname}
           isAuthenticated={isAuthenticated}
         />
       </div>
 
       <div className="ml-60 p-6">
-        <div className="bg-blue-400 text-white rounded-lg p-6 mb-8">
-          <h2 className="text-2xl font-bold">Free Delivery!</h2>
-          <p className="text-sm">
-            Today only - next-day delivery on all orders.
-          </p>
-          <button className="mt-4 bg-white text-blue-500 px-4 py-2 rounded">
-            Browse products
-          </button>
-        </div>
-
-        <h3 className="text-xl text-slate-800 font-semibold mb-4">
-          Hot Deals 🔥
-        </h3>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
           {[
             { name: "Nintendo Switch", condition: "Brand new" },

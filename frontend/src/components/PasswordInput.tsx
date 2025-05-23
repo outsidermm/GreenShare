@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import { useState } from "react";
 import { RiEyeFill, RiEyeOffFill } from "react-icons/ri";
@@ -12,25 +12,25 @@ interface PasswordInputProps {
 }
 
 export default function PasswordInput(props: PasswordInputProps) {
-  const { password,  setPassword,  pwdChanged, setPwdChanged, passwordError } = props;
+  const { password, setPassword, pwdChanged, setPwdChanged, passwordError } =
+    props;
   const [isPwdHidden, setIsPwdHidden] = useState(true);
-
 
   return (
     <>
       <div className="pt-5">
         <label className="block mb-2 text-slate-800">Password</label>
-        <div className='relative'>
+        <div className="relative">
           <input
             type={isPwdHidden ? "password" : "text"}
-            placeholder='Enter your password'
+            placeholder="Enter your password"
             required
             minLength={8}
             maxLength={32}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             onFocus={() => setPwdChanged(true)}
-            className={`border-slate-500 text-slate-500 rounded py-2 px-3 w-full ${pwdChanged ? 'invalid:border-red-500' : ''} border-2`}
+            className={`border-slate-500 text-slate-500 rounded py-2 px-3 w-full ${pwdChanged ? "invalid:border-red-500" : ""} border-2`}
           />
           <button
             type="button"

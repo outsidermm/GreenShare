@@ -1,28 +1,36 @@
-'use client';
+"use client";
 
-import {useState} from 'react';
-import Link from 'next/link';
-import registerUser from '../services/registerUser';
-import PasswordInput from './PasswordInput';
-import CredentialsInput from './CredentialsInput';
+import { useState } from "react";
+import Link from "next/link";
+import registerUser from "../services/registerUser";
+import PasswordInput from "./PasswordInput";
+import CredentialsInput from "./CredentialsInput";
+import { useRouter } from "next/navigation";
 
 export default function RegisterForm() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const[firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
+  const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
 
   const [firstNameChanged, setFirstNameChanged] = useState(false);
   const [lastNameChanged, setLastNameChanged] = useState(false);
   const [emailChanged, setEmailChanged] = useState(false);
   const [pwdChanged, setPwdChanged] = useState(false);
 
-  const [errorType, setErrorType] = useState('');
+  const [errorType, setErrorType] = useState("");
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const handleSubmit = async () => {
     try {
-      const csrf_token = await registerUser(email, password , firstName, lastName);
-      localStorage.setItem('csrfToken', csrf_token);
+      const csrf_token = await registerUser(
+        email,
+        password,
+        firstName,
+        lastName,
+      );
+      localStorage.setItem("csrfToken", csrf_token);
       setPassword("");
       setEmail("");
       setFirstName("");
@@ -33,26 +41,25 @@ export default function RegisterForm() {
       setEmailChanged(false);
       setPwdChanged(false);
 
-      setErrorType("")
+      setErrorType("");
 
+      setShowSuccess(true);
+      setTimeout(() => {
+        router.replace("/");
+      }, 500);
     } catch (err: unknown) {
       if (err instanceof Error) {
-        if(err.message.toLowerCase().includes("exist")) {
+        if (err.message.toLowerCase().includes("exist")) {
           setErrorType("email-exists");
-        }
-        else if(err.message.toLowerCase().includes("email")) {
+        } else if (err.message.toLowerCase().includes("email")) {
           setErrorType("email");
-        }
-        else if (err.message.toLowerCase().includes("first name")) {
+        } else if (err.message.toLowerCase().includes("first name")) {
           setErrorType("first name");
-        }
-        else if (err.message.toLowerCase().includes("last name")) {
+        } else if (err.message.toLowerCase().includes("last name")) {
           setErrorType("last name");
-        }
-        else if (err.message.toLowerCase().includes("password")) {
+        } else if (err.message.toLowerCase().includes("password")) {
           setErrorType("password");
-        }
-        else {
+        } else {
           setErrorType(err.message);
           console.log("Error: ", err.message);
         }
@@ -62,13 +69,33 @@ export default function RegisterForm() {
 
   return (
     <div className="sm:max-w-xl shadow-slate-200 shadow-xl rounded-2xl p-6 px-10 sm:min-w-md w-11/12 bg-white">
-      <h1 className="text-4xl text-center text-slate-800 font-bold">Registration</h1>
-      {!["", "email", "password", "first name", "last name", "email-exists"].includes(errorType) && (
+      <h1 className="text-4xl text-center text-slate-800 font-bold">
+        Registration
+      </h1>
+      {showSuccess && (
+        <div className="text-white text-sm text-center mb-2 bg-green-500 rounded-lg py-2 px-4 mt-5 transition-all">
+          Registration successful! Redirecting to homepage...
+        </div>
+      )}
+      {![
+        "",
+        "email",
+        "password",
+        "first name",
+        "last name",
+        "email-exists",
+      ].includes(errorType) && (
         <div className="text-white text-sm text-center mb-2 bg-red-500 rounded-lg py-2 px-4 mt-5 transition-all">
           {errorType}
         </div>
       )}
-      <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }} className="p-5 mt-5">
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleSubmit();
+        }}
+        className="p-5 mt-5"
+      >
         <CredentialsInput
           type="text"
           placeholder="Enter your first name"
@@ -79,8 +106,12 @@ export default function RegisterForm() {
           setCredential={setFirstName}
           credentialChanged={firstNameChanged}
           setCredentialChanged={setFirstNameChanged}
-          credentialError={errorType === "first name" ? "First name must be 2-50 characters long and only include letters, spaces, hyphens, apostrophes, and periods" : ""}
-          label='First Name'
+          credentialError={
+            errorType === "first name"
+              ? "First name must be 2-50 characters long and only include letters, spaces, hyphens, apostrophes, and periods"
+              : ""
+          }
+          label="First Name"
         />
         <CredentialsInput
           type="text"
@@ -92,8 +123,12 @@ export default function RegisterForm() {
           setCredential={setLastName}
           credentialChanged={lastNameChanged}
           setCredentialChanged={setLastNameChanged}
-          credentialError={errorType === "last name" ? "Last name must be 2-50 characters long and only include letters, spaces, hyphens, apostrophes, and periods" : ""}
-          label='Last Name'
+          credentialError={
+            errorType === "last name"
+              ? "Last name must be 2-50 characters long and only include letters, spaces, hyphens, apostrophes, and periods"
+              : ""
+          }
+          label="Last Name"
         />
         <CredentialsInput
           type="email"
@@ -105,31 +140,52 @@ export default function RegisterForm() {
           setCredential={setEmail}
           credentialChanged={emailChanged}
           setCredentialChanged={setEmailChanged}
-          credentialError={errorType === "email-exists" ? "Email already exists" : (errorType === "email" ? "Email must start with letters or numbers, include @ and a valid domain, have a 2-8 character extension, and be 3-320 characters long." : "")}
-          label='Email Address'
+          credentialError={
+            errorType === "email-exists"
+              ? "Email already exists"
+              : errorType === "email"
+                ? "Email must start with letters or numbers, include @ and a valid domain, have a 2-8 character extension, and be 3-320 characters long."
+                : ""
+          }
+          label="Email Address"
         />
         <PasswordInput
           password={password}
           setPassword={setPassword}
           pwdChanged={pwdChanged}
           setPwdChanged={setPwdChanged}
-          passwordError={errorType === "password" ? "Password must be 8-32 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character" : ""}
+          passwordError={
+            errorType === "password"
+              ? "Password must be 8-32 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character"
+              : ""
+          }
         />
-        <div className='py-5'>
-          <label htmlFor="agreement-box" className="inline-flex items-center text-slate-800">
-            <input type="checkbox" id="agreement-box" value="yes" className="mr-2" required />
+        <div className="py-5">
+          <label
+            htmlFor="agreement-box"
+            className="inline-flex items-center text-slate-800"
+          >
+            <input
+              type="checkbox"
+              id="agreement-box"
+              value="yes"
+              className="mr-2"
+              required
+            />
             I agree to the terms of service.
           </label>
         </div>
         <div className="pt-2">
           <button
             type="submit"
-            className="w-full rounded bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-solid border-2 border-blue-500 transition-all">
+            className="w-full rounded bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-solid border-2 border-blue-500 transition-all"
+          >
             Create an Account
           </button>
         </div>
         <div className="pt-5 text-center text-slate-500">
-          <p>Already have an account?&nbsp;
+          <p>
+            Already have an account?&nbsp;
             <Link href="/login" className="text-blue-500 hover:text-blue-700">
               Log in
             </Link>
