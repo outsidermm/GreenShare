@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useEffect, useState, useCallback } from 'react';
-import { usePathname } from 'next/navigation';
-import authUser from '../services/authUser';
+import { useEffect, useState, useCallback } from "react";
+import { usePathname } from "next/navigation";
+import authUser from "../services/authUser";
 
 interface UseAuthResult {
   isAuthenticated: boolean;
@@ -16,7 +16,8 @@ export default function useAuth(): UseAuthResult {
   const refreshAuth = useCallback(async () => {
     try {
       const result = await authUser();
-      const isValid = result && result.message === "Token is valid and user is in session";
+      const isValid =
+        result && result.message === "Token is valid and user is in session";
       setIsAuthenticated(isValid);
     } catch (error) {
       console.error("Authentication validation failed:", error);

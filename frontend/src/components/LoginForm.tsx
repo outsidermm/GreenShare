@@ -1,28 +1,27 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import Link from 'next/link';
-import loginUser from '../services/loginUser';
-import PasswordInput from './PasswordInput';
-import CredentialsInput from './CredentialsInput';
-import { useRouter} from 'next/navigation';
+import { useState } from "react";
+import Link from "next/link";
+import loginUser from "../services/loginUser";
+import PasswordInput from "./PasswordInput";
+import CredentialsInput from "./CredentialsInput";
+import { useRouter } from "next/navigation";
 
 export default function LoginForm() {
   const router = useRouter();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [errorType, setErrorType] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [errorType, setErrorType] = useState("");
 
   const [emailChanged, setEmailChanged] = useState(false);
   const [pwdChanged, setPwdChanged] = useState(false);
 
   const [showSuccess, setShowSuccess] = useState(false);
 
-
   const handleSubmit = async () => {
     try {
       const csrf_token = await loginUser(email, password);
-      localStorage.setItem('csrfToken', csrf_token);
+      localStorage.setItem("csrfToken", csrf_token);
       setPassword("");
       setEmail("");
       setErrorType("");
@@ -34,16 +33,13 @@ export default function LoginForm() {
       setTimeout(() => {
         router.replace("/");
       }, 500);
-
     } catch (err: unknown) {
       if (err instanceof Error) {
         if (err.message.toLowerCase().includes("email")) {
           setErrorType("email");
-        }
-        else if (err.message.toLowerCase().includes("password")) {
+        } else if (err.message.toLowerCase().includes("password")) {
           setErrorType("password");
-        }
-        else {
+        } else {
           setErrorType(err.message);
           console.log("Error: ", err.message);
         }
@@ -64,7 +60,13 @@ export default function LoginForm() {
           {errorType}
         </div>
       )}
-      <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }} className="p-5 mt-5">
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleSubmit();
+        }}
+        className="p-5 mt-5"
+      >
         <CredentialsInput
           type="email"
           placeholder="Enter your email"
@@ -88,13 +90,18 @@ export default function LoginForm() {
         <div className="pt-10">
           <button
             type="submit"
-            className="w-full rounded bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-solid border-2 border-blue-500 transition-all">
+            className="w-full rounded bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-solid border-2 border-blue-500 transition-all"
+          >
             Login
           </button>
         </div>
         <div className="pt-5 text-center text-slate-500">
-          <p>Don&apos;t have an account?&nbsp;
-            <Link href="/register" className="text-blue-500 hover:text-blue-700">
+          <p>
+            Don&apos;t have an account?&nbsp;
+            <Link
+              href="/register"
+              className="text-blue-500 hover:text-blue-700"
+            >
               Sign Up
             </Link>
           </p>
