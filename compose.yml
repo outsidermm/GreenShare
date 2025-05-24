@@ -72,6 +72,8 @@ services:
     depends_on:
       - db
       - flaskapp
+    profiles:
+      - tests
 
 volumes:
   pgdata: {}
