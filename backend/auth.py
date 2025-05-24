@@ -4,12 +4,13 @@ import re
 from backend.data import users
 
 
-def name_auth(name: str, err_prefix :str) -> bool:
+def name_auth(name: str, err_prefix :str = "User") -> bool:
     """
     Validates a name to ensure it meets length and character requirements.
 
     Args:
         name (str): Name to validate.
+        err_prefix (str): Prefix for error message.
 
     Returns:
         bool: True if the name is valid.
