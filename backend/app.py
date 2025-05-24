@@ -159,6 +159,7 @@ async def validate_token():
         # Return error response if tokens are invalid
         return jsonify({"error": str(e)}), 401
 
+
 @app.route("/item/create", methods=["POST"])
 async def create_item():
     """
@@ -169,12 +170,12 @@ async def create_item():
     data = request.json
     session_token = re.escape(request.cookies.get("session_token"))
     csrf_token = re.escape(request.headers.get("X-CSRF-TOKEN"))
-    title= data["title"]
+    title = data["title"]
     description = data["description"]
     condition = data["condition"]
     location = data["location"]
     images = data["images"]
-    
+
     try:
         # Create a new item using the provided data
         await user_create_item(
@@ -184,7 +185,7 @@ async def create_item():
             new_location=location,
             new_images=images,
             session_token=session_token,
-            csrf_token=csrf_token
+            csrf_token=csrf_token,
         )
         return jsonify({"message": "Item has been successfully created."}), 201
     except Exception as e:
@@ -216,7 +217,9 @@ async def get_browse_items():
     user_id = request.args.get("user_id")
 
     try:
-        filtered_items = await user_get_browse_items(category, condition, location, type, title,item_id, user_id)
+        filtered_items = await user_get_browse_items(
+            category, condition, location, type, title, item_id, user_id
+        )
         if not filtered_items:
             return jsonify({"message": "No items found"}), 404
         return jsonify(filtered_items), 200

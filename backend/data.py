@@ -2,8 +2,12 @@ from backend.classes.user import User
 from backend.classes.item import Item
 
 # In-memory storage for users
-users : dict[str, User] = {}  # Dictionary to store user objects by their unique identifier (e.g., email)
-items : dict [str, Item]= {}  # Dictionary to store item objects by their unique identifier (e.g., item ID)
+users: dict[str, User] = (
+    {}
+)  # Dictionary to store user objects by their unique identifier (e.g., email)
+items: dict[str, Item] = (
+    {}
+)  # Dictionary to store item objects by their unique identifier (e.g., item ID)
 
 
 def admin_retrieve_user_id(session_token: str, csrf_token: str) -> str:

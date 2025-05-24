@@ -30,7 +30,7 @@ class Item:
             condition=new_condition,
             location=new_location,
             user_id=new_user_id,
-            images = new_images,
+            images=new_images,
             category=new_category,
             type=new_type,
         )
@@ -79,7 +79,9 @@ class Item:
         return ItemDB.query.filter_by(id=self.get_item_pk()).first().description
 
     def set_description(self, new_description: str) -> None:
-        ItemDB.query.filter_by(id=self.get_item_pk()).first().description = new_description
+        ItemDB.query.filter_by(id=self.get_item_pk()).first().description = (
+            new_description
+        )
         db.session.commit()
 
     def get_condition(self) -> str:
@@ -102,32 +104,32 @@ class Item:
     def set_location(self, new_location: str) -> None:
         ItemDB.query.filter_by(id=self.get_item_pk()).first().location = new_location
         db.session.commit()
-        
+
     def get_category(self) -> str:
         return ItemDB.query.filter_by(id=self.get_item_pk()).first().category
-    
+
     def set_category(self, new_category: str) -> None:
         ItemDB.query.filter_by(id=self.get_item_pk()).first().category = new_category
         db.session.commit()
-        
+
     def get_images(self) -> list[str]:
         return ItemDB.query.filter_by(id=self.get_item_pk()).first().images
-    
+
     def set_images(self, new_images: list[str]) -> None:
         item = ItemDB.query.filter_by(id=self.get_item_pk()).first()
         item.images = new_images
         db.session.commit()
-        
+
     def get_user_id(self) -> str:
         return ItemDB.query.filter_by(id=self.get_item_pk()).first().user_id
-    
+
     def set_user_id(self, new_user_id: str) -> None:
         ItemDB.query.filter_by(id=self.get_item_pk()).first().user_id = new_user_id
         db.session.commit()
-    
+
     def get_type(self) -> str:
         return ItemDB.query.filter_by(id=self.get_item_pk()).first().type
-    
+
     def set_type(self, new_type: str) -> None:
         ItemDB.query.filter_by(id=self.get_item_pk()).first().type = new_type
         db.session.commit()
