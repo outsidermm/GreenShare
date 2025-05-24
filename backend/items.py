@@ -18,6 +18,7 @@ async def user_create_item(
     new_description: str,
     new_condition: str,
     new_location: str,
+    new_type: str,
     new_images: list[str],
     session_token: str,
     csrf_token: str,
@@ -37,24 +38,59 @@ async def user_create_item(
         csrf_token (str): User's CSRF token.
     """
     new_user_id = admin_retrieve_user_id(session_token, csrf_token)
+    new_category = "Uncategorized" 
     new_title = new_title.title()
     new_description = new_description.title()
     new_condition = new_condition.title()
     new_location = new_location.title()
+    new_type = new_type.title()
     
     safe_title = re.escape(new_title)
     safe_description = re.escape(new_description)
     safe_condition = re.escape(new_condition)
     safe_location = re.escape(new_location)
+    safe_type = re.escape(new_type)
     
-    new_item = Item(
-        title=safe_title,
-        description=safe_description,
-        condition=safe_condition,
-        location=safe_location,
-        user_id=new_user_id,
-        images=new_images,
-    )
+    try:
+        new_item = Item(
+            new_title=safe_title,
+            new_description=safe_description,
+            new_condition=safe_condition,
+            new_location=safe_location,
+            new_user_id=new_user_id,
+            new_type=safe_type,
+            new_category=new_category,
+            new_images=new_images,
+        )
+        items[new_item.get_item_pk()] = new_item  # Store the item object by item ID
+    except Exception as e:
+        raise Exception(f"Failed to create item: {str(e)}")
     
-    items[new_item.get_item_pk()] = new_item  # Store the item object by item ID
+async def user_get_browse_items(category_filter: str, condition_filter:str , location_filter:str , type_filter:str, title_filter:str) -> dict[dict]:
+    """
+    Retrieves filtered items from the database.
+
+    Returns:
+        dict[dict]: Dictionary of all item data in dictionary format.
+    """
     
+    safe_category_filter = re.escape(category_filter.title()) if category_filter else None
+    safe_condition_filter = re.escape(condition_filter.title()) if condition_filter else None
+    safe_location_filter = re.escape(location_filter.title()) if location_filter else None
+    safe_type_filter = re.escape(type_filter.title()) if type_filter else None
+    safe_title_filter = re.escape(title_filter.title()) if title_filter else None
+    
+    filtered_items = {}
+    
+    for item in items.values():
+        if (
+            (safe_category_filter is None or item.get_category() == safe_category_filter) and
+            (safe_condition_filter is None or item.get_condition() == safe_condition_filter) and
+            (safe_location_filter is None or item.get_location() == safe_location_filter) and
+            (safe_type_filter is None or item.get_type() == safe_type_filter) and
+            (safe_title_filter is None or title_matches(safe_title_filter, item.get_title())) and
+            item.get_status() == "Available"  # Only include available items
+        ):
+            filtered_items[item.get_item_pk()] = item.item_data()
+    
+    return filtered_items
