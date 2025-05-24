@@ -17,12 +17,13 @@ class Item:
         new_condition: str,
         new_location: str,
         new_user_id: str,
+        new_type: str,
+        new_category: str,
         new_images: list[str] = [],
     ):
         """
         Creates a new item in the database and sets internal state.
         """
-        new_category = "Uncategorized"  # Default category if not specified
         new_item = ItemDB(
             title=new_title,
             description=new_description,
@@ -31,6 +32,7 @@ class Item:
             user_id=new_user_id,
             images = new_images,
             category=new_category,
+            type=new_type,
         )
         db.session.add(new_item)
         db.session.commit()
@@ -114,4 +116,18 @@ class Item:
     def set_images(self, new_images: list[str]) -> None:
         item = ItemDB.query.filter_by(id=self.get_item_pk()).first()
         item.images = new_images
+        db.session.commit()
+        
+    def get_user_id(self) -> str:
+        return ItemDB.query.filter_by(id=self.get_item_pk()).first().user_id
+    
+    def set_user_id(self, new_user_id: str) -> None:
+        ItemDB.query.filter_by(id=self.get_item_pk()).first().user_id = new_user_id
+        db.session.commit()
+    
+    def get_type(self) -> str:
+        return ItemDB.query.filter_by(id=self.get_item_pk()).first().type
+    
+    def set_type(self, new_type: str) -> None:
+        ItemDB.query.filter_by(id=self.get_item_pk()).first().type = new_type
         db.session.commit()

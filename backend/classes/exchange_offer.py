@@ -84,3 +84,19 @@ class ExchangeOffer:
     def set_message(self, new_message: str) -> None:
         ExchangeOfferDB.query.filter_by(id=self.get_offer_pk()).first().message = new_message
         db.session.commit()
+        
+    def get_requested_item_id(self) -> Optional[str]:
+        return ExchangeOfferDB.query.filter_by(id=self.get_offer_pk()).first().offered_item_id
+    
+    def set_requested_item_id(self, new_item_id: Optional[str]) -> None:
+        offer = ExchangeOfferDB.query.filter_by(id=self.get_offer_pk()).first()
+        offer.offered_item_id = new_item_id
+        db.session.commit()
+        
+    def get_offered_by_id(self) -> list[str]:
+        return ExchangeOfferDB.query.filter_by(id=self.get_offer_pk()).first().offered_by_id
+    
+    def set_offered_by_id(self, new_offered_by_id: list[str]) -> None:
+        offer = ExchangeOfferDB.query.filter_by(id=self.get_offer_pk()).first()
+        offer.offered_by_id = new_offered_by_id
+        db.session.commit()

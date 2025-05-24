@@ -33,7 +33,6 @@ async def user_create_item(
         new_location (str): Location of the item.
         new_user_id (int): ID of the user creating the item.
         new_images (list[str]): List of image URLs for the item.
-        new_category (str): Category of the item.
         session_token (str): User's session token.
         csrf_token (str): User's CSRF token.
     """

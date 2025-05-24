@@ -13,6 +13,7 @@ class ItemDB(db.Model):
     location = db.Column(db.String(512), nullable=False)
     category = db.Column(db.String(100), nullable=False)
     updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
+    type = db.Column(db.String(100), nullable=False)
 
     offers = db.relationship(
         "ExchangeOffer", backref="item", lazy=True, foreign_keys="ExchangeOffer.item_id"
@@ -30,4 +31,5 @@ class ItemDB(db.Model):
             "images": [image.url for image in self.images],
             "updated_at": self.updated_at.isoformat(),
             "category": self.category,
+            "type": self.type,
         }
