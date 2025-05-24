@@ -4,7 +4,7 @@ import re
 from backend.data import users
 
 
-def name_auth(name: str, err_prefix :str = "User") -> bool:
+def name_auth(name: str, err_prefix: str = "User") -> bool:
     """
     Validates a name to ensure it meets length and character requirements.
 
@@ -26,7 +26,8 @@ def name_auth(name: str, err_prefix :str = "User") -> bool:
         return True
     abort(
         400,
-        description= err_prefix + " name must be 2 to 50 characters long and can only include letters, spaces, hyphens, apostrophes, and periods",
+        description=err_prefix
+        + " name must be 2 to 50 characters long and can only include letters, spaces, hyphens, apostrophes, and periods",
     )
 
 
