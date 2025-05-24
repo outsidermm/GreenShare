@@ -8,7 +8,10 @@ from backend.auth import (
     user_auth_validate_csrf_token,
 )
 from backend.classes.user import User
+from backend.classes.item import Item
+from backend.classes.exchange_offer import ExchangeOffer
 import re
+from backend.items import user_create_item
 
 
 @app.route("/")
@@ -156,12 +159,45 @@ async def validate_token():
         # Return error response if tokens are invalid
         return jsonify({"error": str(e)}), 401
 
+@app.route("/item/create", methods=["POST"])
+async def create_item():
+    """
+    Creates a new item with the provided details.
+
+    Expects item data in JSON format and returns the created item ID.
+    """
+    data = request.json
+    session_token = re.escape(request.cookies.get("session_token"))
+    csrf_token = re.escape(request.headers.get("X-CSRF-TOKEN"))
+    title= data["title"]
+    description = data["description"]
+    condition = data["condition"]
+    location = data["location"]
+    images = data["images"]
+    
+    try:
+        # Create a new item using the provided data
+        await user_create_item(
+            new_title=title,
+            new_description=description,
+            new_condition=condition,
+            new_location=location,
+            new_images=images,
+            session_token=session_token,
+            csrf_token=csrf_token
+        )
+        return jsonify({"message": "Item has been successfully created."}), 201
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+
 
 # Entry point to run the Flask app
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
         User.backup()
+        Item.backup()
+        ExchangeOffer.backup()
 
     # Run Flask server in debug mode on port 4000 for local testing
     app.run(host="0.0.0.0", port=4000, debug=True)
