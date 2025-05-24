@@ -65,10 +65,19 @@ async def user_create_item(
     except Exception as e:
         raise Exception(f"Failed to create item: {str(e)}")
     
-async def user_get_browse_items(category_filter: str, condition_filter:str , location_filter:str , type_filter:str, title_filter:str) -> dict[dict]:
+async def user_get_browse_items(category_filter: str, condition_filter:str , location_filter:str , type_filter:str, title_filter:str, item_id:str, user_id:str) -> dict[dict]:
     """
     Retrieves filtered items from the database.
-
+    
+    Args:
+        category_filter (str): Filter items by category.
+        condition_filter (str): Filter items by condition.
+        location_filter (str): Filter items by location.
+        type_filter (str): Filter items by type.
+        title_filter (str): Filter items by title.
+        item_id (str): Retrieve a single item by ID.
+        user_id (str): Filter items by user ID.
+        
     Returns:
         dict[dict]: Dictionary of all item data in dictionary format.
     """
@@ -88,7 +97,9 @@ async def user_get_browse_items(category_filter: str, condition_filter:str , loc
             (safe_location_filter is None or item.get_location() == safe_location_filter) and
             (safe_type_filter is None or item.get_type() == safe_type_filter) and
             (safe_title_filter is None or title_matches(safe_title_filter, item.get_title())) and
-            item.get_status() == "Available"  # Only include available items
+            (item.get_status() == "Available") and  # Only include available items
+            (user_id is None or item.get_user_id() == user_id) and  # Filter by user ID if provided
+            (item_id is None or item.get_item_pk() == item_id)  # Include item if item_id matches
         ):
             filtered_items[item.get_item_pk()] = item.item_data()
     

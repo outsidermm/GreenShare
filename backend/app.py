@@ -201,6 +201,8 @@ async def get_browse_items():
     - location: filter by location
     - type: filter by type
     - title: filter by title
+    - id: retrieve a single item by ID
+    - user_id: filter by user ID
 
     Returns:
         Single item (if id provided) or list of filtered items.
@@ -210,9 +212,11 @@ async def get_browse_items():
     location = request.args.get("location")
     type = request.args.get("type")
     title = request.args.get("title")
+    item_id = request.args.get("id")
+    user_id = request.args.get("user_id")
 
     try:
-        filtered_items = await user_get_browse_items(category, condition, location, type, title)
+        filtered_items = await user_get_browse_items(category, condition, location, type, title,item_id, user_id)
         if not filtered_items:
             return jsonify({"message": "No items found"}), 404
         return jsonify(filtered_items), 200
