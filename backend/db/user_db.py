@@ -12,7 +12,8 @@ class UserDB(db.Model):
     def to_json(self) -> dict:
         return {
             "id": self.id,
-            "name": self.name,
+            "first_name": self.first_name,
+            "last_name": self.last_name,
             "email": self.email,
             "password": self.password,
         }
