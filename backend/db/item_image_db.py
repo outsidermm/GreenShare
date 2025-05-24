@@ -1,6 +1,6 @@
 from backend.config import db
 
-class ItemImage(db.Model):
+class ItemImageDB(db.Model):
     __tablename__ = 'item_images'
     id = db.Column(db.Integer, primary_key=True)
     item_id = db.Column(db.Integer, db.ForeignKey('items.id'), nullable=False)

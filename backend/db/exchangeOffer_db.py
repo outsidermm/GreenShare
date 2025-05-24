@@ -2,7 +2,7 @@ from datetime import datetime
 from backend.config import db
 
 
-class ExchangeOffer(db.Model):
+class ExchangeOfferDB(db.Model):
     __tablename__ = "exchange_offers"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -15,7 +15,7 @@ class ExchangeOffer(db.Model):
         db.Integer, db.ForeignKey("items.id"), nullable=True
     )  # optional item in return
 
-    message = db.Column(db.Text, nullable=True)
+    message = db.Column(db.Text, nullable=False)
     status = db.Column(
         db.String(50), default="Pending"
     )  # Pending, Accepted, Rejected, Cancelled

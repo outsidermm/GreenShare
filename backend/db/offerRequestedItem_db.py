@@ -2,7 +2,7 @@ from backend.config import db
 
 
 # Join table for requested items in offers
-class OfferRequestedItem(db.Model):
+class OfferRequestedItemDB(db.Model):
     __tablename__ = "offer_requested_items"
     id = db.Column(db.Integer, primary_key=True)
     offer_id = db.Column(
