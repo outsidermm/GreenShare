@@ -27,7 +27,7 @@ def bypass_validations(monkeypatch):
     # Override pwd_auth, email_auth, and name_auth if needed.
     monkeypatch.setattr("backend.auth.pwd_auth", lambda pwd: True)
     monkeypatch.setattr("backend.auth.email_auth", lambda email: True)
-    monkeypatch.setattr("backend.auth.name_auth", lambda name: True)
+    monkeypatch.setattr("backend.auth.name_auth", lambda name, err_prefix: True)
 
 
 # -----------------------------------------------------------------------------

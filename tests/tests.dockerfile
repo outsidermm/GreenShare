@@ -1,5 +1,5 @@
 # Dockerfile.test
-FROM python:3.12
+FROM python:3.13
 
 # Set working directory to /app (your project root inside the container)
 WORKDIR /app
