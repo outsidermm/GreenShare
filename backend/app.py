@@ -11,7 +11,7 @@ from backend.classes.user import User
 from backend.classes.item import Item
 from backend.classes.exchange_offer import ExchangeOffer
 import re
-from backend.items import user_create_item
+from backend.items import user_create_item, user_get_browse_items
 
 
 @app.route("/")
@@ -189,6 +189,35 @@ async def create_item():
         return jsonify({"message": "Item has been successfully created."}), 201
     except Exception as e:
         return jsonify({"error": str(e)}), 400
+
+
+# Unified GET /item route with optional filters
+@app.route("/item", methods=["GET"])
+async def get_browse_items():
+    """
+    Retrieves items from the database with optional filters:
+    - category: filter by category
+    - condition: filter by condition
+    - location: filter by location
+    - type: filter by type
+    - title: filter by title
+
+    Returns:
+        Single item (if id provided) or list of filtered items.
+    """
+    category = request.args.get("category")
+    condition = request.args.get("condition")
+    location = request.args.get("location")
+    type = request.args.get("type")
+    title = request.args.get("title")
+
+    try:
+        filtered_items = await user_get_browse_items(category, condition, location, type, title)
+        if not filtered_items:
+            return jsonify({"message": "No items found"}), 404
+        return jsonify(filtered_items), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 # Entry point to run the Flask app
