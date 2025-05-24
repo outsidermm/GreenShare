@@ -12,6 +12,7 @@ from backend.classes.item import Item
 from backend.classes.exchange_offer import ExchangeOffer
 import re
 from backend.items import user_create_item, user_get_browse_items
+from backend.data import users, items, exchange_offers
 
 
 @app.route("/")
@@ -231,9 +232,9 @@ async def get_browse_items():
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
-        User.backup()
-        Item.backup()
-        ExchangeOffer.backup()
+        users = User.backup()
+        items = Item.backup()
+        exchange_offers = ExchangeOffer.backup()
 
     # Run Flask server in debug mode on port 4000 for local testing
     app.run(host="0.0.0.0", port=4000, debug=True)
