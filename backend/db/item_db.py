@@ -16,7 +16,9 @@ class ItemDB(db.Model):
     type = db.Column(db.String(100), nullable=False)
 
     offers = db.relationship(
-        "ExchangeOffer", backref="item", lazy=True, foreign_keys="ExchangeOffer.item_id"
+        "backend.db.exchangeOffer_db.ExchangeOfferDB",
+        backref="item",
+        foreign_keys="ExchangeOfferDB.item_id",
     )
 
     def to_json(self) -> dict:

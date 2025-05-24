@@ -1,6 +1,20 @@
 from datetime import datetime
 from backend.config import db
 
+offer_offered_items = db.Table(
+    "offer_offered_items",
+    db.Model.metadata,
+    db.Column("offer_id", db.Integer, db.ForeignKey("exchange_offers.id")),
+    db.Column("item_id", db.Integer, db.ForeignKey("items.id")),
+)
+
+offer_requested_items = db.Table(
+    "offer_requested_items",
+    db.Model.metadata,
+    db.Column("offer_id", db.Integer, db.ForeignKey("exchange_offers.id")),
+    db.Column("item_id", db.Integer, db.ForeignKey("items.id")),
+)
+
 
 class ExchangeOfferDB(db.Model):
     __tablename__ = "exchange_offers"
@@ -24,10 +38,10 @@ class ExchangeOfferDB(db.Model):
 
     # New relationships for multiple offered/requested items
     offered_items = db.relationship(
-        "ItemDB", secondary="offer_offered_items", backref="offers_made_for"
+        "ItemDB", secondary=offer_offered_items, backref="offers_made_for"
     )
     requested_items = db.relationship(
-        "ItemDB", secondary="offer_requested_items", backref="offers_requested_for"
+        "ItemDB", secondary=offer_requested_items, backref="offers_requested_for"
     )
 
     def to_json(self) -> dict:
