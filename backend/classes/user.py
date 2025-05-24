@@ -55,7 +55,7 @@ class User:
         self.set_csrf_token(self.generate_csrf_token())
 
     @classmethod
-    def backup(cls) -> dict["User"]:
+    def backup(cls) -> dict[str, "User"]:
         """
         Return a dictionary of existing user from UserDB.
         """
@@ -71,7 +71,7 @@ class User:
             user_obj.set_csrf_token(user_obj.generate_csrf_token())
             user_dict[user.email] = user_obj
 
-        return user_obj
+        return user_dict
 
     def generate_session_token(self) -> str:
         """
