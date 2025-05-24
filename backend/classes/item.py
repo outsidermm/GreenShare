@@ -29,7 +29,7 @@ class Item:
             condition=new_condition,
             location=new_location,
             user_id=new_user_id,
-            images = new_images
+            images = new_images,
             category=new_category,
         )
         db.session.add(new_item)
