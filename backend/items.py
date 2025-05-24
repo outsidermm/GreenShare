@@ -1,6 +1,16 @@
 from backend.data import admin_retrieve_user_id, items
 import re
 from backend.classes.item import Item
+from difflib import SequenceMatcher
+
+
+def title_matches(user_input: str, item_title: str, threshold: float = 0.7) -> bool:
+    user_input = user_input.lower()
+    item_title = item_title.lower()
+    return (
+        user_input in item_title or
+        SequenceMatcher(None, user_input, item_title).ratio() >= threshold
+    )
 
 
 async def user_create_item(
