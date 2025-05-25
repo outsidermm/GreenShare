@@ -1,4 +1,4 @@
-from backend.db.item_db import ItemDB
+from backend.models import ItemDB,ItemImageDB
 from backend.config import db
 
 
@@ -8,7 +8,7 @@ class Item:
     Provides accessors, mutators, and internal DB reference.
     """
 
-    __item_pk: str = None
+    __item_pk: int = None
 
     def __init__(
         self,
@@ -16,7 +16,7 @@ class Item:
         new_description: str,
         new_condition: str,
         new_location: str,
-        new_user_id: str,
+        new_user_id: int,
         new_type: str,
         new_category: str,
         new_images: list[str] = [],
@@ -24,17 +24,24 @@ class Item:
         """
         Creates a new item in the database and sets internal state.
         """
+        # Create main item first
         new_item = ItemDB(
             title=new_title,
             description=new_description,
             condition=new_condition,
             location=new_location,
             user_id=new_user_id,
-            images=new_images,
             category=new_category,
             type=new_type,
+            status="Available"  # Explicitly set status
         )
         db.session.add(new_item)
+        db.session.commit()
+
+        # Then create associated images separately
+        for image_url in new_images:
+            image = ItemImageDB(item_id=new_item.id, url=image_url)
+            db.session.add(image)
         db.session.commit()
 
         self.set_item_pk(new_item.id)
@@ -62,10 +69,10 @@ class Item:
         """
         return ItemDB.query.filter_by(id=self.get_item_pk()).first().to_json()
 
-    def get_item_pk(self) -> str:
+    def get_item_pk(self) -> int:
         return self.__item_pk
 
-    def set_item_pk(self, item_pk: str) -> None:
+    def set_item_pk(self, item_pk: int) -> None:
         self.__item_pk = item_pk
 
     def get_title(self) -> str:
