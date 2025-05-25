@@ -13,7 +13,7 @@ exchange_offers: dict[str, Item] = (
 )  # Dictionary to store exchange offer objects by their unique identifier (e.g., offer ID)
 
 
-def admin_retrieve_user_id(session_token: str, csrf_token: str) -> str:
+def admin_retrieve_user_id(session_token: str, csrf_token: str) -> int:
     """
     Retrieves the full name of a user based on valid session and CSRF tokens.
 
