@@ -50,13 +50,13 @@ async def user_create_item(
     safe_condition = re.escape(new_condition)
     safe_location = re.escape(new_location)
     safe_type = re.escape(new_type)
-    
-    if len(new_title)>100 or len(new_title)<3:
+
+    if len(new_title) > 100 or len(new_title) < 3:
         abort(400, "Title must be between 3 and 100 characters.")
-        
-    if len(new_description)>1000 or len(new_description)<10:
+
+    if len(new_description) > 1000 or len(new_description) < 10:
         abort(400, "Description must be between 10 and 1000 characters.")
-        
+
     if new_condition not in [
         "New",
         "Like New",
@@ -65,13 +65,24 @@ async def user_create_item(
         "Fair",
         "Poor",
     ]:
-        abort(400, "Condition must be one of: New, Like New, Very Good, Good, Fair, Poor.")
-        
+        abort(
+            400, "Condition must be one of: New, Like New, Very Good, Good, Fair, Poor."
+        )
+
     if new_type not in ["Free", "Exchange"]:
         abort(400, "Type must be either 'Free' or 'Exchange'.")
-        
-    if new_category not in ["essentials", "living", "tools-tech", "style-expression", "leisure-learning"]:
-        abort(400, "Category must be one of: essentials, living, tools-tech, style-expression, leisure-learning.")
+
+    if new_category not in [
+        "Essentials",
+        "Living",
+        "Tools-Tech",
+        "Style-Expression",
+        "Leisure-Learning",
+    ]:
+        abort(
+            400,
+            "Category must be one of: essentials, living, tools-tech, style-expression, leisure-learning.",
+        )
 
     try:
         new_item = Item(
@@ -114,17 +125,62 @@ async def user_get_browse_items(
         dict[dict]: Dictionary of all item data in dictionary format.
     """
 
-    safe_category_filter = (
-        re.escape(category_filter.title()) if category_filter else None
-    )
-    safe_condition_filter = (
-        re.escape(condition_filter.title()) if condition_filter else None
-    )
-    safe_location_filter = (
-        re.escape(location_filter.title()) if location_filter else None
-    )
-    safe_type_filter = re.escape(type_filter.title()) if type_filter else None
-    safe_title_filter = re.escape(title_filter.title()) if title_filter else None
+    if title_filter is not None:
+        title_filter = title_filter.title()
+        if len(title_filter) < 3 or len(title_filter) > 100:
+            abort(400, "Title filter must be between 3 and 100 characters.")
+        safe_title_filter = re.escape(title_filter)
+
+    if category_filter is not None:
+        category_filter = category_filter.title()
+        if category_filter not in [
+            "Essentials",
+            "Living",
+            "Tools-Tech",
+            "Style-Expression",
+            "Leisure-Learning",
+        ]:
+            abort(
+                400,
+                "Category must be one of: Essentials, Living, Tools & Tech, Style & Expression, Leisure & Learning.",
+            )
+        safe_category_filter = re.escape(category_filter)
+
+    if condition_filter is not None:
+        condition_filter = condition_filter.title()
+        if condition_filter not in [
+            "New",
+            "Like New",
+            "Very Good",
+            "Good",
+            "Fair",
+            "Poor",
+        ]:
+            abort(
+                400,
+                "Condition must be one of: New, Like New, Very Good, Good, Fair, Poor.",
+            )
+        safe_condition_filter = re.escape(condition_filter)
+
+    if location_filter is not None:
+        location_filter = location_filter.title()
+        if len(location_filter) < 3 or len(location_filter) > 100:
+            abort(400, "Location filter must be between 3 and 100 characters.")
+        safe_location_filter = re.escape(location_filter)
+
+    if type_filter is not None:
+        type_filter = type_filter.title()
+        if type_filter not in ["Free", "Exchange"]:
+            abort(400, "Type must be either 'Free' or 'Exchange'.")
+        safe_type_filter = re.escape(type_filter)
+
+    if item_id is not None:
+        if not item_id.isdigit() or int(item_id) <= 0:
+            abort(400, "Item ID must be a positive integer.")
+
+    if user_id is not None:
+        if not user_id.isdigit() or int(user_id) <= 0:
+            abort(400, "User ID must be a positive integer.")
 
     filtered_items = {}
 
