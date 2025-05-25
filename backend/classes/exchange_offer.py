@@ -1,4 +1,4 @@
-from backend.db.exchangeOffer_db import ExchangeOfferDB
+from backend.models import ExchangeOfferDB
 from backend.config import db
 from typing import Optional
 
