@@ -2,10 +2,9 @@ import hashlib
 from cryptography.fernet import Fernet
 import secrets
 import re
-from backend.db.user_db import UserDB
+from backend.models import UserDB
 from backend.config import db
 import os
-from typing import Optional
 
 user_key = os.getenv("USER_FERNET_KEY")
 user_cipher_suite = Fernet(user_key)
@@ -22,7 +21,7 @@ class User:
 
     __session_token: str = None
     __csrf_token: str = None
-    __user_pk: str = None
+    __user_pk: int = None
 
     def __init__(
         self,
@@ -225,7 +224,7 @@ class User:
         """
         return self.__csrf_token
 
-    def set_user_pk(self, user_pk: str) -> None:
+    def set_user_pk(self, user_pk: int) -> None:
         """
         Sets the user's primary key.
 
@@ -234,7 +233,7 @@ class User:
         """
         self.__user_pk = user_pk
 
-    def get_user_pk(self) -> str:
+    def get_user_pk(self) -> int:
         """
         Returns the user's primary key.
         """
