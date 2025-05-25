@@ -12,9 +12,9 @@ from backend.auth import (
 )
 
 # Import the global users dictionary so we can reset it between tests.
-from backend.data import users
+from backend.data import users, items
 from backend.config import app, db
-from backend.db.user_db import UserDB
+from backend.models import UserDB, ItemDB, ItemImageDB
 
 
 # -----------------------------------------------------------------------------
@@ -26,7 +26,11 @@ def clear_users():
     Clears the global users dictionary before each test to ensure test isolation.
     """
     users.clear()
+    items.clear()
+    db.session.query(ItemImageDB).delete()
+    db.session.query(ItemDB).delete()
     db.session.query(UserDB).delete()
+    db.session.commit()
 
 
 @pytest.fixture(scope="module", autouse=True)

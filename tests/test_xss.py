@@ -1,10 +1,10 @@
 import re
 import pytest
 from backend.auth import user_auth_register
-from backend.data import users
+from backend.data import users,items
 from backend.classes.user import User
 from backend.config import app, db
-from backend.db.user_db import UserDB
+from backend.models import UserDB, ItemDB, ItemImageDB
 
 
 # -----------------------------------------------------------------------------
@@ -13,7 +13,11 @@ from backend.db.user_db import UserDB
 @pytest.fixture(autouse=True)
 def clear_users():
     users.clear()
+    items.clear()
+    db.session.query(ItemImageDB).delete()
+    db.session.query(ItemDB).delete()
     db.session.query(UserDB).delete()
+    db.session.commit()
 
 
 @pytest.fixture(scope="module", autouse=True)
