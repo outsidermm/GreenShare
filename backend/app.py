@@ -8,7 +8,11 @@ from backend.auth import (
     user_auth_validate_csrf_token,
 )
 from backend.classes.user import User
+from backend.classes.item import Item
+from backend.classes.exchange_offer import ExchangeOffer
 import re
+from backend.items import user_create_item, user_get_browse_items
+from backend.data import users, items, exchange_offers
 
 
 @app.route("/")
@@ -157,11 +161,80 @@ async def validate_token():
         return jsonify({"error": str(e)}), 401
 
 
+@app.route("/item/create", methods=["POST"])
+async def create_item():
+    """
+    Creates a new item with the provided details.
+
+    Expects item data in JSON format and returns the created item ID.
+    """
+    data = request.json
+    session_token = re.escape(request.cookies.get("session_token"))
+    csrf_token = re.escape(request.headers.get("X-CSRF-TOKEN"))
+    title = data["title"]
+    description = data["description"]
+    condition = data["condition"]
+    location = data["location"]
+    images = data["images"]
+
+    try:
+        # Create a new item using the provided data
+        await user_create_item(
+            new_title=title,
+            new_description=description,
+            new_condition=condition,
+            new_location=location,
+            new_images=images,
+            session_token=session_token,
+            csrf_token=csrf_token,
+        )
+        return jsonify({"message": "Item has been successfully created."}), 201
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+
+
+# Unified GET /item route with optional filters
+@app.route("/item", methods=["GET"])
+async def get_browse_items():
+    """
+    Retrieves items from the database with optional filters:
+    - category: filter by category
+    - condition: filter by condition
+    - location: filter by location
+    - type: filter by type
+    - title: filter by title
+    - id: retrieve a single item by ID
+    - user_id: filter by user ID
+
+    Returns:
+        Single item (if id provided) or list of filtered items.
+    """
+    category = request.args.get("category")
+    condition = request.args.get("condition")
+    location = request.args.get("location")
+    type = request.args.get("type")
+    title = request.args.get("title")
+    item_id = request.args.get("id")
+    user_id = request.args.get("user_id")
+
+    try:
+        filtered_items = await user_get_browse_items(
+            category, condition, location, type, title, item_id, user_id
+        )
+        if not filtered_items:
+            return jsonify({"message": "No items found"}), 404
+        return jsonify(filtered_items), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
 # Entry point to run the Flask app
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
-        User.backup()
+        users = User.backup()
+        items = Item.backup()
+        exchange_offers = ExchangeOffer.backup()
 
     # Run Flask server in debug mode on port 4000 for local testing
     app.run(host="0.0.0.0", port=4000, debug=True)

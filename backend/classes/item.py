@@ -1,0 +1,142 @@
+from backend.models import ItemDB,ItemImageDB
+from backend.config import db
+
+
+class Item:
+    """
+    Represents an item listed on the GreenShare platform.
+    Provides accessors, mutators, and internal DB reference.
+    """
+
+    __item_pk: int = None
+
+    def __init__(
+        self,
+        new_title: str,
+        new_description: str,
+        new_condition: str,
+        new_location: str,
+        new_user_id: int,
+        new_type: str,
+        new_category: str,
+        new_images: list[str] = [],
+    ):
+        """
+        Creates a new item in the database and sets internal state.
+        """
+        # Create main item first
+        new_item = ItemDB(
+            title=new_title,
+            description=new_description,
+            condition=new_condition,
+            location=new_location,
+            user_id=new_user_id,
+            category=new_category,
+            type=new_type,
+            status="Available"  # Explicitly set status
+        )
+        db.session.add(new_item)
+        db.session.commit()
+
+        # Then create associated images separately
+        for image_url in new_images:
+            image = ItemImageDB(item_id=new_item.id, url=image_url)
+            db.session.add(image)
+        db.session.commit()
+
+        self.set_item_pk(new_item.id)
+
+    @classmethod
+    def backup(cls) -> dict[str, "Item"]:
+        """
+        Loads all items from the database and returns a dictionary of Item instances keyed by item ID.
+        """
+        item_records = ItemDB.query.all()
+        if not item_records:
+            return {}
+
+        item_dict = {}
+        for item in item_records:
+            item_obj = cls.__new__(cls)
+            item_obj.set_item_pk(item.id)
+            item_dict[str(item.id)] = item_obj
+
+        return item_dict
+
+    def item_data(self) -> dict:
+        """
+        Returns item data from the database.
+        """
+        return ItemDB.query.filter_by(id=self.get_item_pk()).first().to_json()
+
+    def get_item_pk(self) -> int:
+        return self.__item_pk
+
+    def set_item_pk(self, item_pk: int) -> None:
+        self.__item_pk = item_pk
+
+    def get_title(self) -> str:
+        return ItemDB.query.filter_by(id=self.get_item_pk()).first().title
+
+    def set_title(self, new_title: str) -> None:
+        ItemDB.query.filter_by(id=self.get_item_pk()).first().title = new_title
+        db.session.commit()
+
+    def get_description(self) -> str:
+        return ItemDB.query.filter_by(id=self.get_item_pk()).first().description
+
+    def set_description(self, new_description: str) -> None:
+        ItemDB.query.filter_by(id=self.get_item_pk()).first().description = (
+            new_description
+        )
+        db.session.commit()
+
+    def get_condition(self) -> str:
+        return ItemDB.query.filter_by(id=self.get_item_pk()).first().condition
+
+    def set_condition(self, new_condition: str) -> None:
+        ItemDB.query.filter_by(id=self.get_item_pk()).first().condition = new_condition
+        db.session.commit()
+
+    def get_status(self) -> str:
+        return ItemDB.query.filter_by(id=self.get_item_pk()).first().status
+
+    def set_status(self, new_status: str) -> None:
+        ItemDB.query.filter_by(id=self.get_item_pk()).first().status = new_status
+        db.session.commit()
+
+    def get_location(self) -> str:
+        return ItemDB.query.filter_by(id=self.get_item_pk()).first().location
+
+    def set_location(self, new_location: str) -> None:
+        ItemDB.query.filter_by(id=self.get_item_pk()).first().location = new_location
+        db.session.commit()
+
+    def get_category(self) -> str:
+        return ItemDB.query.filter_by(id=self.get_item_pk()).first().category
+
+    def set_category(self, new_category: str) -> None:
+        ItemDB.query.filter_by(id=self.get_item_pk()).first().category = new_category
+        db.session.commit()
+
+    def get_images(self) -> list[str]:
+        return ItemDB.query.filter_by(id=self.get_item_pk()).first().images
+
+    def set_images(self, new_images: list[str]) -> None:
+        item = ItemDB.query.filter_by(id=self.get_item_pk()).first()
+        item.images = new_images
+        db.session.commit()
+
+    def get_user_id(self) -> str:
+        return ItemDB.query.filter_by(id=self.get_item_pk()).first().user_id
+
+    def set_user_id(self, new_user_id: str) -> None:
+        ItemDB.query.filter_by(id=self.get_item_pk()).first().user_id = new_user_id
+        db.session.commit()
+
+    def get_type(self) -> str:
+        return ItemDB.query.filter_by(id=self.get_item_pk()).first().type
+
+    def set_type(self, new_type: str) -> None:
+        ItemDB.query.filter_by(id=self.get_item_pk()).first().type = new_type
+        db.session.commit()
