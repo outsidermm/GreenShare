@@ -2,6 +2,7 @@ from backend.data import admin_retrieve_user_id, items
 import re
 from backend.classes.item import Item
 from difflib import SequenceMatcher
+from flask import abort
 
 
 def title_matches(user_input: str, item_title: str, threshold: float = 0.7) -> bool:
@@ -49,6 +50,28 @@ async def user_create_item(
     safe_condition = re.escape(new_condition)
     safe_location = re.escape(new_location)
     safe_type = re.escape(new_type)
+    
+    if len(new_title)>100 or len(new_title)<3:
+        abort(400, "Title must be between 3 and 100 characters.")
+        
+    if len(new_description)>1000 or len(new_description)<10:
+        abort(400, "Description must be between 10 and 1000 characters.")
+        
+    if new_condition not in [
+        "New",
+        "Like New",
+        "Very Good",
+        "Good",
+        "Fair",
+        "Poor",
+    ]:
+        abort(400, "Condition must be one of: New, Like New, Very Good, Good, Fair, Poor.")
+        
+    if new_type not in ["Free", "Exchange"]:
+        abort(400, "Type must be either 'Free' or 'Exchange'.")
+        
+    if new_category not in ["essentials", "living", "tools-tech", "style-expression", "leisure-learning"]:
+        abort(400, "Category must be one of: essentials, living, tools-tech, style-expression, leisure-learning.")
 
     try:
         new_item = Item(
