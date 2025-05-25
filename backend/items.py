@@ -38,7 +38,7 @@ async def user_create_item(
         csrf_token (str): User's CSRF token.
     """
     new_user_id = admin_retrieve_user_id(session_token, csrf_token)
-    new_category = "Uncategorized"
+    new_category = "Essentials"
     new_title = new_title.title()
     new_description = new_description.title()
     new_condition = new_condition.title()
@@ -101,13 +101,13 @@ async def user_create_item(
 
 
 async def user_get_browse_items(
-    category_filter: str,
-    condition_filter: str,
-    location_filter: str,
-    type_filter: str,
-    title_filter: str,
-    item_id: str,
-    user_id: str,
+    category_filter: str = None,
+    condition_filter: str = None,
+    location_filter: str = None,
+    type_filter: str = None,
+    title_filter: str = None,
+    item_id: str = None,
+    user_id: str = None,
 ) -> dict[dict]:
     """
     Retrieves filtered items from the database.
@@ -124,12 +124,19 @@ async def user_get_browse_items(
     Returns:
         dict[dict]: Dictionary of all item data in dictionary format.
     """
-
+    filtered_items = {}
+    for item_key, item in items.items():
+        if item.get_status() == "Available":
+            filtered_items[item_key] = item
+    
     if title_filter is not None:
         title_filter = title_filter.title()
         if len(title_filter) < 3 or len(title_filter) > 100:
             abort(400, "Title filter must be between 3 and 100 characters.")
         safe_title_filter = re.escape(title_filter)
+        for item_key, item in filtered_items.items():
+            if title_matches(safe_title_filter, item.get_title()):
+                filtered_items[item.get_item_pk()] = item.item_data()
 
     if category_filter is not None:
         category_filter = category_filter.title()
@@ -145,6 +152,9 @@ async def user_get_browse_items(
                 "Category must be one of: Essentials, Living, Tools & Tech, Style & Expression, Leisure & Learning.",
             )
         safe_category_filter = re.escape(category_filter)
+        for item_key, item in filtered_items.items():
+            if item.get_category() != safe_category_filter:
+                del filtered_items[item_key]
 
     if condition_filter is not None:
         condition_filter = condition_filter.title()
@@ -161,56 +171,39 @@ async def user_get_browse_items(
                 "Condition must be one of: New, Like New, Very Good, Good, Fair, Poor.",
             )
         safe_condition_filter = re.escape(condition_filter)
+        for item_key, item in filtered_items.items():
+            if item.get_condition() != safe_condition_filter:
+                del filtered_items[item_key]
 
     if location_filter is not None:
         location_filter = location_filter.title()
         if len(location_filter) < 3 or len(location_filter) > 100:
             abort(400, "Location filter must be between 3 and 100 characters.")
         safe_location_filter = re.escape(location_filter)
+        for item_key, item in filtered_items.items():
+            if item.get_location() != safe_location_filter:
+                del filtered_items[item_key]
 
     if type_filter is not None:
         type_filter = type_filter.title()
         if type_filter not in ["Free", "Exchange"]:
             abort(400, "Type must be either 'Free' or 'Exchange'.")
         safe_type_filter = re.escape(type_filter)
+        for item_key, item in filtered_items.items():
+            if item.get_type() != safe_type_filter:
+                del filtered_items[item_key]
 
     if item_id is not None:
         if not item_id.isdigit() or int(item_id) <= 0:
             abort(400, "Item ID must be a positive integer.")
+        for item_key, item in filtered_items.items():
+            if item.get_item_pk() != int(item_id):
+                del filtered_items[item_key]
 
     if user_id is not None:
         if not user_id.isdigit() or int(user_id) <= 0:
             abort(400, "User ID must be a positive integer.")
-
-    filtered_items = {}
-
-    for item in items.values():
-        if (
-            (
-                safe_category_filter is None
-                or item.get_category() == safe_category_filter
-            )
-            and (
-                safe_condition_filter is None
-                or item.get_condition() == safe_condition_filter
-            )
-            and (
-                safe_location_filter is None
-                or item.get_location() == safe_location_filter
-            )
-            and (safe_type_filter is None or item.get_type() == safe_type_filter)
-            and (
-                safe_title_filter is None
-                or title_matches(safe_title_filter, item.get_title())
-            )
-            and (item.get_status() == "Available")  # Only include available items
-            and (
-                user_id is None or item.get_user_id() == user_id
-            )  # Filter by user ID if provided
-            and (
-                item_id is None or item.get_item_pk() == item_id
-            )  # Include item if item_id matches
-        ):
-            filtered_items[item.get_item_pk()] = item.item_data()
-
+        for item_key, item in filtered_items.items():
+            if item.get_user_id() != int(user_id):
+                del filtered_items[item_key]
     return filtered_items
