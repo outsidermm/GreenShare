@@ -1,11 +1,9 @@
 "use client";
-import { MdOutlineShoppingCart } from "react-icons/md";
-import { FaRegHeart } from "react-icons/fa";
-import { IoMdNotificationsOutline } from "react-icons/io";
 import useAuth from "@/hooks/useAuth";
 import { useRouter, usePathname } from "next/navigation";
 import logoutUser from "@/services/logoutUser";
 import NavBar from "@/components/NavBar";
+import HeaderBar from "@/components/HeaderBar";
 
 export default function Home() {
   const { isAuthenticated, refreshAuth } = useAuth();
@@ -25,7 +23,7 @@ export default function Home() {
   };
 
   const handleLogout = async () => {
-    logoutUser();
+    await logoutUser();
     refreshAuth();
     router.refresh();
   };
@@ -33,37 +31,7 @@ export default function Home() {
   return (
     <div className="bg-slate-100 w-screen min-h-screen pt-16">
       <div className="fixed top-0 left-0 w-full bg-slate-900 shadow z-50 px-6 py-4 flex items-center justify-between gap-4 sm:gap-10">
-        <div className="text-2xl font-bold text-green-600">GreenShare</div>
-
-        <div className="flex items-center gap-4 flex-grow px-4">
-          <input
-            type="text"
-            placeholder="Search for items"
-            className="flex-grow px-3 py-2 rounded-xl border border-white focus:border-green-500 outline-none placeholder-white bg-inherit text-sm"
-          />
-        </div>
-
-        <div className="flex items-center gap-2 sm:gap-6">
-          <button>
-            <FaRegHeart />
-          </button>
-          <button>
-            <MdOutlineShoppingCart />
-          </button>
-          <button>
-            <IoMdNotificationsOutline />
-          </button>
-          {isAuthenticated ? (
-            <button className="text-sm">Profile</button>
-          ) : (
-            <button
-              onClick={handleLogin}
-              className="text-sm text-green-700 border px-3 py-1 rounded hover:bg-green-50"
-            >
-              Login
-            </button>
-          )}
-        </div>
+         <HeaderBar isAuthenticated={isAuthenticated} handleLogin={handleLogin} />
       </div>
 
       <div className="fixed top-16 left-0 w-60 h-[calc(100vh-4rem)] bg-slate-900 text-white px-6 py-6 shadow-slate-400 shadow-xl flex flex-col justify-between">
