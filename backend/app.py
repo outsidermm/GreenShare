@@ -147,10 +147,9 @@ async def validate_token():
     Requires session token from cookies and CSRF token from headers.
     """
     # Retrieve and sanitise session and CSRF tokens
-    session_token = re.escape(request.cookies.get("session_token"))
-    csrf_token = re.escape(request.headers.get("X-CSRF-TOKEN"))
-
     try:
+        session_token = re.escape(request.cookies.get("session_token"))
+        csrf_token = re.escape(request.headers.get("X-CSRF-TOKEN"))
         # Check the validity of session and CSRF tokens
         if await user_auth_validate_session_token(
             session_token
