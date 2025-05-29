@@ -33,6 +33,7 @@ services:
       - FLASK_ENV=development
       - USER_FERNET_KEY=${USER_FERNET_KEY}
       - SECRET_KEY=${SECRET_KEY}
+      - PLACES_API_KEY=${PLACES_API_KEY}
     command: ["python","-u", "backend/app.py"]
     volumes:
       - ./backend:/app/backend
