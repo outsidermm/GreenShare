@@ -13,7 +13,9 @@ from backend.classes.exchange_offer import ExchangeOffer
 import re
 from backend.items import user_create_item, user_get_browse_items
 from backend.data import users, items, exchange_offers
+import os, requests
 
+PLACES_API_KEY = os.getenv("PLACES_API_KEY")
 
 @app.route("/")
 def index():
@@ -225,6 +227,18 @@ async def get_browse_items():
         return jsonify(filtered_items), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/autocomplete", methods=["POST"])
+async def address_autocomplete():
+    data = request.json
+    input = data["input"]
+
+    google_url = "https://maps.googleapis.com/maps/api/place/autocomplete/json"
+    params = {"input": input, "key": PLACES_API_KEY}
+
+    response = requests.get(google_url, params=params)
+    return jsonify(response.json())
 
 
 # Entry point to run the Flask app
