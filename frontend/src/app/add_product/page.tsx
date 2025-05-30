@@ -12,6 +12,7 @@ import Image from "next/image";
 import LocationSelect from "@/components/LocationSelect";
 import DropDown from "@/components/DropDown";
 import createItem from "@/services/createItem";
+import swal from "sweetalert";
 
 export interface Option {
   value: string;
@@ -97,13 +98,13 @@ export default function Home() {
         if (response.error) {
           alert(`Error: ${response.error}`);
         } else {
-          alert("Product added successfully!");
+          swal("Success!", "Product added successfully!", "success");
           router.push("/");
         }
       })
       .catch((error) => {
         console.error("Error creating item:", error);
-        alert("An error occurred while adding the product.");
+        swal("Error!", "Failed to add product. Please try again.", "error");  
       });
     setTitle("");
     setDescription("");
