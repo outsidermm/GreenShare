@@ -58,11 +58,11 @@ async def user_create_item(
         abort(400, "Description must be between 10 and 1000 characters.")
 
     if new_condition not in [
-        "new",
-        "like-new",
-        "used-good",
-        "used-fair",
-        "poor",
+        "New",
+        "Like-New",
+        "used-Good",
+        "Used-Fair",
+        "Poor",
     ]:
         abort(
             400, "Condition must be one of: New, Like New, Good, Fair, Poor."
