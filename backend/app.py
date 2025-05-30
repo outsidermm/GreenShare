@@ -256,7 +256,11 @@ async def address_autocomplete():
     input = data["input"]
 
     google_url = "https://maps.googleapis.com/maps/api/place/autocomplete/json"
-    params = {"input": input, "key": PLACES_API_KEY}
+    params = {
+        "input": input,
+        "types": "address",
+        "key": PLACES_API_KEY,
+    }
 
     response = requests.get(google_url, params=params)
     return jsonify(response.json())
