@@ -75,7 +75,13 @@ export default function Home() {
       alert("You must be logged in to add a product.");
       return;
     }
-    if (!title || !description || !selectedCondition || !selectedType || !selectedLocation) {
+    if (
+      !title ||
+      !description ||
+      !selectedCondition ||
+      !selectedType ||
+      !selectedLocation
+    ) {
       alert("Please fill in all required fields.");
       return;
     }
