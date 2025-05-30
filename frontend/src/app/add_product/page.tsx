@@ -10,15 +10,9 @@ import { AiOutlineShop } from "react-icons/ai";
 import { useState } from "react";
 import Image from 'next/image'
 import LocationSelect from "@/components/LocationSelect";
-import { OnChangeValue } from "react-select";
-import dynamic from 'next/dynamic';
+import DropDown from "@/components/DropDown";
 
-// Dynamic import with SSR disabled
-const Select = dynamic(() => import('react-select'), { 
-  ssr: false 
-});
-
-interface Option {
+export interface Option {
   value: string;
   label: string;
 }
@@ -143,102 +137,29 @@ export default function Home() {
             </div>
 
             <div className="pt-6">
-              <label className="block mb-2 text-slate-800">Location</label>
               <LocationSelect 
                 value={selectedLocation}
                 onChange={setSelectedLocation}
               />
             </div>
 
-
-
             <div className="pt-6">
-              <label className="block mb-2 text-slate-800">Condition</label>
-              <Select
+              <DropDown
+                selectedOption={selectedCondition}
+                setSelectedOption={setSelectedCondition}
                 options={conditionOptions}
-                value={selectedCondition}
-                onChange={((option: OnChangeValue<unknown, false>) => setSelectedCondition((option as Option) || null))}
+                label_text="Condition"
                 placeholder="Select product condition"
-                required
-                styles={{
-                  control: (base, state) => ({
-                    ...base,
-                    border: state.isFocused ? "none" : "2px solid #64748b", // slate-400
-                    borderRadius: "0.5rem",
-                    fontSize: "1rem",
-                    boxShadow: state.isFocused ? "0 0 0 2px #22c55e" : "none", // green-400 outline ring
-                  }),
-                  option: (base, { isFocused, isSelected }) => ({
-                    ...base,
-                    backgroundColor: isSelected
-                      ? "#4ade80" // green-400
-                      : isFocused
-                      ? "#bbf7d0" // green-100
-                      : "white",
-                    color: isSelected || isFocused ? "#1e293b" : "#334155", // slate-800 or slate-700
-                    fontWeight: isSelected ? "600" : "400",
-                    cursor: "pointer",
-                  }),
-                  menu: (base) => ({
-                    ...base,
-                    borderRadius: "0.5rem",
-                    overflow: "hidden",
-                    boxShadow: "0 0 0 1px #94a3b8",
-                  }),
-                  placeholder: (base) => ({
-                    ...base,
-                    color: "#64748b", // slate-500
-                  }),
-                  singleValue: (base) => ({
-                    ...base,
-                    color: "#1e293b", // slate-800
-                  }),
-                }}
-              />
+                />
             </div>
 
             <div className="pt-6">
-              <label className="block mb-2 text-slate-800">Item Exchange Type</label>
-              <Select
+              <DropDown
+                selectedOption={selectedType}
+                setSelectedOption={setSelectedType}
                 options={typeOptions}
-                value={selectedType}
-                onChange={(option: OnChangeValue<unknown, false>) => setSelectedType(option as Option | null)}
+                label_text="Item Exchange Type"
                 placeholder="Select Item Exchange Type"
-                required
-                styles={{
-                  control: (base, state) => ({
-                    ...base,
-                    border: state.isFocused ? "none" : "2px solid #64748b", // slate-400
-                    borderRadius: "0.5rem",
-                    fontSize: "1rem",
-                    boxShadow: state.isFocused ? "0 0 0 2px #22c55e" : "none", // green-400 outline ring
-                  }),
-                  option: (base, { isFocused, isSelected }) => ({
-                    ...base,
-                    backgroundColor: isSelected
-                      ? "#4ade80" // green-400
-                      : isFocused
-                      ? "#bbf7d0" // green-100
-                      : "white",
-                    color: isSelected || isFocused ? "#1e293b" : "#334155", // slate-800 or slate-700
-                    fontWeight: isSelected ? "600" : "400",
-                    cursor: "pointer",
-                  }),
-                  menu: (base) => ({
-                    ...base,
-                    borderRadius: "0.5rem",
-                    overflow: "hidden",
-                    boxShadow: "0 0 0 1px #94a3b8",
-                  }),
-                  placeholder: (base) => ({
-                    ...base,
-                    color: "#64748b", // slate-500
-                  }),
-                  singleValue: (base) => ({
-                    ...base,
-                    color: "#1e293b", // slate-800
-                  }),
-                }}
               />
             </div>
 
