@@ -5,3 +5,4 @@ Flask-CORS
 cryptography
 asgiref
 pytest-asyncio
+requests

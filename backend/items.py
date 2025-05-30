@@ -59,14 +59,13 @@ async def user_create_item(
 
     if new_condition not in [
         "New",
-        "Like New",
-        "Very Good",
-        "Good",
-        "Fair",
+        "Like-New",
+        "used-Good",
+        "Used-Fair",
         "Poor",
     ]:
         abort(
-            400, "Condition must be one of: New, Like New, Very Good, Good, Fair, Poor."
+            400, "Condition must be one of: New, Like New, Good, Fair, Poor."
         )
 
     if new_type not in ["Free", "Exchange"]:
