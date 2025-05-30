@@ -11,6 +11,7 @@ import { useState } from "react";
 import Image from "next/image";
 import LocationSelect from "@/components/LocationSelect";
 import DropDown from "@/components/DropDown";
+import createItem from "@/services/createItem";
 
 export interface Option {
   value: string;
@@ -66,10 +67,47 @@ export default function Home() {
   const handleLogout = async () => {
     await logoutUser();
     refreshAuth();
-    router.refresh();
+    router.push("/");
   };
 
-  const handleSubmit = async () => {};
+  const handleSubmit = async () => {
+    if (!isAuthenticated) {
+      alert("You must be logged in to add a product.");
+      return;
+    }
+    if (!title || !description || !selectedCondition || !selectedType || !selectedLocation) {
+      alert("Please fill in all required fields.");
+      return;
+    }
+    await createItem({
+      title,
+      description,
+      condition: selectedCondition.value,
+      type: selectedType.value,
+      location: selectedLocation.value,
+      images: selectedFiles,
+    })
+      .then((response) => {
+        if (response.error) {
+          alert(`Error: ${response.error}`);
+        } else {
+          alert("Product added successfully!");
+          router.push("/");
+        }
+      })
+      .catch((error) => {
+        console.error("Error creating item:", error);
+        alert("An error occurred while adding the product.");
+      });
+    setTitle("");
+    setDescription("");
+    setSelectedCondition(null);
+    setSelectedType(null);
+    setSelectedLocation(null);
+    setSelectedFiles([]);
+    setIsTitleChanged(false);
+    setIsDescriptionChanged(false);
+  };
 
   return (
     <>
@@ -203,6 +241,8 @@ export default function Home() {
                           <Image
                             src={URL.createObjectURL(file)}
                             alt={`Preview ${index + 1}`}
+                            width={300}
+                            height={300}
                             className="w-full h-full object-cover"
                           />
                         </div>
