@@ -12,10 +12,10 @@ from backend.classes.item import Item
 from backend.classes.exchange_offer import ExchangeOffer
 import re
 from backend.items import user_create_item, user_get_browse_items
-from backend.data import users, items, exchange_offers
 import os, requests
 
 PLACES_API_KEY = os.getenv("PLACES_API_KEY")
+IMGUR_CLIENT_ID = os.getenv("IMGUR_CLIENT_ID")
 
 @app.route("/")
 def index():
@@ -169,23 +169,44 @@ async def create_item():
 
     Expects item data in JSON format and returns the created item ID.
     """
-    data = request.json
-    session_token = re.escape(request.cookies.get("session_token"))
-    csrf_token = re.escape(request.headers.get("X-CSRF-TOKEN"))
-    title = data["title"]
-    description = data["description"]
-    condition = data["condition"]
-    location = data["location"]
-    images = data["images"]
-
     try:
+        data = request.form
+        session_token = re.escape(request.cookies.get("session_token"))
+        csrf_token = re.escape(request.headers.get("X-CSRF-TOKEN"))
+        title = data["title"]
+        description = data["description"]
+        condition = data["condition"]
+        location = data["location"]
+        type = data["type"]
+        images_file = request.files.getlist("images")
+
+        if not all ([title, description, condition, location, type]):
+            return jsonify({"error": "All fields are required"}), 400
+
+        headers = {"Authorization": f"Client-ID {IMGUR_CLIENT_ID}"}
+
+        # Upload each image to Imgur and collect URLs
+        image_urls = []
+        for file in images_file:
+            upload_response = requests.post(
+                "https://api.imgur.com/3/image",
+                headers=headers,
+                files={"image": file.read()}
+            )
+            if upload_response.status_code == 200:
+                image_urls.append(upload_response.json()["data"]["link"])
+                print(f"Image uploaded successfully: {image_urls[-1]}")
+            else:
+                return jsonify({"error": "Failed to upload image to Imgur"}), 500
+
         # Create a new item using the provided data
         await user_create_item(
             new_title=title,
             new_description=description,
             new_condition=condition,
             new_location=location,
-            new_images=images,
+            new_type=type,
+            new_images=image_urls,
             session_token=session_token,
             csrf_token=csrf_token,
         )
