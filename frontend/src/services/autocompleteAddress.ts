@@ -14,7 +14,9 @@ interface AutocompleteResponse {
   status: string;
 }
 
-export default async function autocompleteAddress(input: string): Promise<PlacePrediction[]> {
+export default async function autocompleteAddress(
+  input: string,
+): Promise<PlacePrediction[]> {
   if (!input || input.length < 3) {
     return []; // Return empty array if input is too short
   }

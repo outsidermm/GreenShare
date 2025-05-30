@@ -29,10 +29,11 @@ const LocationSelect = ({ value, onChange }: LocationSelectProps) => {
       setIsLoading(true);
       try {
         const predictions = await autocompleteAddress(inputValue);
-        const newOptions = predictions?.map((prediction) => ({
-          value: prediction.place_id,
-          label: prediction.description,
-        })) || [];
+        const newOptions =
+          predictions?.map((prediction) => ({
+            value: prediction.place_id,
+            label: prediction.description,
+          })) || [];
         setOptions(newOptions);
       } catch (error) {
         console.error("Error fetching locations:", error);
@@ -66,7 +67,7 @@ const LocationSelect = ({ value, onChange }: LocationSelectProps) => {
       loadingMessage={() => "Searching locations..."}
       onInputChange={setInputValue}
       isLoading={isLoading}
-      />
+    />
   );
 };
 

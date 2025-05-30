@@ -31,7 +31,10 @@ export default function Home() {
   return (
     <div className="bg-slate-100 w-screen min-h-screen pt-16">
       <div className="fixed top-0 left-0 w-full bg-slate-900 shadow z-50 px-6 py-4 flex items-center justify-between gap-4 sm:gap-10">
-         <HeaderBar isAuthenticated={isAuthenticated} handleLogin={handleLogin} />
+        <HeaderBar
+          isAuthenticated={isAuthenticated}
+          handleLogin={handleLogin}
+        />
       </div>
 
       <div className="fixed top-16 left-0 w-60 h-[calc(100vh-4rem)] bg-slate-900 text-white px-6 py-6 shadow-slate-400 shadow-xl flex flex-col justify-between">
