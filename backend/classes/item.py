@@ -1,4 +1,4 @@
-from backend.models import ItemDB,ItemImageDB
+from backend.models import ItemDB, ItemImageDB
 from backend.config import db
 
 
@@ -33,7 +33,7 @@ class Item:
             user_id=new_user_id,
             category=new_category,
             type=new_type,
-            status="available"  # Explicitly set status
+            status="available",  # Explicitly set status
         )
         db.session.add(new_item)
         db.session.commit()

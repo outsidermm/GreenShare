@@ -64,9 +64,7 @@ async def user_create_item(
         "used-fair",
         "poor",
     ]:
-        abort(
-            400, "Condition must be one of: New, Like New, Good, Fair, Poor."
-        )
+        abort(400, "Condition must be one of: New, Like New, Good, Fair, Poor.")
 
     if new_type not in ["free", "exchange"]:
         abort(400, "Type must be either 'Free' or 'Exchange'.")
@@ -127,15 +125,19 @@ async def user_get_browse_items(
         if not item_id.isdigit() or int(item_id) <= 0:
             abort(400, "Item ID must be a positive integer.")
         for item_key, item in items.items():
-            if ((item.get_item_pk() == int(item_id)) and (item.get_status() == "available")):
+            if (item.get_item_pk() == int(item_id)) and (
+                item.get_status() == "available"
+            ):
                 return {item_key: item}
 
-    filtered_items : dict[int, Item]= {}
+    filtered_items: dict[int, Item] = {}
     for item_key, item in items.items():
         if item.get_status() == "available":
             filtered_items[item_key] = item
 
-    filtered_items_copy = filtered_items.copy()  # Create a copy to avoid modifying the original
+    filtered_items_copy = (
+        filtered_items.copy()
+    )  # Create a copy to avoid modifying the original
 
     if title_filter is not None:
         title_filter = title_filter.lower()
@@ -145,17 +147,19 @@ async def user_get_browse_items(
         for item_key, item in filtered_items.items():
             if not title_matches(safe_title_filter, item.get_title()):
                 del filtered_items[item_key]
-    
-    filtered_items_copy = filtered_items.copy()  # Create a copy to avoid modifying the original
+
+    filtered_items_copy = (
+        filtered_items.copy()
+    )  # Create a copy to avoid modifying the original
 
     if category_filter is not None:
         category_filter = category_filter.lower()
         if category_filter not in [
-        "essentials",
-        "living",
-        "tools-tech",
-        "style-expression",
-        "leisure-learning",
+            "essentials",
+            "living",
+            "tools-tech",
+            "style-expression",
+            "leisure-learning",
         ]:
             abort(
                 400,
@@ -166,16 +170,18 @@ async def user_get_browse_items(
             if item.get_category() != safe_category_filter:
                 del filtered_items[item_key]
 
-    filtered_items_copy = filtered_items.copy()  # Create a copy to avoid modifying the original
+    filtered_items_copy = (
+        filtered_items.copy()
+    )  # Create a copy to avoid modifying the original
 
     if condition_filter is not None:
         condition_filter = condition_filter.lower()
         if condition_filter not in [
-        "new",
-        "like-new",
-        "used-good",
-        "used-fair",
-        "poor",
+            "new",
+            "like-new",
+            "used-good",
+            "used-fair",
+            "poor",
         ]:
             abort(
                 400,
@@ -186,7 +192,9 @@ async def user_get_browse_items(
             if item.get_condition() != safe_condition_filter:
                 del filtered_items[item_key]
 
-    filtered_items_copy = filtered_items.copy()  # Create a copy to avoid modifying the original
+    filtered_items_copy = (
+        filtered_items.copy()
+    )  # Create a copy to avoid modifying the original
 
     if location_filter is not None:
         location_filter = location_filter.lower()
@@ -206,8 +214,10 @@ async def user_get_browse_items(
             if item.get_type() != safe_type_filter:
                 del filtered_items[item_key]
 
-    filtered_items_copy = filtered_items.copy()  # Create a copy to avoid modifying the original
-                
+    filtered_items_copy = (
+        filtered_items.copy()
+    )  # Create a copy to avoid modifying the original
+
     if user_id is not None:
         if not user_id.isdigit() or int(user_id) <= 0:
             abort(400, "User ID must be a positive integer.")

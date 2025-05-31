@@ -11,14 +11,12 @@ import Image from "next/image";
 import { Item } from "@/types/item";
 import { toTitleCase } from "@/utils/titleCase";
 
-
 export default function Home() {
   const { isAuthenticated, refreshAuth } = useAuth();
   const router = useRouter();
   const [items, setItems] = useState<Array<Item>>([]);
 
-
-  useEffect (() => {
+  useEffect(() => {
     const fetchItems = async () => {
       try {
         const response = await getItem({});
@@ -29,7 +27,7 @@ export default function Home() {
     };
 
     fetchItems();
-},[])
+  }, []);
 
   const handleLogin = async () => {
     router.push("/login");
@@ -75,17 +73,22 @@ export default function Home() {
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-6">
           {items.length > 0 ? (
             items.map((item) => (
-              <Link key = {item.id}href={`/view_product/${item.id}`}>
+              <Link key={item.id} href={`/view_product/${item.id}`}>
                 <div className="bg-white rounded shadow p-4 cursor-pointer hover:shadow-lg transition">
-                  <Image 
+                  <Image
                     src={item.images[0]}
                     alt={item.title}
                     width={200}
                     height={200}
-                    className="w-full h-32 object-cover mb-3 rounded" />
-                  <h4 className="text-slate-800 font-bold">{toTitleCase(item.title)}</h4>
+                    className="w-full h-32 object-cover mb-3 rounded"
+                  />
+                  <h4 className="text-slate-800 font-bold">
+                    {toTitleCase(item.title)}
+                  </h4>
                   <p className="text-blue-600">{toTitleCase(item.condition)}</p>
-                  <p className="text-slate-600 text-sm">{toTitleCase(item.type)}</p>
+                  <p className="text-slate-600 text-sm">
+                    {toTitleCase(item.type)}
+                  </p>
                 </div>
               </Link>
             ))

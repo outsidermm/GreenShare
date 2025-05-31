@@ -15,7 +15,6 @@ import swal from "sweetalert";
 import { Item } from "@/types/item";
 import { toTitleCase } from "@/utils/titleCase";
 
-
 export default function Home() {
   const { isAuthenticated, refreshAuth } = useAuth();
   const router = useRouter();
@@ -23,14 +22,12 @@ export default function Home() {
   const [item, setItem] = useState<Item>();
   const item_id_filter = pathname.replace("/view_product/", "");
 
-
-
-  useEffect (() => {
+  useEffect(() => {
     const fetchItems = async () => {
       try {
-        const response = await getItem({item_id: item_id_filter});
+        const response = await getItem({ item_id: item_id_filter });
         if (response.length === 1) {
-        setItem(response[0]);
+          setItem(response[0]);
         }
       } catch (error) {
         console.error("Error fetching items:", error);
@@ -38,7 +35,7 @@ export default function Home() {
     };
 
     fetchItems();
-},[pathname, item_id_filter])
+  }, [pathname, item_id_filter]);
 
   const handleLogin = async () => {
     router.push("/login");
@@ -62,8 +59,8 @@ export default function Home() {
           router.push("/login");
         }
       });
+    }
   };
-}
 
   return (
     <div className="bg-slate-100 w-screen min-h-screen pt-16">
@@ -83,24 +80,30 @@ export default function Home() {
       </div>
 
       <div className="ml-60 p-6">
-        <div className= "p-2 mb-40">
-          <div onClick={() => router.back()} className="cursor-pointer w-fit p-1 hover:bg-slate-300 rounded">
+        <div className="p-2 mb-40">
+          <div
+            onClick={() => router.back()}
+            className="cursor-pointer w-fit p-1 hover:bg-slate-300 rounded"
+          >
             <FaChevronLeft color="black" size={16} />
           </div>
         </div>
-          <div className="flex flex-col sm:flex-row gap-6">
-            <div className="flex-1 flex justify-center items-center">
-              <Carousel
-                showArrows={true}
-                showIndicators={true}
-                infiniteLoop={true}
-                dynamicHeight={false}
-                showThumbs={false}
-                className="w-full rounded-xl shadow-xl"
-              >
-                {item && item.images.length > 0 ? (
-                  item.images.map((image, index) => (
-                    <div key={index} className="flex justify-center items-center w-full h-full bg-white overflow-hidden rounded">
+        <div className="flex flex-col sm:flex-row gap-6">
+          <div className="flex-1 flex justify-center items-center">
+            <Carousel
+              showArrows={true}
+              showIndicators={true}
+              infiniteLoop={true}
+              dynamicHeight={false}
+              showThumbs={false}
+              className="w-full rounded-xl shadow-xl"
+            >
+              {item && 
+                (item.images.map((image, index) => (
+                    <div
+                      key={index}
+                      className="flex justify-center items-center w-full h-full bg-white overflow-hidden rounded"
+                    >
                       <Image
                         src={image}
                         alt={item.title}
@@ -110,56 +113,64 @@ export default function Home() {
                       />
                     </div>
                   ))
-                ) : (
-                  [
-                    <div key="placeholder" className="flex justify-center items-center w-full h-full bg-white overflow-hidden rounded">
-                      <Image
-                        src="/placeholder.png"
-                        alt="No image available"
-                        width={500}
-                        height={500}
-                        className="object-contain mx-auto h-auto w-auto"
-                      />
-                    </div>
-                  ]
-                )}
-              </Carousel>
-            </div>
-            <div className="flex-1">
-              {item ? (
-                <>
-                  <h1 className="text-2xl font-bold text-slate-800 mb-4">{toTitleCase(item.title)}</h1>
-                  <h3 className="text-lg font-medium text-slate-700 mb-2">Description:</h3>
-                  <p className="text-slate-600 mb-4">{toTitleCase(item.description)}</p>
+                )
+              }
+            </Carousel>
+          </div>
+          <div className="flex-1">
+            {item ? (
+              <>
+                <h1 className="text-2xl font-bold text-slate-800 mb-4">
+                  {toTitleCase(item.title)}
+                </h1>
+                <h3 className="text-lg font-medium text-slate-700 mb-2">
+                  Description:
+                </h3>
+                <p className="text-slate-600 mb-4">
+                  {toTitleCase(item.description)}
+                </p>
 
-                  <h3 className="text-lg font-medium text-slate-700 mb-2">Condition:</h3>
-                  <p className="text-blue-600 mb-2">{toTitleCase(item.condition)}</p>
+                <h3 className="text-lg font-medium text-slate-700 mb-2">
+                  Condition:
+                </h3>
+                <p className="text-blue-600 mb-2">
+                  {toTitleCase(item.condition)}
+                </p>
 
-                  <h3 className="text-lg font-medium text-slate-700 mb-2">Type:</h3>
-                  <p className="text-slate-600 mb-2">{toTitleCase(item.type)}</p>
+                <h3 className="text-lg font-medium text-slate-700 mb-2">
+                  Type:
+                </h3>
+                <p className="text-slate-600 mb-2">{toTitleCase(item.type)}</p>
 
-                  <h3 className="text-lg font-medium text-slate-700 mb-2">Location:</h3>
-                  <p className="text-slate-600 mb-2">{toTitleCase(item.location)}</p>
+                <h3 className="text-lg font-medium text-slate-700 mb-2">
+                  Location:
+                </h3>
+                <p className="text-slate-600 mb-2">
+                  {toTitleCase(item.location)}
+                </p>
 
-                  <h3 className="text-lg font-medium text-slate-700 mb-2">Last Updated:</h3>
-                  <p className="text-slate-600 mb-2">{new Date(item.updated_at).toLocaleDateString()}</p>
-
-                </>
-              ) : (
-                <div className="text-center text-slate-600">
-                  <p>Item not found.</p>
-                </div>
-              )}
-              <div className="pt-10 p-6">
-                <button
-                  onClick={handleOffer}
-                  className="w-full rounded bg-green-600 hover:bg-green-500 text-slate-900 font-bold py-2 px-4 border-solid border-2 border-green-600 transition-all"
-                >
-                  Make an Offer
-                </button>
+                <h3 className="text-lg font-medium text-slate-700 mb-2">
+                  Last Updated:
+                </h3>
+                <p className="text-slate-600 mb-2">
+                  {new Date(item.updated_at).toLocaleDateString()}
+                </p>
+              </>
+            ) : (
+              <div className="text-center text-slate-600">
+                <p>Item not found.</p>
               </div>
+            )}
+            <div className="pt-10 p-6">
+              <button
+                onClick={handleOffer}
+                className="w-full rounded bg-green-600 hover:bg-green-500 text-slate-900 font-bold py-2 px-4 border-solid border-2 border-green-600 transition-all"
+              >
+                Make an Offer
+              </button>
             </div>
           </div>
+        </div>
       </div>
     </div>
   );

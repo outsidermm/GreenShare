@@ -18,6 +18,7 @@ import os, requests
 PLACES_API_KEY = os.getenv("PLACES_API_KEY")
 IMGUR_CLIENT_ID = os.getenv("IMGUR_CLIENT_ID")
 
+
 @app.route("/")
 def index():
     """Simple index route to verify the server is running."""
@@ -181,7 +182,7 @@ async def create_item():
         type = data["type"]
         images_file = request.files.getlist("images")
 
-        if not all ([title, description, condition, location, type]):
+        if not all([title, description, condition, location, type]):
             return jsonify({"error": "All fields are required"}), 400
 
         headers = {"Authorization": f"Client-ID {IMGUR_CLIENT_ID}"}
@@ -192,7 +193,7 @@ async def create_item():
             upload_response = requests.post(
                 "https://api.imgur.com/3/image",
                 headers=headers,
-                files={"image": file.read()}
+                files={"image": file.read()},
             )
             if upload_response.status_code == 200:
                 image_urls.append(upload_response.json()["data"]["link"])

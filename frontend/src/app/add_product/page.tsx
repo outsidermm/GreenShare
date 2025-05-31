@@ -47,7 +47,6 @@ export default function Home() {
   );
   const [selectedType, setSelectedType] = useState<Option | null>(null);
 
-
   const [selectedLocation, setSelectedLocation] = useState<Option | null>(null);
 
   const handleLogin = async () => {
@@ -93,7 +92,7 @@ export default function Home() {
       })
       .catch((error) => {
         console.error("Error creating item:", error);
-        swal("Error!", "Failed to add product. Please try again.", "error");  
+        swal("Error!", "Failed to add product. Please try again.", "error");
       });
     setTitle("");
     setDescription("");
@@ -139,7 +138,7 @@ export default function Home() {
               </div>
               <button
                 type="submit"
-                className="bg-green-400 text-slate-800 px-4 py-2 rounded-full hover:bg-green-500 flex items-center gap-2 transition-all"
+                className="bg-green-600 text-slate-800 px-4 py-2 rounded-full hover:bg-green-500 flex items-center gap-2 transition-all border-2 border-green-600 font-bold"
               >
                 <IoMdCheckmark />
                 <p>Add Product</p>
@@ -219,6 +218,7 @@ export default function Home() {
                   <input
                     type="file"
                     accept="image/*"
+                    required
                     multiple
                     onChange={(e) => {
                       const files = Array.from(e.target.files || []);

@@ -5,7 +5,6 @@ import autocompleteAddress from "@/services/autocompleteAddress";
 import DropDown from "./DropDown";
 import { Option } from "@/types/option";
 
-
 interface LocationSelectProps {
   value: Option | null;
   onChange: (value: Option | null) => void;
