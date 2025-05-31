@@ -8,20 +8,9 @@ import { useEffect, useState } from "react";
 import getItem from "@/services/getItem";
 import Link from "next/link";
 import Image from "next/image";
+import { Item } from "@/types/item";
 
-interface Item {
-    id: string;
-    user_id: string;
-    title: string;
-    description: string;
-    condition: string;
-    status: string;
-    location: string;
-    category: string;
-    type: string;
-    updated_at: string;
-    images: string[];
-}
+
 
 export default function Home() {
   const { isAuthenticated, refreshAuth } = useAuth();

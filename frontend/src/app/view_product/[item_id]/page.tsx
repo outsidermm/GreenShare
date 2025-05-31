@@ -12,20 +12,8 @@ import "swiper/css";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import swal from "sweetalert";
+import { Item } from "@/types/item";
 
-interface Item {
-    id: string;
-    user_id: string;
-    title: string;
-    description: string;
-    condition: string;
-    status: string;
-    location: string;
-    category: string;
-    type: string;
-    updated_at: string;
-    images: string[];
-}
 
 export default function Home() {
   const { isAuthenticated, refreshAuth } = useAuth();

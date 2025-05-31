@@ -8,33 +8,14 @@ import { useEffect, useState } from "react";
 import getItem from "@/services/getItem";
 import Link from "next/link";
 import Image from "next/image";
+import { Item } from "@/types/item";
 
-interface Item {
-    id: string;
-    user_id: string;
-    title: string;
-    description: string;
-    condition: string;
-    status: string;
-    location: string;
-    category: string;
-    type: string;
-    updated_at: string;
-    images: string[];
-}
 
 export default function Home() {
   const { isAuthenticated, refreshAuth } = useAuth();
   const router = useRouter();
   const [items, setItems] = useState<Array<Item>>([]);
 
-  const categories = [
-    { label: "Essentials", path: "/category/essentials" },
-    { label: "Living", path: "/category/living" },
-    { label: "Tools & Tech", path: "/category/tools-tech" },
-    { label: "Style & Expression", path: "/category/style-expression" },
-    { label: "Leisure & Learning", path: "/category/leisure-learning" },
-  ];
 
   useEffect (() => {
     const fetchItems = async () => {
@@ -70,7 +51,6 @@ export default function Home() {
 
       <div className="fixed top-16 left-0 w-60 h-[calc(100vh-4rem)] bg-slate-900 text-white px-6 py-6 shadow-slate-400 shadow-xl flex flex-col justify-between">
         <NavBar
-          categories={categories}
           handleLogout={handleLogout}
           pathname="/"
           isAuthenticated={isAuthenticated}
