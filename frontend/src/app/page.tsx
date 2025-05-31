@@ -4,10 +4,27 @@ import { useRouter } from "next/navigation";
 import NavBar from "@/components/NavBar";
 import logoutUser from "@/services/logoutUser";
 import HeaderBar from "@/components/HeaderBar";
+import { useEffect, useState } from "react";
+import getItem from "@/services/getItem";
+
+interface Item {
+    id: string;
+    user_id: string;
+    title: string;
+    description: string;
+    condition: string;
+    status: string;
+    location: string;
+    category: string;
+    type: string;
+    updated_at: string;
+    images: string[];
+}
 
 export default function Home() {
   const { isAuthenticated, refreshAuth } = useAuth();
   const router = useRouter();
+  const [items, setItems] = useState<Array<Item>>([]);
 
   const categories = [
     { label: "Essentials", path: "/category/essentials" },
@@ -16,6 +33,19 @@ export default function Home() {
     { label: "Style & Expression", path: "/category/style-expression" },
     { label: "Leisure & Learning", path: "/category/leisure-learning" },
   ];
+
+  useEffect (() => {
+    const fetchItems = async () => {
+      try {
+        const response = await getItem({});
+        setItems(response);
+      } catch (error) {
+        console.error("Error fetching items:", error);
+      }
+    };
+
+    fetchItems();
+},[])
 
   const handleLogin = async () => {
     router.push("/login");
@@ -60,19 +90,22 @@ export default function Home() {
           Hot Deals 🔥
         </h3>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
-          {[
-            { name: "Nintendo Switch", condition: "Brand new" },
-            { name: "Sony A7s III", condition: "Slightly used" },
-          ].map((item, i) => (
-            <div key={i} className="bg-white rounded shadow p-4">
-              <div className="bg-slate-500 h-32 mb-3 rounded" />
-              <h4 className="text-slate-800 font-bold">{item.name}</h4>
-              <p className="text-blue-600">{item.condition}</p>
-              <button className="mt-2 text-sm bg-blue-500 text-white px-3 py-1 rounded hover:bg-green-600">
-                Make a Offer
-              </button>
+          {items.length > 0 ? (
+            items.map((item) => (
+              <div key={item.id} className="bg-white rounded shadow p-4">
+                <div className="bg-slate-500 h-32 mb-3 rounded" />
+                <h4 className="text-slate-800 font-bold">{item.title}</h4>
+                <p className="text-blue-600">{item.condition}</p>
+                <button className="mt-2 text-sm bg-blue-500 text-white px-3 py-1 rounded hover:bg-green-600">
+                  Make an Offer
+                </button>
+              </div>
+            ))
+          ) : (
+            <div className="col-span-4 text-center text-slate-600">
+              <p>No items available at the moment.</p>
             </div>
-          ))}
+          )}
         </div>
       </div>
     </div>
