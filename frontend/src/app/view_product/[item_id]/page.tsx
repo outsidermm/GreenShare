@@ -13,6 +13,7 @@ import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import swal from "sweetalert";
 import { Item } from "@/types/item";
+import { toTitleCase } from "@/utils/titleCase";
 
 
 export default function Home() {
@@ -127,18 +128,18 @@ export default function Home() {
             <div className="flex-1">
               {item ? (
                 <>
-                  <h1 className="text-2xl font-bold text-slate-800 mb-4">{item.title}</h1>
+                  <h1 className="text-2xl font-bold text-slate-800 mb-4">{toTitleCase(item.title)}</h1>
                   <h3 className="text-lg font-medium text-slate-700 mb-2">Description:</h3>
-                  <p className="text-slate-600 mb-4">{item.description}</p>
+                  <p className="text-slate-600 mb-4">{toTitleCase(item.description)}</p>
 
                   <h3 className="text-lg font-medium text-slate-700 mb-2">Condition:</h3>
-                  <p className="text-blue-600 mb-2">{item.condition}</p>
+                  <p className="text-blue-600 mb-2">{toTitleCase(item.condition)}</p>
 
                   <h3 className="text-lg font-medium text-slate-700 mb-2">Type:</h3>
-                  <p className="text-slate-600 mb-2">{item.type}</p>
+                  <p className="text-slate-600 mb-2">{toTitleCase(item.type)}</p>
 
                   <h3 className="text-lg font-medium text-slate-700 mb-2">Location:</h3>
-                  <p className="text-slate-600 mb-2">{item.location}</p>
+                  <p className="text-slate-600 mb-2">{toTitleCase(item.location)}</p>
 
                   <h3 className="text-lg font-medium text-slate-700 mb-2">Last Updated:</h3>
                   <p className="text-slate-600 mb-2">{new Date(item.updated_at).toLocaleDateString()}</p>

@@ -9,6 +9,7 @@ import getItem from "@/services/getItem";
 import Link from "next/link";
 import Image from "next/image";
 import { Item } from "@/types/item";
+import { toTitleCase } from "@/utils/titleCase";
 
 
 
@@ -73,9 +74,9 @@ export default function Home() {
                     width={200}
                     height={200}
                     className="w-full h-32 object-cover mb-3 rounded" />
-                  <h4 className="text-slate-800 font-bold">{item.title}</h4>
-                  <p className="text-blue-600">{item.condition}</p>
-                  <p className="text-slate-600 text-sm">{item.type}</p>
+                  <h4 className="text-slate-800 font-bold">{toTitleCase(item.title)}</h4>
+                  <p className="text-blue-600">{toTitleCase(item.condition)}</p>
+                  <p className="text-slate-600 text-sm">{toTitleCase(item.type)}</p>
                 </div>
               </Link>
             ))
