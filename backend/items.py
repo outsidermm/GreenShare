@@ -107,7 +107,7 @@ async def user_get_browse_items(
     title_filter: str = None,
     item_id: str = None,
     user_id: str = None,
-) -> dict[dict]:
+) -> dict[int, Item]:
     """
     Retrieves filtered items from the database.
 
@@ -123,11 +123,11 @@ async def user_get_browse_items(
     Returns:
         dict[dict]: Dictionary of all item data in dictionary format.
     """
-    filtered_items = {}
+    filtered_items : dict[int, Item]= {}
     for item_key, item in items.items():
         if item.get_status() == "Available":
             filtered_items[item_key] = item
-    
+
     if title_filter is not None:
         title_filter = title_filter.title()
         if len(title_filter) < 3 or len(title_filter) > 100:
@@ -198,7 +198,7 @@ async def user_get_browse_items(
         for item_key, item in filtered_items.items():
             if item.get_item_pk() != int(item_id):
                 del filtered_items[item_key]
-
+                
     if user_id is not None:
         if not user_id.isdigit() or int(user_id) <= 0:
             abort(400, "User ID must be a positive integer.")
