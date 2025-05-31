@@ -4,17 +4,21 @@ import { MdLogout } from "react-icons/md";
 import Link from "next/link";
 
 interface NavBarProps {
-  categories: {
-    label: string;
-    path: string;
-  }[];
   handleLogout: () => void;
   pathname: string;
   isAuthenticated: boolean;
 }
 
 export default function NavBar(props: NavBarProps) {
-  const { categories, handleLogout, pathname, isAuthenticated } = props;
+  const {handleLogout, pathname, isAuthenticated } = props;
+
+  const categories = [
+    { label: "Essentials", path: "/category/essentials" },
+    { label: "Living", path: "/category/living" },
+    { label: "Tools & Tech", path: "/category/tools-tech" },
+    { label: "Style & Expression", path: "/category/style-expression" },
+    { label: "Leisure & Learning", path: "/category/leisure-learning" },
+  ];
 
   return (
     <>

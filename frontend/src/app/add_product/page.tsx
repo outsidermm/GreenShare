@@ -51,13 +51,6 @@ export default function Home() {
   );
   const [selectedType, setSelectedType] = useState<Option | null>(null);
 
-  const categories = [
-    { label: "Essentials", path: "/category/essentials" },
-    { label: "Living", path: "/category/living" },
-    { label: "Tools & Tech", path: "/category/tools-tech" },
-    { label: "Style & Expression", path: "/category/style-expression" },
-    { label: "Leisure & Learning", path: "/category/leisure-learning" },
-  ];
 
   const [selectedLocation, setSelectedLocation] = useState<Option | null>(null);
 
@@ -128,7 +121,6 @@ export default function Home() {
 
         <div className="fixed top-16 left-0 w-60 h-[calc(100vh-4rem)] bg-slate-900 text-white px-6 py-6 shadow-slate-400 shadow-xl flex flex-col justify-between">
           <NavBar
-            categories={categories}
             handleLogout={handleLogout}
             pathname={pathname}
             isAuthenticated={isAuthenticated}
