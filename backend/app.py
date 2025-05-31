@@ -216,7 +216,7 @@ async def create_item():
 
 
 # Unified GET /item route with optional filters
-@app.route("/item", methods=["GET"])
+@app.route("/items", methods=["GET"])
 async def get_browse_items():
     """
     Retrieves items from the database with optional filters:
@@ -243,9 +243,7 @@ async def get_browse_items():
         filtered_items = await user_get_browse_items(
             category, condition, location, type, title, item_id, user_id
         )
-        if not filtered_items:
-            return jsonify({"message": "No items found"}), 404
-        return jsonify(filtered_items), 200
+        return jsonify([item.to_dict() for key, item in filtered_items.items()]), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
