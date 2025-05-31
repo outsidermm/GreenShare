@@ -12,6 +12,7 @@ from backend.classes.item import Item
 from backend.classes.exchange_offer import ExchangeOffer
 import re
 from backend.items import user_create_item, user_get_browse_items
+from backend.data import users, items, exchange_offers
 import os, requests
 
 PLACES_API_KEY = os.getenv("PLACES_API_KEY")
@@ -268,9 +269,9 @@ async def address_autocomplete():
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
-        users = User.backup()
-        items = Item.backup()
-        exchange_offers = ExchangeOffer.backup()
+        users.update(User.backup())  # Load users from the database
+        items.update(Item.backup())
+        exchange_offers.update(ExchangeOffer.backup())
 
     # Run Flask server in debug mode on port 4000 for local testing
     app.run(host="0.0.0.0", port=4000, debug=True)
