@@ -140,3 +140,10 @@ class Item:
     def set_type(self, new_type: str) -> None:
         ItemDB.query.filter_by(id=self.get_item_pk()).first().type = new_type
         db.session.commit()
+
+    def to_dict(self) -> dict:
+        """
+        Returns a dictionary representation of the item.
+        """
+        item = ItemDB.query.filter_by(id=self.get_item_pk()).first()
+        return item.to_json()
