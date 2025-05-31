@@ -8,6 +8,9 @@ import { useEffect, useState } from "react";
 import getItem from "@/services/getItem";
 import Image from "next/image";
 import { FaChevronLeft } from "react-icons/fa6";
+import "swiper/css";
+import { Carousel } from "react-responsive-carousel";
+import "react-responsive-carousel/lib/styles/carousel.min.css";
 
 interface Item {
     id: string;
@@ -82,22 +85,47 @@ export default function Home() {
       </div>
 
       <div className="ml-60 p-6">
-        <div className= "p-2">
+        <div className= "p-2 mb-6">
           <div onClick={() => router.back()} className="cursor-pointer w-fit p-1 hover:bg-slate-300 rounded">
             <FaChevronLeft color="black" size={16} />
           </div>
         </div>
         <div className="flex flex-col sm:flex-row gap-6">
-          <div className="flex-1">
-            {item && (
-              <Image
-                src={item.images[0] || "/placeholder.png"}
-                alt={item.title}
-                width={500}
-                height={500}
-                className="w-full max-h-screen rounded shadow"
-              />
-            )}
+          <div className="flex-1 flex justify-center items-center">
+            <Carousel
+              showArrows={true}
+              showIndicators={true}
+              infiniteLoop={true}
+              dynamicHeight={false}
+              showThumbs={false}
+              className="w-full rounded-xl shadow-xl"
+            >
+              {item && item.images.length > 0 ? (
+                item.images.map((image, index) => (
+                  <div key={index} className="flex justify-center items-center w-full h-full bg-white overflow-hidden rounded">
+                    <Image
+                      src={image}
+                      alt={item.title}
+                      width={500}
+                      height={500}
+                      className="object-contain mx-auto h-auto w-auto"
+                    />
+                  </div>
+                ))
+              ) : (
+                [
+                  <div key="placeholder" className="flex justify-center items-center w-full h-full bg-white overflow-hidden rounded">
+                    <Image
+                      src="/placeholder.png"
+                      alt="No image available"
+                      width={500}
+                      height={500}
+                      className="object-contain mx-auto h-auto w-auto"
+                    />
+                  </div>
+                ]
+              )}
+            </Carousel>
           </div>
           <div className="flex-1">
             {item ? (
