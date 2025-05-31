@@ -61,7 +61,14 @@ export default function Home() {
 
   const handleSubmit = async () => {
     if (!isAuthenticated) {
-      alert("You must be logged in to add a product.");
+      swal("Please log in to add a product.", {
+        icon: "warning",
+        buttons: ["Cancel", "Login"], // [cancel, confirm]
+      }).then((willLogin) => {
+        if (willLogin) {
+          router.push("/login");
+        }
+      });
       return;
     }
     if (
@@ -69,9 +76,12 @@ export default function Home() {
       !description ||
       !selectedCondition ||
       !selectedType ||
-      !selectedLocation
+      !selectedLocation ||
+      !selectedFiles.length
     ) {
-      alert("Please fill in all required fields.");
+      swal("Please fill in all fields and select at least one image.", {
+        icon: "warning",
+      });
       return;
     }
     await createItem({
