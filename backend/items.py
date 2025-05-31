@@ -123,10 +123,19 @@ async def user_get_browse_items(
     Returns:
         dict[dict]: Dictionary of all item data in dictionary format.
     """
+    if item_id is not None:
+        if not item_id.isdigit() or int(item_id) <= 0:
+            abort(400, "Item ID must be a positive integer.")
+        for item_key, item in items.items():
+            if ((item.get_item_pk() == int(item_id)) and (item.get_status() == "available")):
+                return {item_key: item}
+
     filtered_items : dict[int, Item]= {}
     for item_key, item in items.items():
         if item.get_status() == "available":
             filtered_items[item_key] = item
+
+    filtered_items_copy = filtered_items.copy()  # Create a copy to avoid modifying the original
 
     if title_filter is not None:
         title_filter = title_filter.lower()
@@ -134,8 +143,10 @@ async def user_get_browse_items(
             abort(400, "Title filter must be between 3 and 100 characters.")
         safe_title_filter = re.escape(title_filter)
         for item_key, item in filtered_items.items():
-            if title_matches(safe_title_filter, item.get_title()):
-                filtered_items[item.get_item_pk()] = item.item_data()
+            if not title_matches(safe_title_filter, item.get_title()):
+                del filtered_items[item_key]
+    
+    filtered_items_copy = filtered_items.copy()  # Create a copy to avoid modifying the original
 
     if category_filter is not None:
         category_filter = category_filter.lower()
@@ -151,9 +162,11 @@ async def user_get_browse_items(
                 "Category must be one of: Essentials, Living, Tools & Tech, Style & Expression, Leisure & Learning.",
             )
         safe_category_filter = re.escape(category_filter)
-        for item_key, item in filtered_items.items():
+        for item_key, item in filtered_items_copy.items():
             if item.get_category() != safe_category_filter:
                 del filtered_items[item_key]
+
+    filtered_items_copy = filtered_items.copy()  # Create a copy to avoid modifying the original
 
     if condition_filter is not None:
         condition_filter = condition_filter.lower()
@@ -169,16 +182,18 @@ async def user_get_browse_items(
                 "Condition must be one of: New, Like New, Very Good, Good, Fair, Poor.",
             )
         safe_condition_filter = re.escape(condition_filter)
-        for item_key, item in filtered_items.items():
+        for item_key, item in filtered_items_copy.items():
             if item.get_condition() != safe_condition_filter:
                 del filtered_items[item_key]
+
+    filtered_items_copy = filtered_items.copy()  # Create a copy to avoid modifying the original
 
     if location_filter is not None:
         location_filter = location_filter.lower()
         if len(location_filter) < 3 or len(location_filter) > 100:
             abort(400, "Location filter must be between 3 and 100 characters.")
         safe_location_filter = re.escape(location_filter)
-        for item_key, item in filtered_items.items():
+        for item_key, item in filtered_items_copy.items():
             if item.get_location() != safe_location_filter:
                 del filtered_items[item_key]
 
@@ -187,21 +202,16 @@ async def user_get_browse_items(
         if type_filter not in ["Free", "Exchange"]:
             abort(400, "Type must be either 'Free' or 'Exchange'.")
         safe_type_filter = re.escape(type_filter)
-        for item_key, item in filtered_items.items():
+        for item_key, item in filtered_items_copy.items():
             if item.get_type() != safe_type_filter:
                 del filtered_items[item_key]
 
-    if item_id is not None:
-        if not item_id.isdigit() or int(item_id) <= 0:
-            abort(400, "Item ID must be a positive integer.")
-        for item_key, item in filtered_items.items():
-            if item.get_item_pk() != int(item_id):
-                del filtered_items[item_key]
+    filtered_items_copy = filtered_items.copy()  # Create a copy to avoid modifying the original
                 
     if user_id is not None:
         if not user_id.isdigit() or int(user_id) <= 0:
             abort(400, "User ID must be a positive integer.")
-        for item_key, item in filtered_items.items():
+        for item_key, item in filtered_items_copy.items():
             if item.get_user_id() != int(user_id):
                 del filtered_items[item_key]
     return filtered_items
