@@ -5,10 +5,10 @@ from backend.classes.item import Item
 users: dict[str, User] = (
     {}
 )  # Dictionary to store user objects by their unique identifier (e.g., email)
-items: dict[str, Item] = (
+items: dict[int, Item] = (
     {}
 )  # Dictionary to store item objects by their unique identifier (e.g., item ID)
-exchange_offers: dict[str, Item] = (
+exchange_offers: dict[int, Item] = (
     {}
 )  # Dictionary to store exchange offer objects by their unique identifier (e.g., offer ID)
 

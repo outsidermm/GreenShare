@@ -38,12 +38,12 @@ async def user_create_item(
         csrf_token (str): User's CSRF token.
     """
     new_user_id = admin_retrieve_user_id(session_token, csrf_token)
-    new_category = "Essentials"
-    new_title = new_title.title()
-    new_description = new_description.title()
-    new_condition = new_condition.title()
-    new_location = new_location.title()
-    new_type = new_type.title()
+    new_category = "essentials"
+    new_title = new_title.lower()
+    new_description = new_description.lower()
+    new_condition = new_condition.lower()
+    new_location = new_location.lower()
+    new_type = new_type.lower()
 
     safe_title = re.escape(new_title)
     safe_description = re.escape(new_description)
@@ -58,25 +58,23 @@ async def user_create_item(
         abort(400, "Description must be between 10 and 1000 characters.")
 
     if new_condition not in [
-        "New",
-        "Like-New",
-        "used-Good",
-        "Used-Fair",
-        "Poor",
+        "new",
+        "like-new",
+        "used-good",
+        "used-fair",
+        "poor",
     ]:
-        abort(
-            400, "Condition must be one of: New, Like New, Good, Fair, Poor."
-        )
+        abort(400, "Condition must be one of: New, Like New, Good, Fair, Poor.")
 
-    if new_type not in ["Free", "Exchange"]:
+    if new_type not in ["free", "exchange"]:
         abort(400, "Type must be either 'Free' or 'Exchange'.")
 
     if new_category not in [
-        "Essentials",
-        "Living",
-        "Tools-Tech",
-        "Style-Expression",
-        "Leisure-Learning",
+        "essentials",
+        "living",
+        "tools-tech",
+        "style-expression",
+        "leisure-learning",
     ]:
         abort(
             400,
@@ -107,7 +105,7 @@ async def user_get_browse_items(
     title_filter: str = None,
     item_id: str = None,
     user_id: str = None,
-) -> dict[dict]:
+) -> dict[int, Item]:
     """
     Retrieves filtered items from the database.
 
@@ -123,86 +121,107 @@ async def user_get_browse_items(
     Returns:
         dict[dict]: Dictionary of all item data in dictionary format.
     """
-    filtered_items = {}
+    if item_id is not None:
+        if not item_id.isdigit() or int(item_id) <= 0:
+            abort(400, "Item ID must be a positive integer.")
+        for item_key, item in items.items():
+            if (item.get_item_pk() == int(item_id)) and (
+                item.get_status() == "available"
+            ):
+                return {item_key: item}
+
+    filtered_items: dict[int, Item] = {}
     for item_key, item in items.items():
-        if item.get_status() == "Available":
+        if item.get_status() == "available":
             filtered_items[item_key] = item
-    
+
+    filtered_items_copy = (
+        filtered_items.copy()
+    )  # Create a copy to avoid modifying the original
+
     if title_filter is not None:
-        title_filter = title_filter.title()
+        title_filter = title_filter.lower()
         if len(title_filter) < 3 or len(title_filter) > 100:
             abort(400, "Title filter must be between 3 and 100 characters.")
         safe_title_filter = re.escape(title_filter)
         for item_key, item in filtered_items.items():
-            if title_matches(safe_title_filter, item.get_title()):
-                filtered_items[item.get_item_pk()] = item.item_data()
+            if not title_matches(safe_title_filter, item.get_title()):
+                del filtered_items[item_key]
+
+    filtered_items_copy = (
+        filtered_items.copy()
+    )  # Create a copy to avoid modifying the original
 
     if category_filter is not None:
-        category_filter = category_filter.title()
+        category_filter = category_filter.lower()
         if category_filter not in [
-            "Essentials",
-            "Living",
-            "Tools-Tech",
-            "Style-Expression",
-            "Leisure-Learning",
+            "essentials",
+            "living",
+            "tools-tech",
+            "style-expression",
+            "leisure-learning",
         ]:
             abort(
                 400,
                 "Category must be one of: Essentials, Living, Tools & Tech, Style & Expression, Leisure & Learning.",
             )
         safe_category_filter = re.escape(category_filter)
-        for item_key, item in filtered_items.items():
+        for item_key, item in filtered_items_copy.items():
             if item.get_category() != safe_category_filter:
                 del filtered_items[item_key]
 
+    filtered_items_copy = (
+        filtered_items.copy()
+    )  # Create a copy to avoid modifying the original
+
     if condition_filter is not None:
-        condition_filter = condition_filter.title()
+        condition_filter = condition_filter.lower()
         if condition_filter not in [
-            "New",
-            "Like New",
-            "Very Good",
-            "Good",
-            "Fair",
-            "Poor",
+            "new",
+            "like-new",
+            "used-good",
+            "used-fair",
+            "poor",
         ]:
             abort(
                 400,
                 "Condition must be one of: New, Like New, Very Good, Good, Fair, Poor.",
             )
         safe_condition_filter = re.escape(condition_filter)
-        for item_key, item in filtered_items.items():
+        for item_key, item in filtered_items_copy.items():
             if item.get_condition() != safe_condition_filter:
                 del filtered_items[item_key]
 
+    filtered_items_copy = (
+        filtered_items.copy()
+    )  # Create a copy to avoid modifying the original
+
     if location_filter is not None:
-        location_filter = location_filter.title()
+        location_filter = location_filter.lower()
         if len(location_filter) < 3 or len(location_filter) > 100:
             abort(400, "Location filter must be between 3 and 100 characters.")
         safe_location_filter = re.escape(location_filter)
-        for item_key, item in filtered_items.items():
+        for item_key, item in filtered_items_copy.items():
             if item.get_location() != safe_location_filter:
                 del filtered_items[item_key]
 
     if type_filter is not None:
-        type_filter = type_filter.title()
+        type_filter = type_filter.lower()
         if type_filter not in ["Free", "Exchange"]:
             abort(400, "Type must be either 'Free' or 'Exchange'.")
         safe_type_filter = re.escape(type_filter)
-        for item_key, item in filtered_items.items():
+        for item_key, item in filtered_items_copy.items():
             if item.get_type() != safe_type_filter:
                 del filtered_items[item_key]
 
-    if item_id is not None:
-        if not item_id.isdigit() or int(item_id) <= 0:
-            abort(400, "Item ID must be a positive integer.")
-        for item_key, item in filtered_items.items():
-            if item.get_item_pk() != int(item_id):
-                del filtered_items[item_key]
+    filtered_items_copy = (
+        filtered_items.copy()
+    )  # Create a copy to avoid modifying the original
 
     if user_id is not None:
         if not user_id.isdigit() or int(user_id) <= 0:
             abort(400, "User ID must be a positive integer.")
-        for item_key, item in filtered_items.items():
+        for item_key, item in filtered_items_copy.items():
             if item.get_user_id() != int(user_id):
                 del filtered_items[item_key]
     return filtered_items

@@ -1,6 +1,7 @@
 from datetime import datetime
 from backend.config import db
 
+
 class UserDB(db.Model):
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
@@ -96,20 +97,12 @@ offer_requested_items = db.Table(
 )
 
 
-ItemDB.images = db.relationship(
-    "ItemImageDB",
-    backref="item",
-    lazy=True
-)
+ItemDB.images = db.relationship("ItemImageDB", backref="item", lazy=True)
 
 ExchangeOfferDB.offered_items = db.relationship(
-    "ItemDB",
-    secondary=offer_offered_items,
-    backref="offers_made_for"
+    "ItemDB", secondary=offer_offered_items, backref="offers_made_for"
 )
 
 ExchangeOfferDB.requested_items = db.relationship(
-    "ItemDB",
-    secondary=offer_requested_items,
-    backref="offers_requested_for"
+    "ItemDB", secondary=offer_requested_items, backref="offers_requested_for"
 )

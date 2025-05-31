@@ -4,18 +4,30 @@ import { useRouter } from "next/navigation";
 import NavBar from "@/components/NavBar";
 import logoutUser from "@/services/logoutUser";
 import HeaderBar from "@/components/HeaderBar";
+import { useEffect, useState } from "react";
+import getItem from "@/services/getItem";
+import Link from "next/link";
+import Image from "next/image";
+import { Item } from "@/types/item";
+import { toTitleCase } from "@/utils/titleCase";
 
 export default function Home() {
   const { isAuthenticated, refreshAuth } = useAuth();
   const router = useRouter();
+  const [items, setItems] = useState<Array<Item>>([]);
 
-  const categories = [
-    { label: "Essentials", path: "/category/essentials" },
-    { label: "Living", path: "/category/living" },
-    { label: "Tools & Tech", path: "/category/tools-tech" },
-    { label: "Style & Expression", path: "/category/style-expression" },
-    { label: "Leisure & Learning", path: "/category/leisure-learning" },
-  ];
+  useEffect(() => {
+    const fetchItems = async () => {
+      try {
+        const response = await getItem({});
+        setItems(response);
+      } catch (error) {
+        console.error("Error fetching items:", error);
+      }
+    };
+
+    fetchItems();
+  }, []);
 
   const handleLogin = async () => {
     router.push("/login");
@@ -38,7 +50,6 @@ export default function Home() {
 
       <div className="fixed top-16 left-0 w-60 h-[calc(100vh-4rem)] bg-slate-900 text-white px-6 py-6 shadow-slate-400 shadow-xl flex flex-col justify-between">
         <NavBar
-          categories={categories}
           handleLogout={handleLogout}
           pathname="/"
           isAuthenticated={isAuthenticated}
@@ -59,20 +70,33 @@ export default function Home() {
         <h3 className="text-xl text-slate-800 font-semibold mb-4">
           Hot Deals 🔥
         </h3>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
-          {[
-            { name: "Nintendo Switch", condition: "Brand new" },
-            { name: "Sony A7s III", condition: "Slightly used" },
-          ].map((item, i) => (
-            <div key={i} className="bg-white rounded shadow p-4">
-              <div className="bg-slate-500 h-32 mb-3 rounded" />
-              <h4 className="text-slate-800 font-bold">{item.name}</h4>
-              <p className="text-blue-600">{item.condition}</p>
-              <button className="mt-2 text-sm bg-blue-500 text-white px-3 py-1 rounded hover:bg-green-600">
-                Make a Offer
-              </button>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-6">
+          {items.length > 0 ? (
+            items.map((item) => (
+              <Link key={item.id} href={`/view_product/${item.id}`}>
+                <div className="bg-white rounded shadow p-4 cursor-pointer hover:shadow-lg transition">
+                  <Image
+                    src={item.images[0]}
+                    alt={item.title}
+                    width={200}
+                    height={200}
+                    className="w-full h-32 object-cover mb-3 rounded"
+                  />
+                  <h4 className="text-slate-800 font-bold">
+                    {toTitleCase(item.title)}
+                  </h4>
+                  <p className="text-blue-600">{toTitleCase(item.condition)}</p>
+                  <p className="text-slate-600 text-sm">
+                    {toTitleCase(item.type)}
+                  </p>
+                </div>
+              </Link>
+            ))
+          ) : (
+            <div className="col-span-4 text-center text-slate-600">
+              <p>No items available at the moment.</p>
             </div>
-          ))}
+          )}
         </div>
       </div>
     </div>

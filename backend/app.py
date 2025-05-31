@@ -12,10 +12,12 @@ from backend.classes.item import Item
 from backend.classes.exchange_offer import ExchangeOffer
 import re
 from backend.items import user_create_item, user_get_browse_items
+from backend.data import users, items, exchange_offers
 import os, requests
 
 PLACES_API_KEY = os.getenv("PLACES_API_KEY")
 IMGUR_CLIENT_ID = os.getenv("IMGUR_CLIENT_ID")
+
 
 @app.route("/")
 def index():
@@ -180,7 +182,7 @@ async def create_item():
         type = data["type"]
         images_file = request.files.getlist("images")
 
-        if not all ([title, description, condition, location, type]):
+        if not all([title, description, condition, location, type]):
             return jsonify({"error": "All fields are required"}), 400
 
         headers = {"Authorization": f"Client-ID {IMGUR_CLIENT_ID}"}
@@ -191,7 +193,7 @@ async def create_item():
             upload_response = requests.post(
                 "https://api.imgur.com/3/image",
                 headers=headers,
-                files={"image": file.read()}
+                files={"image": file.read()},
             )
             if upload_response.status_code == 200:
                 image_urls.append(upload_response.json()["data"]["link"])
@@ -216,7 +218,7 @@ async def create_item():
 
 
 # Unified GET /item route with optional filters
-@app.route("/item", methods=["GET"])
+@app.route("/items", methods=["GET"])
 async def get_browse_items():
     """
     Retrieves items from the database with optional filters:
@@ -243,9 +245,7 @@ async def get_browse_items():
         filtered_items = await user_get_browse_items(
             category, condition, location, type, title, item_id, user_id
         )
-        if not filtered_items:
-            return jsonify({"message": "No items found"}), 404
-        return jsonify(filtered_items), 200
+        return jsonify([item.to_dict() for key, item in filtered_items.items()]), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -270,9 +270,9 @@ async def address_autocomplete():
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
-        users = User.backup()
-        items = Item.backup()
-        exchange_offers = ExchangeOffer.backup()
+        users.update(User.backup())  # Load users from the database
+        items.update(Item.backup())
+        exchange_offers.update(ExchangeOffer.backup())
 
     # Run Flask server in debug mode on port 4000 for local testing
     app.run(host="0.0.0.0", port=4000, debug=True)

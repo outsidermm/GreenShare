@@ -13,11 +13,7 @@ import LocationSelect from "@/components/LocationSelect";
 import DropDown from "@/components/DropDown";
 import createItem from "@/services/createItem";
 import swal from "sweetalert";
-
-export interface Option {
-  value: string;
-  label: string;
-}
+import { Option } from "@/types/option";
 
 export default function Home() {
   const { isAuthenticated, refreshAuth } = useAuth();
@@ -51,14 +47,6 @@ export default function Home() {
   );
   const [selectedType, setSelectedType] = useState<Option | null>(null);
 
-  const categories = [
-    { label: "Essentials", path: "/category/essentials" },
-    { label: "Living", path: "/category/living" },
-    { label: "Tools & Tech", path: "/category/tools-tech" },
-    { label: "Style & Expression", path: "/category/style-expression" },
-    { label: "Leisure & Learning", path: "/category/leisure-learning" },
-  ];
-
   const [selectedLocation, setSelectedLocation] = useState<Option | null>(null);
 
   const handleLogin = async () => {
@@ -73,7 +61,14 @@ export default function Home() {
 
   const handleSubmit = async () => {
     if (!isAuthenticated) {
-      alert("You must be logged in to add a product.");
+      swal("Please log in to add a product.", {
+        icon: "warning",
+        buttons: ["Cancel", "Login"], // [cancel, confirm]
+      }).then((willLogin) => {
+        if (willLogin) {
+          router.push("/login");
+        }
+      });
       return;
     }
     if (
@@ -81,9 +76,12 @@ export default function Home() {
       !description ||
       !selectedCondition ||
       !selectedType ||
-      !selectedLocation
+      !selectedLocation ||
+      !selectedFiles.length
     ) {
-      alert("Please fill in all required fields.");
+      swal("Please fill in all fields and select at least one image.", {
+        icon: "warning",
+      });
       return;
     }
     await createItem({
@@ -91,7 +89,7 @@ export default function Home() {
       description,
       condition: selectedCondition.value,
       type: selectedType.value,
-      location: selectedLocation.value,
+      location: selectedLocation.label,
       images: selectedFiles,
     })
       .then((response) => {
@@ -104,7 +102,7 @@ export default function Home() {
       })
       .catch((error) => {
         console.error("Error creating item:", error);
-        swal("Error!", "Failed to add product. Please try again.", "error");  
+        swal("Error!", "Failed to add product. Please try again.", "error");
       });
     setTitle("");
     setDescription("");
@@ -128,7 +126,6 @@ export default function Home() {
 
         <div className="fixed top-16 left-0 w-60 h-[calc(100vh-4rem)] bg-slate-900 text-white px-6 py-6 shadow-slate-400 shadow-xl flex flex-col justify-between">
           <NavBar
-            categories={categories}
             handleLogout={handleLogout}
             pathname={pathname}
             isAuthenticated={isAuthenticated}
@@ -151,7 +148,7 @@ export default function Home() {
               </div>
               <button
                 type="submit"
-                className="bg-green-400 text-slate-800 px-4 py-2 rounded-full hover:bg-green-500 flex items-center gap-2 transition-all"
+                className="bg-green-600 text-slate-800 px-4 py-2 rounded-full hover:bg-green-500 flex items-center gap-2 transition-all border-2 border-green-600 font-bold"
               >
                 <IoMdCheckmark />
                 <p>Add Product</p>
@@ -231,6 +228,7 @@ export default function Home() {
                   <input
                     type="file"
                     accept="image/*"
+                    required
                     multiple
                     onChange={(e) => {
                       const files = Array.from(e.target.files || []);

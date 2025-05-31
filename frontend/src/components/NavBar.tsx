@@ -4,17 +4,21 @@ import { MdLogout } from "react-icons/md";
 import Link from "next/link";
 
 interface NavBarProps {
-  categories: {
-    label: string;
-    path: string;
-  }[];
   handleLogout: () => void;
   pathname: string;
   isAuthenticated: boolean;
 }
 
 export default function NavBar(props: NavBarProps) {
-  const { categories, handleLogout, pathname, isAuthenticated } = props;
+  const { handleLogout, pathname, isAuthenticated } = props;
+
+  const categories = [
+    { label: "Essentials", path: "/category/essentials" },
+    { label: "Living", path: "/category/living" },
+    { label: "Tools & Tech", path: "/category/tools-tech" },
+    { label: "Style & Expression", path: "/category/style-expression" },
+    { label: "Leisure & Learning", path: "/category/leisure-learning" },
+  ];
 
   return (
     <>
@@ -50,30 +54,34 @@ export default function NavBar(props: NavBarProps) {
             );
           })}
         </ul>
-        {isAuthenticated && (<h2 className="text-sm font-bold mb-2 mt-6">
-          <Link
-            href="/add_product"
-            className={`block px-4 py-1 rounded transition-all ${
-              pathname === "/add_product"
-                ? "bg-slate-800 border-l-4 border-green-400 text-green-400 font-semibold"
-                : "hover:text-green-400"
-            }`}
-          >
-            Add Product
-          </Link>
-        </h2>)}
-        {isAuthenticated && (<h2 className="text-sm font-bold mb-2 mt-6">
-          <Link
-            href="/offers"
-            className={`block px-4 py-1 rounded transition-all ${
-              pathname === "/offers"
-                ? "bg-slate-800 border-l-4 border-green-400 text-green-400 font-semibold"
-                : "hover:text-green-400"
-            }`}
-          >
-            Offers
-          </Link>
-        </h2>)}
+        {isAuthenticated && (
+          <h2 className="text-sm font-bold mb-2 mt-6">
+            <Link
+              href="/add_product"
+              className={`block px-4 py-1 rounded transition-all ${
+                pathname === "/add_product"
+                  ? "bg-slate-800 border-l-4 border-green-400 text-green-400 font-semibold"
+                  : "hover:text-green-400"
+              }`}
+            >
+              Add Product
+            </Link>
+          </h2>
+        )}
+        {isAuthenticated && (
+          <h2 className="text-sm font-bold mb-2 mt-6">
+            <Link
+              href="/offers"
+              className={`block px-4 py-1 rounded transition-all ${
+                pathname === "/offers"
+                  ? "bg-slate-800 border-l-4 border-green-400 text-green-400 font-semibold"
+                  : "hover:text-green-400"
+              }`}
+            >
+              Offers
+            </Link>
+          </h2>
+        )}
       </div>
       {isAuthenticated && (
         <div className="flex flex-row transition-all cursor-pointer py-4">
