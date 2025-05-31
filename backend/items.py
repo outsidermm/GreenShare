@@ -38,12 +38,12 @@ async def user_create_item(
         csrf_token (str): User's CSRF token.
     """
     new_user_id = admin_retrieve_user_id(session_token, csrf_token)
-    new_category = "Essentials"
-    new_title = new_title.title()
-    new_description = new_description.title()
-    new_condition = new_condition.title()
-    new_location = new_location.title()
-    new_type = new_type.title()
+    new_category = "essentials"
+    new_title = new_title.lower()
+    new_description = new_description.lower()
+    new_condition = new_condition.lower()
+    new_location = new_location.lower()
+    new_type = new_type.lower()
 
     safe_title = re.escape(new_title)
     safe_description = re.escape(new_description)
@@ -58,25 +58,25 @@ async def user_create_item(
         abort(400, "Description must be between 10 and 1000 characters.")
 
     if new_condition not in [
-        "New",
-        "Like-New",
-        "used-Good",
-        "Used-Fair",
-        "Poor",
+        "new",
+        "like-new",
+        "used-good",
+        "used-fair",
+        "poor",
     ]:
         abort(
             400, "Condition must be one of: New, Like New, Good, Fair, Poor."
         )
 
-    if new_type not in ["Free", "Exchange"]:
+    if new_type not in ["free", "exchange"]:
         abort(400, "Type must be either 'Free' or 'Exchange'.")
 
     if new_category not in [
-        "Essentials",
-        "Living",
-        "Tools-Tech",
-        "Style-Expression",
-        "Leisure-Learning",
+        "essentials",
+        "living",
+        "tools-tech",
+        "style-expression",
+        "leisure-learning",
     ]:
         abort(
             400,
@@ -125,11 +125,11 @@ async def user_get_browse_items(
     """
     filtered_items : dict[int, Item]= {}
     for item_key, item in items.items():
-        if item.get_status() == "Available":
+        if item.get_status() == "available":
             filtered_items[item_key] = item
 
     if title_filter is not None:
-        title_filter = title_filter.title()
+        title_filter = title_filter.lower()
         if len(title_filter) < 3 or len(title_filter) > 100:
             abort(400, "Title filter must be between 3 and 100 characters.")
         safe_title_filter = re.escape(title_filter)
@@ -138,13 +138,13 @@ async def user_get_browse_items(
                 filtered_items[item.get_item_pk()] = item.item_data()
 
     if category_filter is not None:
-        category_filter = category_filter.title()
+        category_filter = category_filter.lower()
         if category_filter not in [
-            "Essentials",
-            "Living",
-            "Tools-Tech",
-            "Style-Expression",
-            "Leisure-Learning",
+        "essentials",
+        "living",
+        "tools-tech",
+        "style-expression",
+        "leisure-learning",
         ]:
             abort(
                 400,
@@ -156,14 +156,13 @@ async def user_get_browse_items(
                 del filtered_items[item_key]
 
     if condition_filter is not None:
-        condition_filter = condition_filter.title()
+        condition_filter = condition_filter.lower()
         if condition_filter not in [
-            "New",
-            "Like New",
-            "Very Good",
-            "Good",
-            "Fair",
-            "Poor",
+        "new",
+        "like-new",
+        "used-good",
+        "used-fair",
+        "poor",
         ]:
             abort(
                 400,
@@ -175,7 +174,7 @@ async def user_get_browse_items(
                 del filtered_items[item_key]
 
     if location_filter is not None:
-        location_filter = location_filter.title()
+        location_filter = location_filter.lower()
         if len(location_filter) < 3 or len(location_filter) > 100:
             abort(400, "Location filter must be between 3 and 100 characters.")
         safe_location_filter = re.escape(location_filter)
@@ -184,7 +183,7 @@ async def user_get_browse_items(
                 del filtered_items[item_key]
 
     if type_filter is not None:
-        type_filter = type_filter.title()
+        type_filter = type_filter.lower()
         if type_filter not in ["Free", "Exchange"]:
             abort(400, "Type must be either 'Free' or 'Exchange'.")
         safe_type_filter = re.escape(type_filter)
