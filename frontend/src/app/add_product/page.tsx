@@ -91,7 +91,7 @@ export default function Home() {
       description,
       condition: selectedCondition.value,
       type: selectedType.value,
-      location: selectedLocation.value,
+      location: selectedLocation.label,
       images: selectedFiles,
     })
       .then((response) => {
