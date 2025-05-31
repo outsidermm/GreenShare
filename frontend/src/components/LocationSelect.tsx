@@ -3,11 +3,8 @@
 import { useState, useEffect } from "react";
 import autocompleteAddress from "@/services/autocompleteAddress";
 import DropDown from "./DropDown";
+import { Option } from "@/types/option";
 
-interface Option {
-  value: string;
-  label: string;
-}
 
 interface LocationSelectProps {
   value: Option | null;

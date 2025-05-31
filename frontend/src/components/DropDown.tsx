@@ -1,6 +1,6 @@
 "use client";
 
-import { Option } from "@/app/add_product/page";
+import { Option } from "@/types/option";
 import { OnChangeValue } from "react-select";
 import dynamic from "next/dynamic";
 

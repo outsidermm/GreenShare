@@ -13,11 +13,7 @@ import LocationSelect from "@/components/LocationSelect";
 import DropDown from "@/components/DropDown";
 import createItem from "@/services/createItem";
 import swal from "sweetalert";
-
-export interface Option {
-  value: string;
-  label: string;
-}
+import { Option } from "@/types/option";
 
 export default function Home() {
   const { isAuthenticated, refreshAuth } = useAuth();

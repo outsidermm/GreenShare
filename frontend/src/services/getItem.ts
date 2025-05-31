@@ -1,3 +1,5 @@
+import { Item } from "@/types/item";
+
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
 
@@ -9,20 +11,6 @@ interface getItemInput {
     title?: string;
     item_id?: string;
     user_id?: string;
-}
-
-interface Item {
-    id: string;
-    user_id: string;
-    title: string;
-    description: string;
-    condition: string;
-    status: string;
-    location: string;
-    category: string;
-    type: string;
-    updated_at: string;
-    images: string[];
 }
 
 export default async function getItem({
