@@ -1,5 +1,6 @@
 from backend.models import ExchangeOfferDB
 from backend.config import db
+from backend.models import ItemDB
 from typing import Optional
 
 
@@ -8,39 +9,27 @@ class ExchangeOffer:
     Represents an exchange offer with encapsulated access and database interaction.
     """
 
-    __offer_pk: Optional[str] = None
+    __offer_pk: int = None
 
     def __init__(
         self,
-        offered_by_id: list[str],
-        item_id: str,
-        offered_item_id: Optional[str] = None,
+        offered_by_id: int,
+        requested_item_id: int,
+        offered_item_ids: Optional[list[int]] = None,
         message: str = "",
     ):
-        """
-        Creates a new exchange offer in the database and initialises internal state.
-        """
         new_offer = ExchangeOfferDB(
             offered_by_id=offered_by_id,
-            item_id=item_id,
-            offered_item_id=offered_item_id,
+            requested_item_id=requested_item_id,
             message=message,
         )
+        if offered_item_ids:
+            new_offer.offered_items = ItemDB.query.filter(ItemDB.id.in_(offered_item_ids)).all()
+
         db.session.add(new_offer)
         db.session.commit()
         self.set_offer_pk(new_offer.id)
 
-    @classmethod
-    def load(cls, offer_id: str) -> Optional["ExchangeOffer"]:
-        """
-        Loads an existing offer by ID from the database.
-        """
-        offer = ExchangeOfferDB.query.filter_by(id=offer_id).first()
-        if not offer:
-            return None
-        offer_obj = cls.__new__(cls)
-        offer_obj.set_offer_pk(offer.id)
-        return offer_obj
 
     @classmethod
     def backup(cls) -> dict[str, "ExchangeOffer"]:
@@ -59,56 +48,117 @@ class ExchangeOffer:
 
         return offer_dict
 
-    def offer_data(self) -> dict:
+    def set_offer_pk(self, offer_pk: int):
         """
-        Returns the exchange offer data in dictionary form.
+        Sets the primary key for the exchange offer.
         """
-        return ExchangeOfferDB.query.filter_by(id=self.get_offer_pk()).first().to_json()
-
-    def get_offer_pk(self) -> str:
-        return self.__offer_pk
-
-    def set_offer_pk(self, offer_pk: str) -> None:
         self.__offer_pk = offer_pk
+    
+    def get_offer_pk(self) -> int:
+        """
+        Returns the primary key of the exchange offer.
+        """
+        return self.__offer_pk
+    
+    def to_json(self) -> dict:
+        """
+        Converts the exchange offer to a JSON serializable dictionary.
+        """
 
+        offer_record = ExchangeOfferDB.query.get(self.__offer_pk)
+        if not offer_record:
+            raise ValueError("Exchange offer not found in the database.")
+
+        return offer_record.to_json()
+    
     def get_status(self) -> str:
-        return ExchangeOfferDB.query.filter_by(id=self.get_offer_pk()).first().status
+        """
+        Returns the status of the exchange offer.
+        """
 
-    def set_status(self, new_status: str) -> None:
-        ExchangeOfferDB.query.filter_by(id=self.get_offer_pk()).first().status = (
-            new_status
-        )
+        offer_record = ExchangeOfferDB.query.get(self.__offer_pk)
+        if not offer_record:
+            raise ValueError("Exchange offer not found in the database.")
+
+        return offer_record.status
+
+    def set_status(self, status: str):
+        """
+        Sets the status of the exchange offer.
+        """
+
+        offer_record = ExchangeOfferDB.query.get(self.__offer_pk)
+        if not offer_record:
+            raise ValueError("Exchange offer not found in the database.")
+
+        offer_record.status = status
         db.session.commit()
+        self.set_offer_pk(offer_record.id)
 
-    def get_message(self) -> Optional[str]:
-        return ExchangeOfferDB.query.filter_by(id=self.get_offer_pk()).first().message
+    def get_offered_items(self) -> list[int]:
+        """
+        Returns a list of offered item IDs for the exchange offer.
+        """
 
-    def set_message(self, new_message: str) -> None:
-        ExchangeOfferDB.query.filter_by(id=self.get_offer_pk()).first().message = (
-            new_message
-        )
+        offer_record = ExchangeOfferDB.query.get(self.__offer_pk)
+        if not offer_record:
+            raise ValueError("Exchange offer not found in the database.")
+
+        return [item.id for item in offer_record.offered_items]
+
+    def get_offered_by_id(self) -> int:
+        """
+        Returns the user ID of the person who made the offer.
+        """
+
+        offer_record = ExchangeOfferDB.query.get(self.__offer_pk)
+        if not offer_record:
+            raise ValueError("Exchange offer not found in the database.")
+
+        return offer_record.offered_by_id
+    
+    def get_requested_item_id(self) -> int:
+        """
+        Returns the ID of the requested item in the exchange offer.
+        """
+
+        offer_record = ExchangeOfferDB.query.get(self.__offer_pk)
+        if not offer_record:
+            raise ValueError("Exchange offer not found in the database.")
+
+        return offer_record.requested_item_id
+    
+    def get_message(self) -> str:
+        """
+        Returns the message associated with the exchange offer.
+        """
+
+        offer_record = ExchangeOfferDB.query.get(self.__offer_pk)
+        if not offer_record:
+            raise ValueError("Exchange offer not found in the database.")
+
+        return offer_record.message
+    
+    def set_message(self, message: str):
+        """
+        Sets the message for the exchange offer.
+        """
+
+        offer_record = ExchangeOfferDB.query.get(self.__offer_pk)
+        if not offer_record:
+            raise ValueError("Exchange offer not found in the database.")
+
+        offer_record.message = message
         db.session.commit()
+        
+    def delete(self):
+        """
+        Deletes the exchange offer from the database.
+        """
 
-    def get_requested_item_id(self) -> Optional[str]:
-        return (
-            ExchangeOfferDB.query.filter_by(id=self.get_offer_pk())
-            .first()
-            .offered_item_id
-        )
+        offer_record = ExchangeOfferDB.query.get(self.__offer_pk)
+        if not offer_record:
+            raise ValueError("Exchange offer not found in the database.")
 
-    def set_requested_item_id(self, new_item_id: Optional[str]) -> None:
-        offer = ExchangeOfferDB.query.filter_by(id=self.get_offer_pk()).first()
-        offer.offered_item_id = new_item_id
-        db.session.commit()
-
-    def get_offered_by_id(self) -> list[str]:
-        return (
-            ExchangeOfferDB.query.filter_by(id=self.get_offer_pk())
-            .first()
-            .offered_by_id
-        )
-
-    def set_offered_by_id(self, new_offered_by_id: list[str]) -> None:
-        offer = ExchangeOfferDB.query.filter_by(id=self.get_offer_pk()).first()
-        offer.offered_by_id = new_offered_by_id
+        db.session.delete(offer_record)
         db.session.commit()
