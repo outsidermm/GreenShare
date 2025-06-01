@@ -125,7 +125,7 @@ class Item:
     def set_images(self, new_images: list[str]) -> None:
         ItemImageDB.query.filter_by(item_id=self.get_item_pk()).delete()
         db.session.commit()
-        
+
         for image_url in new_images:
             image = ItemImageDB(item_id=self.get_item_pk(), url=image_url)
             db.session.add(image)

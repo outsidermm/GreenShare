@@ -22,6 +22,7 @@ def validate_condition(condition: str) -> str:
         abort(400, "Condition must be one of: New, Like New, Good, Fair, Poor.")
     return sanitize_input(condition)
 
+
 def validate_type(item_type: str) -> str:
     valid_types = ["free", "exchange"]
     item_type = item_type.lower()
@@ -29,17 +30,28 @@ def validate_type(item_type: str) -> str:
         abort(400, "Type must be either 'Free' or 'Exchange'.")
     return sanitize_input(item_type)
 
+
 def validate_category(category: str) -> str:
-    valid_categories = ["essentials", "living", "tools-tech", "style-expression", "leisure-learning"]
+    valid_categories = [
+        "essentials",
+        "living",
+        "tools-tech",
+        "style-expression",
+        "leisure-learning",
+    ]
     category = category.lower()
     if category not in valid_categories:
         abort(400, "Category must be one of: essentials, living, tools-tech, style-expression, leisure-learning.")
     return sanitize_input(category)
 
-def validate_string_length(value: str, field_name: str, min_length: int, max_length: int) -> str:
+
+def validate_string_length(
+    value: str, field_name: str, min_length: int, max_length: int
+) -> str:
     if not (min_length <= len(value) <= max_length):
         abort(400, f"{field_name} must be between {min_length} and {max_length} characters.")
     return sanitize_input(value.lower())
+
 
 
 def title_matches(user_input: str, item_title: str, threshold: float = 0.7) -> bool:
@@ -168,7 +180,9 @@ async def user_get_browse_items(
     )  # Create a copy to avoid modifying the original
 
     if location_filter is not None:
-        safe_location_filter = validate_string_length(location_filter, "Location filter", 3, 100)
+        safe_location_filter = validate_string_length(
+            location_filter, "Location filter", 3, 100
+        )
         for item_key, item in filtered_items_copy.items():
             if item.get_location() != safe_location_filter:
                 del filtered_items[item_key]
@@ -221,7 +235,7 @@ async def user_modify_item(
         Item: The modified item object.
     """
     item_id_int = validate_item_id(item_id)
-    
+
     if session_token and csrf_token:
         user_id = admin_retrieve_user_id(session_token, csrf_token)
         if items[item_id_int].get_user_id() != user_id:
@@ -253,19 +267,19 @@ async def user_modify_item(
         if len(new_location) > 100 or len(new_location) < 3:
             abort(400, "Location must be between 3 and 100 characters.")
         items[item_id_int].set_location(new_location.lower())
-    
+
     if new_type is not None:
         if new_type not in ["free", "exchange"]:
             abort(400, "Type must be either 'Free' or 'Exchange'.")
         items[item_id_int].set_type(new_type.lower())
-    
+
     if new_images is not None:
         if not isinstance(new_images, list):
             abort(400, "Images must be a list of URLs.")
         if len(new_images) > 10:
             abort(400, "You can only upload up to 10 images.")
         items[item_id_int].set_images(new_images)
-    
+
     return items[item_id_int]  # Return the modified item object
 
 

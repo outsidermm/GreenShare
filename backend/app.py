@@ -11,12 +11,24 @@ from backend.classes.user import User
 from backend.classes.item import Item
 from backend.classes.exchange_offer import ExchangeOffer
 import re
-from backend.items import user_create_item, user_delete_item, user_get_browse_items, user_modify_item
+from backend.items import (
+    user_create_item,
+    user_delete_item,
+    user_get_browse_items,
+    user_modify_item,
+)
 from backend.data import users, items, exchange_offers
 import os, requests
 from backend.utils import sanitize_input
 
-from backend.offers import user_accept_offer, user_cancel_offer, user_complete_offer, user_confirm_offer, user_create_offer, user_get_offers
+from backend.offers import (
+    user_accept_offer,
+    user_cancel_offer,
+    user_complete_offer,
+    user_confirm_offer,
+    user_create_offer,
+    user_get_offers,
+)
 
 PLACES_API_KEY = os.getenv("PLACES_API_KEY")
 IMGUR_CLIENT_ID = os.getenv("IMGUR_CLIENT_ID")
@@ -316,17 +328,6 @@ async def delete_item():
         return jsonify({"error": str(e)}), 400
 
 
-
-
-
-
-
-
-
-
-
-
-
 @app.route("offer/create", methods=["POST"])
 async def create_exchange_offer():
     """
@@ -409,7 +410,7 @@ async def accept_exchange_offer():
         return jsonify({"message": message}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-    
+
 
 @app.route("/offer/exchange_complete", methods=["POST"])
 async def complete_exchange_offer():
@@ -433,7 +434,7 @@ async def complete_exchange_offer():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-    
+
 @app.route("/offer/exchange_confirmed", methods=["POST"])
 async def confirm_exchange_offer():
     """
@@ -445,7 +446,6 @@ async def confirm_exchange_offer():
     offer_id = data.get("offerId")
     session_token = re.escape(request.cookies.get("session_token"))
     csrf_token = re.escape(request.headers.get("X-CSRF-TOKEN"))
-
 
     try:
         message = await user_confirm_offer(

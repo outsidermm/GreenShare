@@ -92,9 +92,7 @@ async def user_get_offers(
     return outgoing_offers, incoming_offers
 
 
-async def user_accept_offer(
-    session_token: str, csrf_token: str, offer_id: str
-):
+async def user_accept_offer(session_token: str, csrf_token: str, offer_id: str):
     new_user_id = admin_retrieve_user_id(session_token, csrf_token)
     offer_id = validate_offer_id(offer_id)
 
@@ -106,7 +104,10 @@ async def user_accept_offer(
             and existing_offer.get_status() in ["accepted", "confirmed"]
             and existing_offer.get_offer_pk() != offer.get_offer_pk()
         ):
-            abort(400, "Another offer has already been accepted or confirmed for this item.")
+            abort(
+                400,
+                "Another offer has already been accepted or confirmed for this item.",
+            )
 
     if offer.get_requested_item_id() not in items:
         await user_cancel_offer(session_token, csrf_token, offer_id)
@@ -129,9 +130,7 @@ async def user_accept_offer(
     }
 
 
-async def user_complete_offer(
-    session_token: str, csrf_token: str, offer_id: str
-):
+async def user_complete_offer(session_token: str, csrf_token: str, offer_id: str):
     new_user_id = admin_retrieve_user_id(session_token, csrf_token)
     offer_id = validate_offer_id(offer_id)
 
@@ -146,7 +145,7 @@ async def user_complete_offer(
         abort(400, "Offer is not in an accepted state.")
 
     offer.set_status("completed")  # Update the status to completed
-    
+
     return {
         "message": "Offer completed successfully.",
         "offer_id": offer.get_offer_pk(),
@@ -154,9 +153,7 @@ async def user_complete_offer(
     }
 
 
-async def user_confirm_offer(
-    session_token: str, csrf_token: str, offer_id: str
-):
+async def user_confirm_offer(session_token: str, csrf_token: str, offer_id: str):
     new_user_id = admin_retrieve_user_id(session_token, csrf_token)
     offer_id = validate_offer_id(offer_id)
 
@@ -169,7 +166,9 @@ async def user_confirm_offer(
         abort(400, "Offer is not in a completed state.")
 
     offer.set_status("confirmed")  # Update the status to confirmed
-    items[offer.get_requested_item_id()].set_statis("offer_complete")  # Mark requested item as available
+    items[offer.get_requested_item_id()].set_statis(
+        "offer_complete"
+    )  # Mark requested item as available
     for offered_item_id in offer.get_offered_items():
         if offered_item_id in items:
             items[offered_item_id].set_statis("offer_complete")
@@ -180,16 +179,14 @@ async def user_confirm_offer(
     }
 
 
-async def user_get_offer_details(
-    session_token: str, csrf_token: str, offer_id: str
-):
+async def user_get_offer_details(session_token: str, csrf_token: str, offer_id: str):
     new_user_id = admin_retrieve_user_id(session_token, csrf_token)
     offer_id = validate_offer_id(offer_id)
 
     offer = exchange_offers[offer_id]
     if offer.get_offered_by_id() != new_user_id and (
-        offer.get_requested_item_id() not in items or
-        items[offer.get_requested_item_id()].get_user_id() != new_user_id
+        offer.get_requested_item_id() not in items
+        or items[offer.get_requested_item_id()].get_user_id() != new_user_id
     ):
         abort(403, "You are not authorized to view this offer.")
 
@@ -203,11 +200,16 @@ async def user_cancel_offer(
     offer_id = validate_offer_id(offer_id)
 
     offer = exchange_offers[offer_id]
-    if offer.get_offered_by_id() != new_user_id and items[offer.get_requested_item_id()].get_user_id() != new_user_id:
+    if (
+        offer.get_offered_by_id() != new_user_id
+        and items[offer.get_requested_item_id()].get_user_id() != new_user_id
+    ):
         abort(403, "You are not authorised to cancel this offer.")
 
     if offer.get_status() in ["completed", "confirmed"]:
-        abort(400, "Offer cannot be cancelled after it has been completed or confirmed.")
+        abort(
+            400, "Offer cannot be cancelled after it has been completed or confirmed."
+        )
 
     offer.set_status("cancelled")  # Update the status to cancelled
     offer.set_message(
