@@ -24,12 +24,13 @@ class ExchangeOffer:
             message=message,
         )
         if offered_item_ids:
-            new_offer.offered_items = ItemDB.query.filter(ItemDB.id.in_(offered_item_ids)).all()
+            new_offer.offered_items = ItemDB.query.filter(
+                ItemDB.id.in_(offered_item_ids)
+            ).all()
 
         db.session.add(new_offer)
         db.session.commit()
         self.set_offer_pk(new_offer.id)
-
 
     @classmethod
     def backup(cls) -> dict[str, "ExchangeOffer"]:
@@ -53,13 +54,13 @@ class ExchangeOffer:
         Sets the primary key for the exchange offer.
         """
         self.__offer_pk = offer_pk
-    
+
     def get_offer_pk(self) -> int:
         """
         Returns the primary key of the exchange offer.
         """
         return self.__offer_pk
-    
+
     def to_json(self) -> dict:
         """
         Converts the exchange offer to a JSON serializable dictionary.
@@ -70,7 +71,7 @@ class ExchangeOffer:
             raise ValueError("Exchange offer not found in the database.")
 
         return offer_record.to_json()
-    
+
     def get_status(self) -> str:
         """
         Returns the status of the exchange offer.
@@ -116,7 +117,7 @@ class ExchangeOffer:
             raise ValueError("Exchange offer not found in the database.")
 
         return offer_record.offered_by_id
-    
+
     def get_requested_item_id(self) -> int:
         """
         Returns the ID of the requested item in the exchange offer.
@@ -127,7 +128,7 @@ class ExchangeOffer:
             raise ValueError("Exchange offer not found in the database.")
 
         return offer_record.requested_item_id
-    
+
     def get_message(self) -> str:
         """
         Returns the message associated with the exchange offer.
@@ -138,7 +139,7 @@ class ExchangeOffer:
             raise ValueError("Exchange offer not found in the database.")
 
         return offer_record.message
-    
+
     def set_message(self, message: str):
         """
         Sets the message for the exchange offer.
@@ -150,7 +151,7 @@ class ExchangeOffer:
 
         offer_record.message = message
         db.session.commit()
-        
+
     def delete(self):
         """
         Deletes the exchange offer from the database.

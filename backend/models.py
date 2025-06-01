@@ -62,9 +62,7 @@ class ExchangeOfferDB(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
     offered_by_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-    requested_item_id = db.Column(
-        db.Integer, db.ForeignKey("items.id"), nullable=False
-    )
+    requested_item_id = db.Column(db.Integer, db.ForeignKey("items.id"), nullable=False)
     message = db.Column(db.Text, nullable=False)
     status = db.Column(
         db.String(50), default="Pending"

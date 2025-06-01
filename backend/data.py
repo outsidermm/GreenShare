@@ -1,5 +1,6 @@
 from backend.classes.user import User
 from backend.classes.item import Item
+from backend.classes.exchange_offer import ExchangeOffer
 
 # In-memory storage for users
 users: dict[str, User] = (
@@ -8,7 +9,7 @@ users: dict[str, User] = (
 items: dict[int, Item] = (
     {}
 )  # Dictionary to store item objects by their unique identifier (e.g., item ID)
-exchange_offers: dict[int, Item] = (
+exchange_offers: dict[int, ExchangeOffer] = (
     {}
 )  # Dictionary to store exchange offer objects by their unique identifier (e.g., offer ID)
 

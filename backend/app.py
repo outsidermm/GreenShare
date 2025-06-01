@@ -16,7 +16,7 @@ from backend.data import users, items, exchange_offers
 import os, requests
 from backend.utils import sanitize_input
 
-from backend.offers import user_create_offer
+from backend.offers import user_create_offer, user_get_offers
 
 PLACES_API_KEY = os.getenv("PLACES_API_KEY")
 IMGUR_CLIENT_ID = os.getenv("IMGUR_CLIENT_ID")
@@ -271,7 +271,7 @@ async def create_exchange_offer():
         offered_item_ids = data["offeredItemIds"]
         requested_item_id = data["requestedItemId"]
         message = data["message"]
-        
+
         await user_create_offer(
             session_token=session_token,
             csrf_token=csrf_token,
@@ -280,9 +280,42 @@ async def create_exchange_offer():
             message=message,
         )
 
-        return jsonify({"message": "Exchange offer has been successfully created."}), 201
+        return (
+            jsonify({"message": "Exchange offer has been successfully created."}),
+            201,
+        )
     except Exception as e:
         return jsonify({"error": str(e)}), 400
+
+
+@app.route("offer/userview", methods=["GET"])
+async def view_exchange_offers():
+    """
+    Retrieves all exchange offers from the database.
+
+    Returns:
+        List of exchange offers.
+    """
+    session_token = re.escape(request.cookies.get("session_token"))
+    csrf_token = re.escape(request.headers.get("X-CSRF-TOKEN"))
+
+    try:
+        outgoing_offers, incoming_offers = await user_get_offers(
+            session_token=session_token, csrf_token=csrf_token
+        )
+        outgoing_offers_dict = [offer.to_json() for offer in outgoing_offers]
+        incoming_offers_dict = [offer.to_json() for offer in incoming_offers]
+        return (
+            jsonify(
+                {
+                    "outgoingOffers": outgoing_offers_dict,
+                    "incomingOffers": incoming_offers_dict,
+                }
+            ),
+            200,
+        )
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 @app.route("/api/autocomplete", methods=["POST"])
