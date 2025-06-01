@@ -11,12 +11,12 @@ from backend.classes.user import User
 from backend.classes.item import Item
 from backend.classes.exchange_offer import ExchangeOffer
 import re
-from backend.items import user_create_item, user_get_browse_items
+from backend.items import user_create_item, user_delete_item, user_get_browse_items, user_modify_item
 from backend.data import users, items, exchange_offers
 import os, requests
 from backend.utils import sanitize_input
 
-from backend.offers import user_create_offer, user_get_offers
+from backend.offers import user_accept_offer, user_cancel_offer, user_complete_offer, user_confirm_offer, user_create_offer, user_get_offers
 
 PLACES_API_KEY = os.getenv("PLACES_API_KEY")
 IMGUR_CLIENT_ID = os.getenv("IMGUR_CLIENT_ID")
@@ -225,7 +225,7 @@ async def create_item():
 
 
 # Unified GET /item route with optional filters
-@app.route("/items", methods=["GET"])
+@app.route("/item", methods=["GET"])
 async def get_browse_items():
     """
     Retrieves items from the database with optional filters:
@@ -255,6 +255,76 @@ async def get_browse_items():
         return jsonify([item.to_dict() for key, item in filtered_items.items()]), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+@app.route("/item/edit", methods=["POST"])
+async def edit_item():
+    """
+    Edits an existing item with the provided details.
+
+    Expects item data in JSON format and returns a success message.
+    """
+    try:
+        data = request.json
+        session_token = re.escape(request.cookies.get("session_token"))
+        csrf_token = re.escape(request.headers.get("X-CSRF-TOKEN"))
+        item_id = data["id"]
+        title = data["title"]
+        description = data["description"]
+        condition = data["condition"]
+        location = data["location"]
+        type = data["type"]
+
+        await user_modify_item(
+            item_id=item_id,
+            new_title=title,
+            new_description=description,
+            new_condition=condition,
+            new_location=location,
+            new_type=type,
+            session_token=session_token,
+            csrf_token=csrf_token,
+        )
+        return jsonify({"message": "Item has been successfully edited."}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+
+
+@app.route("/item/delete", methods=["DELETE"])
+async def delete_item():
+    """
+    Deletes an existing item based on the provided item ID.
+
+    Expects item ID in JSON format and returns a success message.
+    """
+    try:
+        data = request.json
+        session_token = re.escape(request.cookies.get("session_token"))
+        csrf_token = re.escape(request.headers.get("X-CSRF-TOKEN"))
+        item_id = data["id"]
+
+        if not item_id:
+            return jsonify({"error": "Item ID is required"}), 400
+
+        await user_delete_item(
+            item_id=item_id,
+            session_token=session_token,
+            csrf_token=csrf_token,
+        )
+        return jsonify({"message": "Item has been successfully deleted."}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+
+
+
+
+
+
+
+
+
+
+
 
 
 @app.route("offer/create", methods=["POST"])
@@ -314,6 +384,126 @@ async def view_exchange_offers():
             ),
             200,
         )
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/offer/accept", methods=["POST"])
+async def accept_exchange_offer():
+    """
+    Accepts an exchange offer based on the provided offer ID.
+
+    Expects offer ID in JSON format and returns a success message.
+    """
+    data = request.json
+    offer_id = data.get("offerId")
+    session_token = re.escape(request.cookies.get("session_token"))
+    csrf_token = re.escape(request.headers.get("X-CSRF-TOKEN"))
+
+    try:
+        message = await user_accept_offer(
+            session_token=session_token,
+            csrf_token=csrf_token,
+            offer_id=offer_id,
+        )
+        return jsonify({"message": message}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+
+@app.route("/offer/exchange_complete", methods=["POST"])
+async def complete_exchange_offer():
+    """
+    Completes an exchange offer based on the provided offer ID.
+
+    Expects offer ID in JSON format and returns a success message.
+    """
+    data = request.json
+    offer_id = data.get("offerId")
+    session_token = re.escape(request.cookies.get("session_token"))
+    csrf_token = re.escape(request.headers.get("X-CSRF-TOKEN"))
+
+    try:
+        message = await user_complete_offer(
+            session_token=session_token,
+            csrf_token=csrf_token,
+            offer_id=offer_id,
+        )
+        return jsonify({"message": message}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+    
+@app.route("/offer/exchange_confirmed", methods=["POST"])
+async def confirm_exchange_offer():
+    """
+    Confirms an exchange offer based on the provided offer ID.
+
+    Expects offer ID in JSON format and returns a success message.
+    """
+    data = request.json
+    offer_id = data.get("offerId")
+    session_token = re.escape(request.cookies.get("session_token"))
+    csrf_token = re.escape(request.headers.get("X-CSRF-TOKEN"))
+
+
+    try:
+        message = await user_confirm_offer(
+            session_token=session_token,
+            csrf_token=csrf_token,
+            offer_id=offer_id,
+        )
+        return jsonify({"message": message}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/offer/details", methods=["GET"])
+async def get_offer_details():
+    """
+    Retrieves details of a specific exchange offer based on the provided offer ID.
+
+    Expects offer ID as a query parameter and returns the offer details.
+    """
+    offer_id = request.args.get("offerId")
+
+    if not offer_id:
+        return jsonify({"error": "Offer ID is required"}), 400
+
+    try:
+        if not offer_id.isdigit():
+            raise ValueError("Offer ID must be an integer.")
+        else:
+            offer_id = int(offer_id)
+
+        if offer_id not in exchange_offers:
+            return jsonify({"error": f"Offer with ID {offer_id} does not exist."}), 404
+
+        offer = exchange_offers[offer_id]
+        return jsonify(offer.to_json()), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/offer/cancel", methods=["POST"])
+async def cancel_exchange_offer():
+    """
+    Cancels an exchange offer based on the provided offer ID.
+
+    Expects offer ID in JSON format and returns a success message.
+    """
+    data = request.json
+    offer_id = data.get("offerId")
+    session_token = re.escape(request.cookies.get("session_token"))
+    csrf_token = re.escape(request.headers.get("X-CSRF-TOKEN"))
+
+    try:
+        message = await user_cancel_offer(
+            session_token=session_token,
+            csrf_token=csrf_token,
+            offer_id=offer_id,
+        )
+        return jsonify({"message": message}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 

@@ -229,3 +229,116 @@ async def user_get_browse_items(
             if item.get_user_id() != int(user_id):
                 del filtered_items[item_key]
     return filtered_items
+
+
+async def user_modify_item(
+    session_token: str,
+    csrf_token: str,
+    item_id: str,
+    new_title: str = None,
+    new_description: str = None,
+    new_condition: str = None,
+    new_location: str = None,
+    new_type: str = None,
+    new_images: list[str] = None,
+) -> Item:
+    """
+    Modifies an existing item in the database.
+
+    Args:
+        item_id (str): ID of the item to modify.
+        new_title (str): New title for the item.
+        new_description (str): New description for the item.
+        new_condition (str): New condition for the item.
+        new_location (str): New location for the item.
+        new_type (str): New type for the item.
+        new_images (list[str]): New list of image URLs for the item.
+        session_token (str): User's session token.
+        csrf_token (str): User's CSRF token.
+
+    Returns:
+        Item: The modified item object.
+    """
+    if not item_id.isdigit() or int(item_id) <= 0:
+        abort(400, "Item ID must be a positive integer.")
+    
+    item_id_int = int(item_id)
+    
+    if item_id_int not in items:
+        abort(404, f"Item with ID {item_id_int} does not exist.")
+
+    if session_token and csrf_token:
+        user_id = admin_retrieve_user_id(session_token, csrf_token)
+        if items[item_id_int].get_user_id() != user_id:
+            abort(403, "You do not have permission to modify this item.")
+
+    if new_title is not None:
+        if len(new_title) > 100 or len(new_title) < 3:
+            abort(400, "Title must be between 3 and 100 characters.")
+        items[item_id_int].set_title(new_title.lower())
+
+    if new_description is not None:
+        if len(new_description) > 1000 or len(new_description) < 10:
+            abort(400, "Description must be between 10 and 1000 characters.")
+        items[item_id_int].set_description(new_description.lower())
+
+    if new_condition is not None:
+        if new_condition not in [
+            "new",
+            "like-new",
+            "used-good",
+            "used-fair",
+            "poor",
+        ]:
+            abort
+            400, "Condition must be one of: New, Like New, Good, Fair, Poor."
+        items[item_id_int].set_condition(new_condition.lower())
+
+    if new_location is not None:
+        if len(new_location) > 100 or len(new_location) < 3:
+            abort(400, "Location must be between 3 and 100 characters.")
+        items[item_id_int].set_location(new_location.lower())
+    
+    if new_type is not None:
+        if new_type not in ["free", "exchange"]:
+            abort(400, "Type must be either 'Free' or 'Exchange'.")
+        items[item_id_int].set_type(new_type.lower())
+    
+    if new_images is not None:
+        if not isinstance(new_images, list):
+            abort(400, "Images must be a list of URLs.")
+        if len(new_images) > 10:
+            abort(400, "You can only upload up to 10 images.")
+        items[item_id_int].set_images(new_images)
+    
+    return items[item_id_int]  # Return the modified item object
+
+
+async def user_delete_item(
+    item_id: str,
+    session_token: str,
+    csrf_token: str,
+) -> None:
+    """
+    Deletes an item from the database.
+
+    Args:
+        item_id (str): ID of the item to delete.
+        session_token (str): User's session token.
+        csrf_token (str): User's CSRF token.
+    """
+    if not item_id.isdigit() or int(item_id) <= 0:
+        abort(400, "Item ID must be a positive integer.")
+    
+    item_id_int = int(item_id)
+    
+    if item_id_int not in items:
+        abort(404, f"Item with ID {item_id_int} does not exist.")
+
+    if session_token and csrf_token:
+        user_id = admin_retrieve_user_id(session_token, csrf_token)
+        if items[item_id_int].get_user_id() != user_id:
+            abort(403, "You do not have permission to delete this item.")
+
+    del items[item_id_int]  # Remove the item from the dictionary
+    

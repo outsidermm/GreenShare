@@ -65,8 +65,8 @@ class ExchangeOfferDB(db.Model):
     requested_item_id = db.Column(db.Integer, db.ForeignKey("items.id"), nullable=False)
     message = db.Column(db.Text, nullable=False)
     status = db.Column(
-        db.String(50), default="Pending"
-    )  # Pending, Accepted, Rejected, Cancelled
+        db.String(50), default="pending"
+    )  # pending, accepted, cancelled, completed, confirmed
 
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 

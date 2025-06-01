@@ -123,8 +123,12 @@ class Item:
         return ItemDB.query.filter_by(id=self.get_item_pk()).first().images
 
     def set_images(self, new_images: list[str]) -> None:
-        item = ItemDB.query.filter_by(id=self.get_item_pk()).first()
-        item.images = new_images
+        ItemImageDB.query.filter_by(item_id=self.get_item_pk()).delete()
+        db.session.commit()
+        
+        for image_url in new_images:
+            image = ItemImageDB(item_id=self.get_item_pk(), url=image_url)
+            db.session.add(image)
         db.session.commit()
 
     def get_user_id(self) -> str:
