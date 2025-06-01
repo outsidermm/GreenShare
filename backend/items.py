@@ -19,8 +19,9 @@ def validate_condition(condition: str) -> str:
     valid_conditions = ["new", "like-new", "used-good", "used-fair", "poor"]
     condition = condition.lower()
     if condition not in valid_conditions:
-        abort(400, "Condition must be one of: New, Like New, Good, Fair, Poor.")
+        abort(400, "Condition must be one of: new, like-new, used-good, used-fair, poor.")
     return sanitize_input(condition)
+
 
 
 def validate_type(item_type: str) -> str:
@@ -105,7 +106,8 @@ async def user_create_item(
             new_category=new_category,
             new_images=new_images,
         )
-        items[new_item.get_item_pk()] = new_item  # Store the item object by item ID
+        items[new_item.get_item_pk()] = new_item # Store the item object by item ID
+        return new_item
     except Exception as e:
         abort(500, f"Failed to create an item: {str(e)}")
 
@@ -180,9 +182,6 @@ async def user_get_browse_items(
     )  # Create a copy to avoid modifying the original
 
     if location_filter is not None:
-        safe_location_filter = validate_string_length(
-            location_filter, "Location filter", 3, 100
-        )
         for item_key, item in filtered_items_copy.items():
             if item.get_location() != safe_location_filter:
                 del filtered_items[item_key]
@@ -244,12 +243,12 @@ async def user_modify_item(
     if new_title is not None:
         if len(new_title) > 100 or len(new_title) < 3:
             abort(400, "Title must be between 3 and 100 characters.")
-        items[item_id_int].set_title(new_title.lower())
+        items[item_id_int].set_title(sanitize_input(new_title.lower()))
 
     if new_description is not None:
         if len(new_description) > 1000 or len(new_description) < 10:
             abort(400, "Description must be between 10 and 1000 characters.")
-        items[item_id_int].set_description(new_description.lower())
+        items[item_id_int].set_description(sanitize_input(new_description.lower()))
 
     if new_condition is not None:
         if new_condition not in [
@@ -261,17 +260,17 @@ async def user_modify_item(
         ]:
             abort
             400, "Condition must be one of: New, Like New, Good, Fair, Poor."
-        items[item_id_int].set_condition(new_condition.lower())
+        items[item_id_int].set_condition(sanitize_input(new_condition.lower()))
 
     if new_location is not None:
         if len(new_location) > 100 or len(new_location) < 3:
             abort(400, "Location must be between 3 and 100 characters.")
-        items[item_id_int].set_location(new_location.lower())
+        items[item_id_int].set_location(sanitize_input(new_location.lower()))
 
     if new_type is not None:
         if new_type not in ["free", "exchange"]:
             abort(400, "Type must be either 'Free' or 'Exchange'.")
-        items[item_id_int].set_type(new_type.lower())
+        items[item_id_int].set_type(sanitize_input(new_type.lower()))
 
     if new_images is not None:
         if not isinstance(new_images, list):
