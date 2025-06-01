@@ -98,7 +98,7 @@ async def user_create_item(
         )
         items[new_item.get_item_pk()] = new_item  # Store the item object by item ID
     except Exception as e:
-        raise Exception(f"Failed to create item: {str(e)}")
+        abort(500, f"Failed to create an item: {str(e)}")
 
 
 async def user_get_browse_items(
