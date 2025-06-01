@@ -16,6 +16,8 @@ from backend.data import users, items, exchange_offers
 import os, requests
 from backend.utils import sanitize_input
 
+from backend.offers import user_create_offer
+
 PLACES_API_KEY = os.getenv("PLACES_API_KEY")
 IMGUR_CLIENT_ID = os.getenv("IMGUR_CLIENT_ID")
 
@@ -253,6 +255,34 @@ async def get_browse_items():
         return jsonify([item.to_dict() for key, item in filtered_items.items()]), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+@app.route("offer/create", methods=["POST"])
+async def create_exchange_offer():
+    """
+    Creates a new exchange offer with the provided details.
+
+    Expects offer data in JSON format and returns the created offer ID.
+    """
+    try:
+        data = request.json
+        session_token = re.escape(request.cookies.get("session_token"))
+        csrf_token = re.escape(request.headers.get("X-CSRF-TOKEN"))
+        offered_item_ids = data["offeredItemIds"]
+        requested_item_id = data["requestedItemId"]
+        message = data["message"]
+        
+        await user_create_offer(
+            session_token=session_token,
+            csrf_token=csrf_token,
+            offered_item_ids=offered_item_ids,
+            requested_item_id=requested_item_id,
+            message=message,
+        )
+
+        return jsonify({"message": "Exchange offer has been successfully created."}), 201
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
 
 
 @app.route("/api/autocomplete", methods=["POST"])
