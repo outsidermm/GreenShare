@@ -14,6 +14,7 @@ import re
 from backend.items import user_create_item, user_get_browse_items
 from backend.data import users, items, exchange_offers
 import os, requests
+from backend.utils import sanitize_input
 
 PLACES_API_KEY = os.getenv("PLACES_API_KEY")
 IMGUR_CLIENT_ID = os.getenv("IMGUR_CLIENT_ID")
@@ -121,9 +122,10 @@ async def logout_user():
 
     Requires session token from cookies and CSRF token from headers.
     """
-    # Retrieve and sanitise session and CSRF tokens from request
-    session_token = re.escape(request.cookies.get("session_token"))
-    csrf_token = re.escape(request.headers.get("X-CSRF-TOKEN"))
+    # Retrieve session and CSRF tokens from request
+    # Tokens don't need HTML escaping as they're not displayed
+    session_token = request.cookies.get("session_token")
+    csrf_token = request.headers.get("X-CSRF-TOKEN")
 
     try:
         # Invalidate user session and CSRF tokens
@@ -150,10 +152,11 @@ async def validate_token():
 
     Requires session token from cookies and CSRF token from headers.
     """
-    # Retrieve and sanitise session and CSRF tokens
+    # Retrieve session and CSRF tokens
     try:
-        session_token = re.escape(request.cookies.get("session_token"))
-        csrf_token = re.escape(request.headers.get("X-CSRF-TOKEN"))
+        # Tokens don't need HTML escaping as they're not displayed
+        session_token = request.cookies.get("session_token")
+        csrf_token = request.headers.get("X-CSRF-TOKEN")
         # Check the validity of session and CSRF tokens
         if await user_auth_validate_session_token(
             session_token
@@ -173,8 +176,10 @@ async def create_item():
     """
     try:
         data = request.form
-        session_token = re.escape(request.cookies.get("session_token"))
-        csrf_token = re.escape(request.headers.get("X-CSRF-TOKEN"))
+        # Tokens don't need HTML escaping as they're not displayed
+        session_token = request.cookies.get("session_token")
+        csrf_token = request.headers.get("X-CSRF-TOKEN")
+        # Get raw input data - sanitization happens in user_create_item
         title = data["title"]
         description = data["description"]
         condition = data["condition"]
@@ -253,7 +258,8 @@ async def get_browse_items():
 @app.route("/api/autocomplete", methods=["POST"])
 async def address_autocomplete():
     data = request.json
-    input = data["input"]
+    # Sanitize input for API request
+    input = sanitize_input(data["input"])
 
     google_url = "https://maps.googleapis.com/maps/api/place/autocomplete/json"
     params = {

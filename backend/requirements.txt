@@ -6,3 +6,4 @@ cryptography
 asgiref
 pytest-asyncio
 requests
+markupsafe

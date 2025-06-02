@@ -2,6 +2,7 @@ from backend.classes.user import User
 from flask import abort
 import re
 from backend.data import users
+from backend.utils import sanitize_input, sanitize_email
 
 
 def name_auth(name: str, err_prefix: str = "User") -> bool:
@@ -97,6 +98,7 @@ async def user_auth_register(
     Raises:
         409 Error: If the email already exists in the user database.
     """
+    # Normalize and validate inputs
     email = email.lower()  # Normalise the email to lowercase
     first_name = (
         first_name.capitalize()
@@ -110,15 +112,18 @@ async def user_auth_register(
     name_auth(first_name, "First")
     name_auth(last_name, "Last")
 
-    # Sanitise and secure input data
-    safe_email = re.escape(email)
-    safe_first_name = re.escape(first_name)
-    safe_last_name = re.escape(last_name)
-    safe_pwd = re.escape(pwd)
+    # Properly sanitize input data to prevent XSS
+    safe_email = sanitize_email(email)  # Emails don't need HTML escaping
+    safe_first_name = sanitize_input(first_name)  # HTML escape for display
+    safe_last_name = sanitize_input(last_name)  # HTML escape for display
+    # Passwords should not be escaped as they're hashed, not displayed
+    safe_pwd = pwd
 
+    # Check if user exists using sanitized email
     if safe_email in users:
         abort(409, description="Email already exists")
 
+    # Create new user with sanitized data
     new_user = User(safe_email, safe_first_name, safe_last_name, safe_pwd)
     users[safe_email] = new_user  # Store the user object by email
 
@@ -139,13 +144,16 @@ async def user_auth_login(email: str, pwd_input: str) -> str:
     Raises:
         401 Error: If the email does not exist or password is incorrect.
     """
+    # Normalize and validate inputs
     email = email.lower()  # Normalise the email to lowercase
 
     email_auth(email)
     pwd_auth(pwd_input)
 
-    safe_email = re.escape(email)
-    safe_pwd = re.escape(pwd_input)
+    # Sanitize email (no HTML escaping needed for emails)
+    safe_email = sanitize_email(email)
+    # Passwords are hashed, not displayed, so no escaping needed
+    safe_pwd = pwd_input
 
     if safe_email not in users:
         abort(401, description="Email does not exist")
