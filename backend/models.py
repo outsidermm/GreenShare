@@ -77,20 +77,16 @@ class ExchangeOfferDB(db.Model):
             "message": self.message,
             "status": self.status,
             "created_at": self.created_at.isoformat(),
-            "offered_items": [item.id for item in self.offered_items],
+            "offered_item_ids": [offered_item.item_id for offered_item in self.offered_items],
             "requested_item_id": self.requested_item_id,
         }
 
 
-offered_items = db.Table(
-    "offered_items",
-    db.Model.metadata,
-    db.Column("offer_id", db.Integer, db.ForeignKey("exchange_offers.id")),
-    db.Column("item_id", db.Integer, db.ForeignKey("items.id")),
-)
+class OfferedItemDB(db.Model):
+    __tablename__ = "offered_items"
+    id = db.Column(db.Integer, primary_key=True)
+    offer_id = db.Column(db.Integer, db.ForeignKey("exchange_offers.id"), nullable=False)
+    item_id = db.Column(db.Integer, db.ForeignKey("items.id"), nullable=False)
 
+ExchangeOfferDB.offered_items = db.relationship("OfferedItemDB", backref="offer", lazy=True)
 ItemDB.images = db.relationship("ItemImageDB", backref="item", lazy=True)
-
-ExchangeOfferDB.offered_items = db.relationship(
-    "ItemDB", secondary=offered_items, backref="offers_made_for"
-)
