@@ -207,7 +207,7 @@ async def user_get_offer_details(session_token: str, csrf_token: str, offer_id: 
 
 
 async def user_cancel_offer(
-    session_token: str, csrf_token: str, offer_id: str, message: str = None
+    session_token: str, csrf_token: str, offer_id: str, message: str = ""
 ):
     new_user_id = admin_retrieve_user_id(session_token, csrf_token)
     offer_id = validate_offer_id(offer_id)
