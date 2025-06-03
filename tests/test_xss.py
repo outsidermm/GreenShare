@@ -5,6 +5,7 @@ from backend.data import users,items
 from backend.classes.user import User
 from backend.config import app, db
 from backend.models import UserDB, ItemDB, ItemImageDB
+from markupsafe import escape
 
 
 # -----------------------------------------------------------------------------
@@ -49,16 +50,16 @@ async def test_xss_escaping_all_fields():
     malicious_last_name = "<img src=x onerror=alert('xss')>"
     malicious_password = "Pass<script>word1!"
 
-    # Expected values after normalization and escaping:
-    # - The email is lowercased then escaped.
-    expected_email = re.escape(malicious_email.lower())
-    # - First and last names are capitalized then escaped.
-    expected_first_name = re.escape(malicious_first_name.capitalize())
-    expected_last_name = re.escape(malicious_last_name.capitalize())
-    # - Password is simply escaped (no normalization).
-    expected_password = re.escape(malicious_password)
+    # Expected values after normalization and sanitization:
+    # - The email is lowercased (no HTML escaping needed for emails)
+    expected_email = malicious_email.lower()
+    # - First and last names are capitalized then HTML escaped
+    expected_first_name = str(escape(malicious_first_name.capitalize()))
+    expected_last_name = str(escape(malicious_last_name.capitalize()))
+    # - Password is not escaped (it's hashed, not displayed)
+    expected_password = malicious_password
 
-    # Register the user (auth.py performs validation, normalization, and escaping).
+    # Register the user (auth.py performs validation, normalization, and sanitization).
     tokens = await user_auth_register(
         email=malicious_email,
         pwd=malicious_password,
@@ -67,10 +68,10 @@ async def test_xss_escaping_all_fields():
     )
     # Tokens are returned as (session_token, csrf_token), but here we focus on stored values.
 
-    # The global users dictionary is keyed by the escaped email.
+    # The global users dictionary is keyed by the sanitized email.
     assert (
         expected_email in users
-    ), "The escaped email should be used as the key in users."
+    ), "The sanitized email should be used as the key in users."
 
     # Retrieve the stored User instance.
     user: User = users[expected_email]
@@ -78,13 +79,13 @@ async def test_xss_escaping_all_fields():
     # Using the getters provided in the User class, assert that each field is stored as expected.
     assert (
         user.get_email() == expected_email
-    ), "User email should be normalized and escaped."
+    ), "User email should be normalized (lowercased)."
     assert (
         user.get_first_name() == expected_first_name
-    ), "User first name should be capitalized and escaped."
+    ), "User first name should be capitalized and HTML escaped."
     assert (
         user.get_last_name() == expected_last_name
-    ), "User last name should be capitalized and escaped."
+    ), "User last name should be capitalized and HTML escaped."
     assert (
         user.verify_pwd(expected_password) is True
-    ), "User password should be escaped."
+    ), "User password should verify correctly (not escaped)."

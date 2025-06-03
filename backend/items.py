@@ -3,6 +3,7 @@ import re
 from backend.classes.item import Item
 from difflib import SequenceMatcher
 from flask import abort
+from backend.utils import sanitize_input
 
 
 def title_matches(user_input: str, item_title: str, threshold: float = 0.7) -> bool:
@@ -39,17 +40,20 @@ async def user_create_item(
     """
     new_user_id = admin_retrieve_user_id(session_token, csrf_token)
     new_category = "essentials"
+    
+    # Normalize inputs to lowercase
     new_title = new_title.lower()
     new_description = new_description.lower()
     new_condition = new_condition.lower()
     new_location = new_location.lower()
     new_type = new_type.lower()
 
-    safe_title = re.escape(new_title)
-    safe_description = re.escape(new_description)
-    safe_condition = re.escape(new_condition)
-    safe_location = re.escape(new_location)
-    safe_type = re.escape(new_type)
+    # Properly sanitize inputs for XSS prevention
+    safe_title = sanitize_input(new_title)
+    safe_description = sanitize_input(new_description)
+    safe_condition = sanitize_input(new_condition)
+    safe_location = sanitize_input(new_location)
+    safe_type = sanitize_input(new_type)
 
     if len(new_title) > 100 or len(new_title) < 3:
         abort(400, "Title must be between 3 and 100 characters.")
@@ -143,7 +147,7 @@ async def user_get_browse_items(
         title_filter = title_filter.lower()
         if len(title_filter) < 3 or len(title_filter) > 100:
             abort(400, "Title filter must be between 3 and 100 characters.")
-        safe_title_filter = re.escape(title_filter)
+        safe_title_filter = sanitize_input(title_filter)
         for item_key, item in filtered_items.items():
             if not title_matches(safe_title_filter, item.get_title()):
                 del filtered_items[item_key]
@@ -165,7 +169,7 @@ async def user_get_browse_items(
                 400,
                 "Category must be one of: Essentials, Living, Tools & Tech, Style & Expression, Leisure & Learning.",
             )
-        safe_category_filter = re.escape(category_filter)
+        safe_category_filter = sanitize_input(category_filter)
         for item_key, item in filtered_items_copy.items():
             if item.get_category() != safe_category_filter:
                 del filtered_items[item_key]
@@ -187,7 +191,7 @@ async def user_get_browse_items(
                 400,
                 "Condition must be one of: New, Like New, Very Good, Good, Fair, Poor.",
             )
-        safe_condition_filter = re.escape(condition_filter)
+        safe_condition_filter = sanitize_input(condition_filter)
         for item_key, item in filtered_items_copy.items():
             if item.get_condition() != safe_condition_filter:
                 del filtered_items[item_key]
@@ -200,7 +204,7 @@ async def user_get_browse_items(
         location_filter = location_filter.lower()
         if len(location_filter) < 3 or len(location_filter) > 100:
             abort(400, "Location filter must be between 3 and 100 characters.")
-        safe_location_filter = re.escape(location_filter)
+        safe_location_filter = sanitize_input(location_filter)
         for item_key, item in filtered_items_copy.items():
             if item.get_location() != safe_location_filter:
                 del filtered_items[item_key]
@@ -209,7 +213,7 @@ async def user_get_browse_items(
         type_filter = type_filter.lower()
         if type_filter not in ["Free", "Exchange"]:
             abort(400, "Type must be either 'Free' or 'Exchange'.")
-        safe_type_filter = re.escape(type_filter)
+        safe_type_filter = sanitize_input(type_filter)
         for item_key, item in filtered_items_copy.items():
             if item.get_type() != safe_type_filter:
                 del filtered_items[item_key]
