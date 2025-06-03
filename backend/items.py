@@ -73,7 +73,7 @@ async def user_create_item(
     new_images: list[str],
     session_token: str,
     csrf_token: str,
-) -> None:
+) -> Item:
     """
     Creates a new item in the database.
 
@@ -92,7 +92,7 @@ async def user_create_item(
     safe_title = validate_string_length(new_title, "Title", 3, 100)
     safe_description = validate_string_length(new_description, "Description", 10, 1000)
     safe_condition = validate_condition(new_condition)
-    safe_location = validate_string_length(new_location, "Location", 3, 100)
+    safe_location = sanitize_input(new_location.lower())
     safe_type = validate_type(new_type)
 
     try:
@@ -182,6 +182,8 @@ async def user_get_browse_items(
     )  # Create a copy to avoid modifying the original
 
     if location_filter is not None:
+        safe_location_filter = sanitize_input(location_filter.lower())
+
         for item_key, item in filtered_items_copy.items():
             if item.get_location() != safe_location_filter:
                 del filtered_items[item_key]
@@ -263,8 +265,6 @@ async def user_modify_item(
         items[item_id_int].set_condition(sanitize_input(new_condition.lower()))
 
     if new_location is not None:
-        if len(new_location) > 100 or len(new_location) < 3:
-            abort(400, "Location must be between 3 and 100 characters.")
         items[item_id_int].set_location(sanitize_input(new_location.lower()))
 
     if new_type is not None:
