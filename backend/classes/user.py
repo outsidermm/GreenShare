@@ -1,10 +1,10 @@
 import hashlib
 from cryptography.fernet import Fernet
 import secrets
-import re
 from backend.models import UserDB
 from backend.config import db
 import os
+from backend.utils import sanitize_input
 
 user_key = os.getenv("USER_FERNET_KEY")
 user_cipher_suite = Fernet(user_key)
@@ -102,7 +102,7 @@ class User:
         """
         return (
             self.get_session_token() is not None
-            and re.escape(self.get_session_token()) == session_token
+            and sanitize_input(self.get_session_token()) == session_token
         )
 
     def is_valid_csrf_token(self, csrf_token: str) -> bool:
@@ -117,7 +117,7 @@ class User:
         """
         return (
             self.get_csrf_token() is not None
-            and re.escape(self.get_csrf_token()) == csrf_token
+            and sanitize_input(self.get_csrf_token()) == csrf_token
         )
 
     def revoke_session_token(self) -> None:
