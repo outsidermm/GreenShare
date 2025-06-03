@@ -1,7 +1,6 @@
 from backend.models import ExchangeOfferDB
 from backend.config import db
-from backend.models import ItemDB
-from typing import Optional
+from backend.models import OfferedItemDB
 
 
 class ExchangeOffer:
@@ -15,7 +14,7 @@ class ExchangeOffer:
         self,
         offered_by_id: int,
         requested_item_id: int,
-        offered_item_ids: Optional[list[int]] = None,
+        offered_item_ids: list[int],
         message: str = "",
     ):
         new_offer = ExchangeOfferDB(
@@ -23,17 +22,18 @@ class ExchangeOffer:
             requested_item_id=requested_item_id,
             message=message,
         )
-        if offered_item_ids:
-            new_offer.offered_items = ItemDB.query.filter(
-                ItemDB.id.in_(offered_item_ids)
-            ).all()
-
         db.session.add(new_offer)
         db.session.commit()
+        
+        for offered_item_id in offered_item_ids:
+            offered_item = OfferedItemDB(item_id=offered_item_id, offer_id = new_offer.id)
+            db.session.add(offered_item)
+        db.session.commit()
+
         self.set_offer_pk(new_offer.id)
 
     @classmethod
-    def backup(cls) -> dict[str, "ExchangeOffer"]:
+    def backup(cls) -> dict[int, "ExchangeOffer"]:
         """
         Loads all exchange offers and returns them as a dictionary of ExchangeOffer instances.
         """
@@ -45,7 +45,7 @@ class ExchangeOffer:
         for offer in offer_records:
             offer_obj = cls.__new__(cls)
             offer_obj.set_offer_pk(offer.id)
-            offer_dict[str(offer.id)] = offer_obj
+            offer_dict[offer.id] = offer_obj
 
         return offer_dict
 
@@ -94,18 +94,17 @@ class ExchangeOffer:
 
         offer_record.status = status
         db.session.commit()
-        self.set_offer_pk(offer_record.id)
 
     def get_offered_items(self) -> list[int]:
         """
         Returns a list of offered item IDs for the exchange offer.
         """
-
+        
         offer_record = ExchangeOfferDB.query.get(self.__offer_pk)
         if not offer_record:
             raise ValueError("Exchange offer not found in the database.")
 
-        return [item.id for item in offer_record.offered_items]
+        return [item.item_id for item in offer_record.offered_items]
 
     def get_offered_by_id(self) -> int:
         """
@@ -133,8 +132,7 @@ class ExchangeOffer:
         """
         Returns the message associated with the exchange offer.
         """
-
-        offer_record = ExchangeOfferDB.query.get(self.__offer_pk)
+        offer_record = db.session.get(ExchangeOfferDB, self.__offer_pk)
         if not offer_record:
             raise ValueError("Exchange offer not found in the database.")
 
