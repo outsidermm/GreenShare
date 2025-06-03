@@ -76,69 +76,72 @@ class Item:
         self.__item_pk = item_pk
 
     def get_title(self) -> str:
+        return db.session.get(ItemDB, self.get_item_pk()).title
         return ItemDB.query.filter_by(id=self.get_item_pk()).first().title
 
     def set_title(self, new_title: str) -> None:
-        ItemDB.query.filter_by(id=self.get_item_pk()).first().title = new_title
+        db.session.get(ItemDB, self.get_item_pk()).title = new_title
         db.session.commit()
 
     def get_description(self) -> str:
-        return ItemDB.query.filter_by(id=self.get_item_pk()).first().description
+        return db.session.get(ItemDB, self.get_item_pk()).description
 
     def set_description(self, new_description: str) -> None:
-        ItemDB.query.filter_by(id=self.get_item_pk()).first().description = (
-            new_description
-        )
+        db.session.get(ItemDB, self.get_item_pk()).description = new_description
         db.session.commit()
 
     def get_condition(self) -> str:
-        return ItemDB.query.filter_by(id=self.get_item_pk()).first().condition
+        return db.session.get(ItemDB, self.get_item_pk()).condition
 
     def set_condition(self, new_condition: str) -> None:
-        ItemDB.query.filter_by(id=self.get_item_pk()).first().condition = new_condition
+        db.session.get(ItemDB, self.get_item_pk()).condition = new_condition
         db.session.commit()
 
     def get_status(self) -> str:
-        return ItemDB.query.filter_by(id=self.get_item_pk()).first().status
+        return db.session.get(ItemDB, self.get_item_pk()).status
 
     def set_status(self, new_status: str) -> None:
-        ItemDB.query.filter_by(id=self.get_item_pk()).first().status = new_status
+        db.session.get(ItemDB, self.get_item_pk()).status = new_status
         db.session.commit()
 
     def get_location(self) -> str:
-        return ItemDB.query.filter_by(id=self.get_item_pk()).first().location
+        return db.session.get(ItemDB, self.get_item_pk()).location
 
     def set_location(self, new_location: str) -> None:
-        ItemDB.query.filter_by(id=self.get_item_pk()).first().location = new_location
+        db.session.get(ItemDB, self.get_item_pk()).location = new_location
         db.session.commit()
 
     def get_category(self) -> str:
-        return ItemDB.query.filter_by(id=self.get_item_pk()).first().category
+        return db.session.get(ItemDB, self.get_item_pk()).category
 
     def set_category(self, new_category: str) -> None:
-        ItemDB.query.filter_by(id=self.get_item_pk()).first().category = new_category
+        db.session.get(ItemDB, self.get_item_pk()).category = new_category
         db.session.commit()
 
     def get_images(self) -> list[str]:
-        return ItemDB.query.filter_by(id=self.get_item_pk()).first().images
+        return db.session.get(ItemDB, self.get_item_pk()).images
 
     def set_images(self, new_images: list[str]) -> None:
-        item = ItemDB.query.filter_by(id=self.get_item_pk()).first()
-        item.images = new_images
+        ItemImageDB.query.filter_by(item_id=self.get_item_pk()).delete()
+        db.session.commit()
+
+        for image_url in new_images:
+            image = ItemImageDB(item_id=self.get_item_pk(), url=image_url)
+            db.session.add(image)
         db.session.commit()
 
     def get_user_id(self) -> str:
-        return ItemDB.query.filter_by(id=self.get_item_pk()).first().user_id
+        return db.session.get(ItemDB, self.get_item_pk()).user_id
 
     def set_user_id(self, new_user_id: str) -> None:
-        ItemDB.query.filter_by(id=self.get_item_pk()).first().user_id = new_user_id
+        db.session.get(ItemDB, self.get_item_pk()).user_id = new_user_id
         db.session.commit()
 
     def get_type(self) -> str:
-        return ItemDB.query.filter_by(id=self.get_item_pk()).first().type
+        return db.session.get(ItemDB, self.get_item_pk()).type
 
     def set_type(self, new_type: str) -> None:
-        ItemDB.query.filter_by(id=self.get_item_pk()).first().type = new_type
+        db.session.get(ItemDB, self.get_item_pk()).type = new_type
         db.session.commit()
 
     def to_dict(self) -> dict:

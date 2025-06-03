@@ -1,6 +1,6 @@
 from backend.models import ExchangeOfferDB
 from backend.config import db
-from typing import Optional
+from backend.models import OfferedItemDB
 
 
 class ExchangeOffer:
@@ -8,42 +8,32 @@ class ExchangeOffer:
     Represents an exchange offer with encapsulated access and database interaction.
     """
 
-    __offer_pk: Optional[str] = None
+    __offer_pk: int = None
 
     def __init__(
         self,
-        offered_by_id: list[str],
-        item_id: str,
-        offered_item_id: Optional[str] = None,
+        offered_by_id: int,
+        requested_item_id: int,
+        offered_item_ids: list[int],
         message: str = "",
     ):
-        """
-        Creates a new exchange offer in the database and initialises internal state.
-        """
         new_offer = ExchangeOfferDB(
             offered_by_id=offered_by_id,
-            item_id=item_id,
-            offered_item_id=offered_item_id,
+            requested_item_id=requested_item_id,
             message=message,
         )
         db.session.add(new_offer)
         db.session.commit()
+
+        for offered_item_id in offered_item_ids:
+            offered_item = OfferedItemDB(item_id=offered_item_id, offer_id=new_offer.id)
+            db.session.add(offered_item)
+        db.session.commit()
+
         self.set_offer_pk(new_offer.id)
 
     @classmethod
-    def load(cls, offer_id: str) -> Optional["ExchangeOffer"]:
-        """
-        Loads an existing offer by ID from the database.
-        """
-        offer = ExchangeOfferDB.query.filter_by(id=offer_id).first()
-        if not offer:
-            return None
-        offer_obj = cls.__new__(cls)
-        offer_obj.set_offer_pk(offer.id)
-        return offer_obj
-
-    @classmethod
-    def backup(cls) -> dict[str, "ExchangeOffer"]:
+    def backup(cls) -> dict[int, "ExchangeOffer"]:
         """
         Loads all exchange offers and returns them as a dictionary of ExchangeOffer instances.
         """
@@ -55,60 +45,81 @@ class ExchangeOffer:
         for offer in offer_records:
             offer_obj = cls.__new__(cls)
             offer_obj.set_offer_pk(offer.id)
-            offer_dict[str(offer.id)] = offer_obj
+            offer_dict[offer.id] = offer_obj
 
         return offer_dict
 
-    def offer_data(self) -> dict:
+    def set_offer_pk(self, offer_pk: int):
         """
-        Returns the exchange offer data in dictionary form.
+        Sets the primary key for the exchange offer.
         """
-        return ExchangeOfferDB.query.filter_by(id=self.get_offer_pk()).first().to_json()
-
-    def get_offer_pk(self) -> str:
-        return self.__offer_pk
-
-    def set_offer_pk(self, offer_pk: str) -> None:
         self.__offer_pk = offer_pk
 
+    def get_offer_pk(self) -> int:
+        """
+        Returns the primary key of the exchange offer.
+        """
+        return self.__offer_pk
+
+    def to_json(self) -> dict:
+        """
+        Converts the exchange offer to a JSON serializable dictionary.
+        """
+        return db.session.get(ExchangeOfferDB, self.get_offer_pk()).to_json()
+
     def get_status(self) -> str:
-        return ExchangeOfferDB.query.filter_by(id=self.get_offer_pk()).first().status
+        """
+        Returns the status of the exchange offer.
+        """
+        return db.session.get(ExchangeOfferDB, self.get_offer_pk()).status
 
-    def set_status(self, new_status: str) -> None:
-        ExchangeOfferDB.query.filter_by(id=self.get_offer_pk()).first().status = (
-            new_status
-        )
+    def set_status(self, status: str):
+        """
+        Sets the status of the exchange offer.
+        """
+
+        db.session.get(ExchangeOfferDB, self.get_offer_pk()).status = status
         db.session.commit()
 
-    def get_message(self) -> Optional[str]:
-        return ExchangeOfferDB.query.filter_by(id=self.get_offer_pk()).first().message
+    def get_offered_items(self) -> list[int]:
+        """
+        Returns a list of offered item IDs for the exchange offer.
+        """
+        offered_items = db.session.get(
+            ExchangeOfferDB, self.get_offer_pk()
+        ).offered_items
+        return [item.item_id for item in offered_items]
 
-    def set_message(self, new_message: str) -> None:
-        ExchangeOfferDB.query.filter_by(id=self.get_offer_pk()).first().message = (
-            new_message
-        )
+    def get_offered_by_id(self) -> int:
+        """
+        Returns the user ID of the person who made the offer.
+        """
+        return db.session.get(ExchangeOfferDB, self.get_offer_pk()).offered_by_id
+
+    def get_requested_item_id(self) -> int:
+        """
+        Returns the ID of the requested item in the exchange offer.
+        """
+        return db.session.get(ExchangeOfferDB, self.get_offer_pk()).requested_item_id
+
+    def get_message(self) -> str:
+        """
+        Returns the message associated with the exchange offer.
+        """
+        return db.session.get(ExchangeOfferDB, self.get_offer_pk()).message
+
+    def set_message(self, message: str):
+        """
+        Sets the message for the exchange offer.
+        """
+        db.session.get(ExchangeOfferDB, self.get_offer_pk()).message = message
         db.session.commit()
 
-    def get_requested_item_id(self) -> Optional[str]:
-        return (
-            ExchangeOfferDB.query.filter_by(id=self.get_offer_pk())
-            .first()
-            .offered_item_id
-        )
+    def delete(self):
+        """
+        Deletes the exchange offer from the database.
+        """
 
-    def set_requested_item_id(self, new_item_id: Optional[str]) -> None:
-        offer = ExchangeOfferDB.query.filter_by(id=self.get_offer_pk()).first()
-        offer.offered_item_id = new_item_id
-        db.session.commit()
-
-    def get_offered_by_id(self) -> list[str]:
-        return (
-            ExchangeOfferDB.query.filter_by(id=self.get_offer_pk())
-            .first()
-            .offered_by_id
-        )
-
-    def set_offered_by_id(self, new_offered_by_id: list[str]) -> None:
-        offer = ExchangeOfferDB.query.filter_by(id=self.get_offer_pk()).first()
-        offer.offered_by_id = new_offered_by_id
+        offer_record = db.session.get(ExchangeOfferDB, self.__offer_pk)
+        db.session.delete(offer_record)
         db.session.commit()

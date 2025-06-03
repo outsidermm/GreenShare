@@ -1,11 +1,11 @@
 import re
 import pytest
 from backend.auth import user_auth_register
-from backend.data import users,items
+from backend.data import users, items, exchange_offers
 from backend.classes.user import User
 from backend.config import app, db
-from backend.models import UserDB, ItemDB, ItemImageDB
 from markupsafe import escape
+from backend.models import UserDB, ItemDB, ItemImageDB, OfferedItemDB, ExchangeOfferDB
 
 
 # -----------------------------------------------------------------------------
@@ -15,6 +15,9 @@ from markupsafe import escape
 def clear_users():
     users.clear()
     items.clear()
+    exchange_offers.clear()
+    db.session.query(OfferedItemDB).delete()
+    db.session.query(ExchangeOfferDB).delete()
     db.session.query(ItemImageDB).delete()
     db.session.query(ItemDB).delete()
     db.session.query(UserDB).delete()

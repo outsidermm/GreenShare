@@ -62,13 +62,13 @@ class ExchangeOfferDB(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
     offered_by_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-
-    message = db.Column(db.Text, nullable=False)
+    requested_item_id = db.Column(db.Integer, db.ForeignKey("items.id"), nullable=False)
+    message = db.Column(db.String, nullable=False)
     status = db.Column(
-        db.String(50), default="Pending"
-    )  # Pending, Accepted, Rejected, Cancelled
+        db.String(50), default="pending"
+    )  # pending, accepted, cancelled, completed, confirmed
 
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.now)
 
     def to_json(self) -> dict:
         return {
@@ -77,32 +77,23 @@ class ExchangeOfferDB(db.Model):
             "message": self.message,
             "status": self.status,
             "created_at": self.created_at.isoformat(),
-            "offered_items": [item.id for item in self.offered_items],
-            "requested_items": [item.id for item in self.requested_items],
+            "offered_item_ids": [
+                offered_item.item_id for offered_item in self.offered_items
+            ],
+            "requested_item_id": self.requested_item_id,
         }
 
 
-offer_offered_items = db.Table(
-    "offer_offered_items",
-    db.Model.metadata,
-    db.Column("offer_id", db.Integer, db.ForeignKey("exchange_offers.id")),
-    db.Column("item_id", db.Integer, db.ForeignKey("items.id")),
-)
+class OfferedItemDB(db.Model):
+    __tablename__ = "offered_items"
+    id = db.Column(db.Integer, primary_key=True)
+    offer_id = db.Column(
+        db.Integer, db.ForeignKey("exchange_offers.id"), nullable=False
+    )
+    item_id = db.Column(db.Integer, db.ForeignKey("items.id"), nullable=False)
 
-offer_requested_items = db.Table(
-    "offer_requested_items",
-    db.Model.metadata,
-    db.Column("offer_id", db.Integer, db.ForeignKey("exchange_offers.id")),
-    db.Column("item_id", db.Integer, db.ForeignKey("items.id")),
-)
-
-
-ItemDB.images = db.relationship("ItemImageDB", backref="item", lazy=True)
 
 ExchangeOfferDB.offered_items = db.relationship(
-    "ItemDB", secondary=offer_offered_items, backref="offers_made_for"
+    "OfferedItemDB", backref="offer", lazy=True
 )
-
-ExchangeOfferDB.requested_items = db.relationship(
-    "ItemDB", secondary=offer_requested_items, backref="offers_requested_for"
-)
+ItemDB.images = db.relationship("ItemImageDB", backref="item", lazy=True)

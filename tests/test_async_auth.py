@@ -12,9 +12,10 @@ from backend.auth import (
 )
 
 # Import the global users dictionary so we can reset it between tests.
-from backend.data import users, items
+from backend.data import users, items, exchange_offers
 from backend.config import app, db
-from backend.models import UserDB, ItemDB, ItemImageDB
+from backend.models import ExchangeOfferDB, UserDB, ItemDB, ItemImageDB, OfferedItemDB
+from backend.utils import sanitize_email, sanitize_input
 
 
 # -----------------------------------------------------------------------------
@@ -27,6 +28,9 @@ def clear_users():
     """
     users.clear()
     items.clear()
+    exchange_offers.clear()
+    db.session.query(OfferedItemDB).delete()
+    db.session.query(ExchangeOfferDB).delete()
     db.session.query(ItemImageDB).delete()
     db.session.query(ItemDB).delete()
     db.session.query(UserDB).delete()
@@ -56,7 +60,7 @@ async def test_user_auth_register_success():
     assert isinstance(session_token, str)
     assert isinstance(csrf_token, str)
     # The email is normalized to lowercase and escaped.
-    safe_email = re.escape(email_input.lower())
+    safe_email = sanitize_email(email_input.lower())
     assert safe_email in users
 
 
@@ -85,7 +89,7 @@ async def test_user_auth_register_normalisation():
     session_token, csrf_token = await user_auth_register(
         email="TEST@DOMAIN.COM", pwd="Password1!", first_name="alice", last_name="smith"
     )
-    safe_email = re.escape("test@domain.com")
+    safe_email = sanitize_input("test@domain.com")
     assert safe_email in users
 
     # Try logging in with the same credentials (even with mixed-case email)
@@ -149,8 +153,8 @@ async def test_user_auth_logout_and_token_validation():
         email="logout@domain.com", pwd="Password1!", first_name="Eva", last_name="Green"
     )
 
-    session_token = re.escape(session_token)
-    csrf_token = re.escape(csrf_token)
+    session_token = sanitize_input(session_token)
+    csrf_token = sanitize_input(csrf_token)
 
     # Validate that the tokens are recognized as valid.
     assert await user_auth_validate_session_token(session_token) is True

@@ -60,7 +60,7 @@ class User:
         """
         user_record = UserDB.query.all()
         if not user_record:
-            return None
+            return {}
 
         user_dict = {}
         for user in user_record:
@@ -243,52 +243,50 @@ class User:
         """
         Returns the user's first name.
         """
-        return UserDB.query.filter_by(id=self.get_user_pk()).first().first_name
+        return db.session.get(UserDB, self.get_user_pk()).first_name
 
     def get_last_name(self) -> str:
         """
         Returns the user's last name.
         """
-        return UserDB.query.filter_by(id=self.get_user_pk()).first().last_name
+        return db.session.get(UserDB, self.get_user_pk()).last_name
 
     def get_email(self) -> str:
         """
         Returns the user's email.
         """
-        return UserDB.query.filter_by(id=self.get_user_pk()).first().email
+        return db.session.get(UserDB, self.get_user_pk()).email
 
     def get_password(self) -> str:
         """
         Returns the user's password.
         """
-        return UserDB.query.filter_by(id=self.get_user_pk()).first().password
+        return db.session.get(UserDB, self.get_user_pk()).password
 
     def set_password(self, new_pwd: str) -> None:
         """
         Sets the user's password.
         """
-        UserDB.query.filter_by(id=self.get_user_pk()).first().password = new_pwd
+        db.session.get(UserDB, self.get_user_pk()).password = new_pwd
         db.session.commit()
 
     def set_first_name(self, new_first_name: str) -> None:
         """
         Sets the user's first name.
         """
-        UserDB.query.filter_by(id=self.get_user_pk()).first().first_name = (
-            new_first_name
-        )
+        db.session.get(UserDB, self.get_user_pk()).first_name = new_first_name
         db.session.commit()
 
     def set_last_name(self, new_last_name: str) -> None:
         """
         Sets the user's last name.
         """
-        UserDB.query.filter_by(id=self.get_user_pk()).first().last_name = new_last_name
+        db.session.get(UserDB, self.get_user_pk()).last_name = new_last_name
         db.session.commit()
 
     def set_email(self, new_email: str) -> None:
         """
         Sets the user's email.
         """
-        UserDB.query.filter_by(id=self.get_user_pk()).first().email = new_email
+        db.session.get(UserDB, self.get_user_pk()).email = new_email
         db.session.commit()
