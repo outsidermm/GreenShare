@@ -24,9 +24,9 @@ class ExchangeOffer:
         )
         db.session.add(new_offer)
         db.session.commit()
-        
+
         for offered_item_id in offered_item_ids:
-            offered_item = OfferedItemDB(item_id=offered_item_id, offer_id = new_offer.id)
+            offered_item = OfferedItemDB(item_id=offered_item_id, offer_id=new_offer.id)
             db.session.add(offered_item)
         db.session.commit()
 
@@ -99,7 +99,7 @@ class ExchangeOffer:
         """
         Returns a list of offered item IDs for the exchange offer.
         """
-        
+
         offer_record = ExchangeOfferDB.query.get(self.__offer_pk)
         if not offer_record:
             raise ValueError("Exchange offer not found in the database.")

@@ -1,7 +1,7 @@
 import re
 import pytest
 from backend.auth import user_auth_register
-from backend.data import users,items, exchange_offers
+from backend.data import users, items, exchange_offers
 from backend.classes.user import User
 from backend.config import app, db
 from markupsafe import escape

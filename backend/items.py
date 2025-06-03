@@ -23,7 +23,6 @@ def validate_condition(condition: str) -> str:
     return sanitize_input(condition)
 
 
-
 def validate_type(item_type: str) -> str:
     valid_types = ["free", "exchange"]
     item_type = item_type.lower()
@@ -106,7 +105,7 @@ async def user_create_item(
             new_category=new_category,
             new_images=new_images,
         )
-        items[new_item.get_item_pk()] = new_item # Store the item object by item ID
+        items[new_item.get_item_pk()] = new_item  # Store the item object by item ID
         return new_item
     except Exception as e:
         abort(500, f"Failed to create an item: {str(e)}")

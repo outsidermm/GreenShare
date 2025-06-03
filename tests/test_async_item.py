@@ -5,7 +5,13 @@ from backend.models import UserDB, ItemDB, ItemImageDB, OfferedItemDB, ExchangeO
 from backend.auth import user_auth_register
 from werkzeug.exceptions import HTTPException
 from backend.data import users, items, exchange_offers
-from backend.items import user_create_item, user_get_browse_items, user_modify_item, user_delete_item
+from backend.items import (
+    user_create_item,
+    user_get_browse_items,
+    user_modify_item,
+    user_delete_item,
+)
+
 
 @pytest.fixture(autouse=True)
 def clear_data():
@@ -25,9 +31,12 @@ def app_context():
     with app.app_context():
         yield app
 
+
 @pytest.mark.asyncio
 async def test_create_item_success():
-    session_token, csrf_token = await user_auth_register("creator@test.com", "Password1!", "John", "Doe")
+    session_token, csrf_token = await user_auth_register(
+        "creator@test.com", "Password1!", "John", "Doe"
+    )
     session_token = re.escape(session_token)
     csrf_token = re.escape(csrf_token)
     await user_create_item(
@@ -42,87 +51,105 @@ async def test_create_item_success():
     )
     assert len(items) == 1
 
+
 @pytest.mark.asyncio
 async def test_create_item_invalid_title_length():
     with pytest.raises(HTTPException) as excinfo:
-        session_token, csrf_token = await user_auth_register("creator@test.com", "Password1!", "John", "Doe")
+        session_token, csrf_token = await user_auth_register(
+            "creator@test.com", "Password1!", "John", "Doe"
+        )
         session_token = re.escape(session_token)
         csrf_token = re.escape(csrf_token)
         await user_create_item(
-        new_title="Te",
-        new_description="A very useful item",
-        new_condition="new",
-        new_location="Sydney",
-        new_type="free",
-        new_images=["http://image.url/1.png"],
-        session_token=session_token,
-        csrf_token=csrf_token,
-    )
+            new_title="Te",
+            new_description="A very useful item",
+            new_condition="new",
+            new_location="Sydney",
+            new_type="free",
+            new_images=["http://image.url/1.png"],
+            session_token=session_token,
+            csrf_token=csrf_token,
+        )
     assert "Title must be between 3 and 100 characters" in excinfo.value.description
-        
+
 
 @pytest.mark.asyncio
 async def test_create_item_invalid_description_length():
     with pytest.raises(HTTPException) as excinfo:
-        session_token, csrf_token = await user_auth_register("creator@test.com", "Password1!", "John", "Doe")
+        session_token, csrf_token = await user_auth_register(
+            "creator@test.com", "Password1!", "John", "Doe"
+        )
         session_token = re.escape(session_token)
         csrf_token = re.escape(csrf_token)
         await user_create_item(
-        new_title="Teii",
-        new_description="short",
-        new_condition="new",
-        new_location="Sydney",
-        new_type="free",
-        new_images=["http://image.url/1.png"],
-        session_token=session_token,
-        csrf_token=csrf_token,
+            new_title="Teii",
+            new_description="short",
+            new_condition="new",
+            new_location="Sydney",
+            new_type="free",
+            new_images=["http://image.url/1.png"],
+            session_token=session_token,
+            csrf_token=csrf_token,
         )
-    assert "Description must be between 10 and 1000 characters." in excinfo.value.description
+    assert (
+        "Description must be between 10 and 1000 characters."
+        in excinfo.value.description
+    )
 
 
 @pytest.mark.asyncio
 async def test_create_item_invalid_condition():
     with pytest.raises(HTTPException) as excinfo:
-        session_token, csrf_token = await user_auth_register("creator@test.com", "Password1!", "John", "Doe")
+        session_token, csrf_token = await user_auth_register(
+            "creator@test.com", "Password1!", "John", "Doe"
+        )
         session_token = re.escape(session_token)
         csrf_token = re.escape(csrf_token)
         await user_create_item(
-        new_title="Legit",
-        new_description="I love this item",
-        new_condition="terrible",
-        new_location="Sydney",
-        new_type="free",
-        new_images=["http://image.url/1.png"],
-        session_token=session_token,
-        csrf_token=csrf_token,
+            new_title="Legit",
+            new_description="I love this item",
+            new_condition="terrible",
+            new_location="Sydney",
+            new_type="free",
+            new_images=["http://image.url/1.png"],
+            session_token=session_token,
+            csrf_token=csrf_token,
         )
-    assert "Condition must be one of: new, like-new, used-good, used-fair, poor." in excinfo.value.description
+    assert (
+        "Condition must be one of: new, like-new, used-good, used-fair, poor."
+        in excinfo.value.description
+    )
 
 
 @pytest.mark.asyncio
 async def test_create_item_invalid_type():
     with pytest.raises(HTTPException) as excinfo:
-        session_token, csrf_token = await user_auth_register("creator@test.com", "Password1!", "John", "Doe")
+        session_token, csrf_token = await user_auth_register(
+            "creator@test.com", "Password1!", "John", "Doe"
+        )
         session_token = re.escape(session_token)
         csrf_token = re.escape(csrf_token)
         await user_create_item(
-        new_title="Legit",
-        new_description="I love this item",
-        new_condition="used-fair",
-        new_location="Sydney",
-        new_type="Trade",
-        new_images=["http://image.url/1.png"],
-        session_token=session_token,
-        csrf_token=csrf_token,
+            new_title="Legit",
+            new_description="I love this item",
+            new_condition="used-fair",
+            new_location="Sydney",
+            new_type="Trade",
+            new_images=["http://image.url/1.png"],
+            session_token=session_token,
+            csrf_token=csrf_token,
         )
     assert "Type must be either 'Free' or 'Exchange'." in excinfo.value.description
 
+
 @pytest.mark.asyncio
 async def test_view_items_filter_by_location_and_type():
-        session_token, csrf_token = await user_auth_register("creator@test.com", "Password1!", "John", "Doe")
-        session_token = re.escape(session_token)
-        csrf_token = re.escape(csrf_token)
-        await user_create_item(
+    session_token, csrf_token = await user_auth_register(
+        "creator@test.com", "Password1!", "John", "Doe"
+    )
+    session_token = re.escape(session_token)
+    csrf_token = re.escape(csrf_token)
+    await user_create_item(
         new_title="Location Type Match",
         new_description="Description for location type match.",
         new_condition="used-good",
@@ -131,9 +158,11 @@ async def test_view_items_filter_by_location_and_type():
         new_images=["http://image.url/5.png"],
         session_token=session_token,
         csrf_token=csrf_token,
-        )
-        filtered_items = await user_get_browse_items(location_filter="Sydney", type_filter="free")
-        assert len(filtered_items) > 0
+    )
+    filtered_items = await user_get_browse_items(
+        location_filter="Sydney", type_filter="free"
+    )
+    assert len(filtered_items) > 0
 
 
 @pytest.mark.asyncio
@@ -154,7 +183,9 @@ async def test_view_items_invalid_user_id():
 
 @pytest.mark.asyncio
 async def test_modify_item_success():
-    session_token, csrf_token = await user_auth_register("modifier@test.com", "Password1!", "Alice", "Smith")
+    session_token, csrf_token = await user_auth_register(
+        "modifier@test.com", "Password1!", "Alice", "Smith"
+    )
     session_token = re.escape(session_token)
     csrf_token = re.escape(csrf_token)
 
@@ -172,7 +203,6 @@ async def test_modify_item_success():
     item_id = new_item.get_item_pk()
     modified_item = await user_get_browse_items(item_id=str(item_id))
     assert modified_item[item_id].get_title() == re.escape("Test Item".lower())
-
 
     await user_modify_item(
         item_id=str(item_id),
@@ -192,7 +222,9 @@ async def test_modify_item_success():
 
 @pytest.mark.asyncio
 async def test_delete_item_success():
-    session_token, csrf_token = await user_auth_register("deleter@test.com", "Password1!", "Bob", "Jones")
+    session_token, csrf_token = await user_auth_register(
+        "deleter@test.com", "Password1!", "Bob", "Jones"
+    )
     session_token = re.escape(session_token)
     csrf_token = re.escape(csrf_token)
 
@@ -208,13 +240,17 @@ async def test_delete_item_success():
     )
 
     item_id = next(iter(items.keys()))
-    await user_delete_item(item_id=str(item_id), session_token=session_token, csrf_token=csrf_token)
+    await user_delete_item(
+        item_id=str(item_id), session_token=session_token, csrf_token=csrf_token
+    )
     assert item_id not in items
 
 
 @pytest.mark.asyncio
 async def test_modify_item_invalid_user():
-    session_token, csrf_token = await user_auth_register("actualowner@test.com", "Password1!", "Emily", "White")
+    session_token, csrf_token = await user_auth_register(
+        "actualowner@test.com", "Password1!", "Emily", "White"
+    )
     session_token = re.escape(session_token)
     csrf_token = re.escape(csrf_token)
 
@@ -231,7 +267,9 @@ async def test_modify_item_invalid_user():
 
     item_id = next(iter(items.keys()))
 
-    new_token, new_csrf = await user_auth_register("attacker@test.com", "Password1!", "Mallory", "Red")
+    new_token, new_csrf = await user_auth_register(
+        "attacker@test.com", "Password1!", "Mallory", "Red"
+    )
     new_token = re.escape(new_token)
     new_csrf = re.escape(new_csrf)
 
@@ -246,4 +284,6 @@ async def test_modify_item_invalid_user():
             session_token=new_token,
             csrf_token=new_csrf,
         )
-    assert "You do not have permission to modify this item." in excinfo.value.description
+    assert (
+        "You do not have permission to modify this item." in excinfo.value.description
+    )

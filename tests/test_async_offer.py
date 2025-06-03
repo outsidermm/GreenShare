@@ -6,7 +6,16 @@ from backend.auth import user_auth_register
 from werkzeug.exceptions import HTTPException
 from backend.data import users, items, exchange_offers
 from backend.items import user_create_item
-from backend.offers import user_create_offer, user_get_offers, user_accept_offer, user_get_offer_details, user_cancel_offer, user_complete_offer, user_confirm_offer
+from backend.offers import (
+    user_create_offer,
+    user_get_offers,
+    user_accept_offer,
+    user_get_offer_details,
+    user_cancel_offer,
+    user_complete_offer,
+    user_confirm_offer,
+)
+
 
 @pytest.fixture(autouse=True)
 def clear_data():
@@ -27,11 +36,14 @@ def app_context():
         yield app
 
 
-
 @pytest.mark.asyncio
 async def test_offer_cancellation_by_offer_maker():
-    maker_token, maker_csrf = await user_auth_register("cancelmaker@test.com", "Password1!", "Maker", "Cancel")
-    owner_token, owner_csrf = await user_auth_register("cancelowner@test.com", "Password1!", "Owner", "Cancel")
+    maker_token, maker_csrf = await user_auth_register(
+        "cancelmaker@test.com", "Password1!", "Maker", "Cancel"
+    )
+    owner_token, owner_csrf = await user_auth_register(
+        "cancelowner@test.com", "Password1!", "Owner", "Cancel"
+    )
     maker_csrf = re.escape(maker_csrf)
     owner_csrf = re.escape(owner_csrf)
     maker_token = re.escape(maker_token)
@@ -49,7 +61,6 @@ async def test_offer_cancellation_by_offer_maker():
     )
     req_id = req_item.get_item_pk()
     print(req_id)
-    
 
     offer_item = await user_create_item(
         new_title="Offered Cancel",
@@ -82,9 +93,15 @@ async def test_offer_cancellation_by_offer_maker():
 
 @pytest.mark.asyncio
 async def test_unauthorised_offer_acceptance():
-    owner_token, owner_csrf = await user_auth_register("unauthowner@test.com", "Password1!", "Unauth", "Owner")
-    maker_token, maker_csrf = await user_auth_register("unauthmaker@test.com", "Password1!", "Unauth", "Maker")
-    attacker_token, attacker_csrf = await user_auth_register("attacker@test.com", "Password1!", "Bad", "Guy")
+    owner_token, owner_csrf = await user_auth_register(
+        "unauthowner@test.com", "Password1!", "Unauth", "Owner"
+    )
+    maker_token, maker_csrf = await user_auth_register(
+        "unauthmaker@test.com", "Password1!", "Unauth", "Maker"
+    )
+    attacker_token, attacker_csrf = await user_auth_register(
+        "attacker@test.com", "Password1!", "Bad", "Guy"
+    )
     owner_csrf = re.escape(owner_csrf)
     maker_csrf = re.escape(maker_csrf)
     attacker_csrf = re.escape(attacker_csrf)
@@ -137,13 +154,16 @@ async def test_unauthorised_offer_acceptance():
 
 @pytest.mark.asyncio
 async def test_cancel_after_accept_fails():
-    owner_token, owner_csrf = await user_auth_register("cancelaccowner@test.com", "Password1!", "Owner", "Accept")
-    maker_token, maker_csrf = await user_auth_register("cancelaccmaker@test.com", "Password1!", "Maker", "Accept")
+    owner_token, owner_csrf = await user_auth_register(
+        "cancelaccowner@test.com", "Password1!", "Owner", "Accept"
+    )
+    maker_token, maker_csrf = await user_auth_register(
+        "cancelaccmaker@test.com", "Password1!", "Maker", "Accept"
+    )
     owner_csrf = re.escape(owner_csrf)
     maker_csrf = re.escape(maker_csrf)
     owner_token = re.escape(owner_token)
     maker_token = re.escape(maker_token)
-
 
     req_item = await user_create_item(
         new_title="Cannot Cancel",
@@ -196,8 +216,12 @@ async def test_cancel_after_accept_fails():
 @pytest.mark.asyncio
 async def test_full_offer_flow():
     # Register two users
-    owner_token, owner_csrf = await user_auth_register("owner@test.com", "Password1!", "Owner", "User")
-    offerer_token, offerer_csrf = await user_auth_register("offerer@test.com", "Password1!", "Offerer", "User")
+    owner_token, owner_csrf = await user_auth_register(
+        "owner@test.com", "Password1!", "Owner", "User"
+    )
+    offerer_token, offerer_csrf = await user_auth_register(
+        "offerer@test.com", "Password1!", "Offerer", "User"
+    )
 
     owner_csrf = re.escape(owner_csrf)
     offerer_csrf = re.escape(offerer_csrf)
@@ -247,7 +271,7 @@ async def test_full_offer_flow():
         csrf_token=owner_csrf,
     )
     assert exchange_offers[offer_id].get_status() == "accepted"
-    
+
     # Offerer completes the offer
     await user_complete_offer(
         offer_id=str(offer_id),
@@ -255,7 +279,7 @@ async def test_full_offer_flow():
         csrf_token=offerer_csrf,
     )
     assert exchange_offers[offer_id].get_status() == "completed"
-    
+
     # Owner confirms offer
     await user_confirm_offer(
         offer_id=str(offer_id),
@@ -268,9 +292,15 @@ async def test_full_offer_flow():
 @pytest.mark.asyncio
 async def test_multiple_offers_conflict():
     # Register users
-    owner_token, owner_csrf = await user_auth_register("owner2@test.com", "Password1!", "Ownertwo", "User")
-    offerer1_token, offerer1_csrf = await user_auth_register("offerer1@test.com", "Password1!", "Offererone", "User")
-    offerer2_token, offerer2_csrf = await user_auth_register("offerer2@test.com", "Password1!", "Offerertwo", "User")
+    owner_token, owner_csrf = await user_auth_register(
+        "owner2@test.com", "Password1!", "Ownertwo", "User"
+    )
+    offerer1_token, offerer1_csrf = await user_auth_register(
+        "offerer1@test.com", "Password1!", "Offererone", "User"
+    )
+    offerer2_token, offerer2_csrf = await user_auth_register(
+        "offerer2@test.com", "Password1!", "Offerertwo", "User"
+    )
 
     owner_csrf = re.escape(owner_csrf)
     offerer1_csrf = re.escape(offerer1_csrf)
@@ -356,9 +386,15 @@ async def test_multiple_offers_conflict():
 
 @pytest.mark.asyncio
 async def test_unauthorised_offer_confirmation():
-    owner_token, owner_csrf = await user_auth_register("unauthcowner@test.com", "Password1!", "Owner", "Confirm")
-    maker_token, maker_csrf = await user_auth_register("unauthcmaker@test.com", "Password1!", "Maker", "Confirm")
-    stranger_token, stranger_csrf = await user_auth_register("stranger@test.com", "Password1!", "Strange", "Guy")
+    owner_token, owner_csrf = await user_auth_register(
+        "unauthcowner@test.com", "Password1!", "Owner", "Confirm"
+    )
+    maker_token, maker_csrf = await user_auth_register(
+        "unauthcmaker@test.com", "Password1!", "Maker", "Confirm"
+    )
+    stranger_token, stranger_csrf = await user_auth_register(
+        "stranger@test.com", "Password1!", "Strange", "Guy"
+    )
 
     owner_csrf = re.escape(owner_csrf)
     maker_csrf = re.escape(maker_csrf)
@@ -401,16 +437,16 @@ async def test_unauthorised_offer_confirmation():
     offer_key = offer.get_offer_pk()
 
     await user_accept_offer(
-
         session_token=owner_token,
-        csrf_token=owner_csrf,        offer_id=str(offer_key),
+        csrf_token=owner_csrf,
+        offer_id=str(offer_key),
     )
 
     with pytest.raises(HTTPException) as excinfo:
         await user_confirm_offer(
-
             session_token=stranger_token,
-            csrf_token=stranger_csrf,            offer_id=str(offer_key),
+            csrf_token=stranger_csrf,
+            offer_id=str(offer_key),
         )
     assert "not authorised to confirm" in excinfo.value.description
     assert exchange_offers[offer_key].get_status() == "accepted"
@@ -419,15 +455,18 @@ async def test_unauthorised_offer_confirmation():
 # New test: user cannot complete an offer before it is confirmed
 @pytest.mark.asyncio
 async def test_offer_confirmation_before_completion():
-    owner_token, owner_csrf = await user_auth_register("compowner@test.com", "Password1!", "Owner", "Complete")
-    maker_token, maker_csrf = await user_auth_register("compmaker@test.com", "Password1!", "Maker", "Complete")
-
+    owner_token, owner_csrf = await user_auth_register(
+        "compowner@test.com", "Password1!", "Owner", "Complete"
+    )
+    maker_token, maker_csrf = await user_auth_register(
+        "compmaker@test.com", "Password1!", "Maker", "Complete"
+    )
 
     owner_csrf = re.escape(owner_csrf)
     maker_csrf = re.escape(maker_csrf)
     owner_token = re.escape(owner_token)
     maker_token = re.escape(maker_token)
-    
+
     req_item = await user_create_item(
         new_title="Completion Attempt",
         new_description="Trying to complete before confirmation",
@@ -452,12 +491,12 @@ async def test_offer_confirmation_before_completion():
     )
     offer_id = offer_item.get_item_pk()
 
-    offer = await user_create_offer(        session_token=maker_token,
+    offer = await user_create_offer(
+        session_token=maker_token,
         csrf_token=maker_csrf,
         requested_item_id=str(req_id),
         offered_item_ids=[str(offer_id)],
         message="Try completing early",
-
     )
     offer_key = offer.get_offer_pk()
 
@@ -469,9 +508,8 @@ async def test_offer_confirmation_before_completion():
 
     with pytest.raises(HTTPException) as excinfo:
         await user_confirm_offer(
-
             session_token=owner_token,
-            csrf_token=owner_csrf, 
+            csrf_token=owner_csrf,
             offer_id=str(offer_key),
         )
     assert "not in a completed state" in excinfo.value.description
@@ -480,21 +518,45 @@ async def test_offer_confirmation_before_completion():
 
 @pytest.mark.asyncio
 async def test_repeated_confirmation():
-    owner_token, owner_csrf = await user_auth_register("reconfowner@test.com", "Password1!", "Owner", "Recon")
-    maker_token, maker_csrf = await user_auth_register("reconfmaker@test.com", "Password1!", "Maker", "Recon")
+    owner_token, owner_csrf = await user_auth_register(
+        "reconfowner@test.com", "Password1!", "Owner", "Recon"
+    )
+    maker_token, maker_csrf = await user_auth_register(
+        "reconfmaker@test.com", "Password1!", "Maker", "Recon"
+    )
 
     owner_csrf = re.escape(owner_csrf)
     maker_csrf = re.escape(maker_csrf)
     owner_token = re.escape(owner_token)
     maker_token = re.escape(maker_token)
 
-    req_item = await user_create_item("Recon Req", "Confirm again test", "used-good", "VIC", "Exchange", ["http://imgur.com/1.png"], owner_token, owner_csrf)
+    req_item = await user_create_item(
+        "Recon Req",
+        "Confirm again test",
+        "used-good",
+        "VIC",
+        "Exchange",
+        ["http://imgur.com/1.png"],
+        owner_token,
+        owner_csrf,
+    )
     req_id = req_item.get_item_pk()
 
-    off = await user_create_item("Recon Offer", "Confirm again test", "Used-fair", "NSW", "Exchange", ["http://imgur.com/2.png"], maker_token, maker_csrf)
+    off = await user_create_item(
+        "Recon Offer",
+        "Confirm again test",
+        "Used-fair",
+        "NSW",
+        "Exchange",
+        ["http://imgur.com/2.png"],
+        maker_token,
+        maker_csrf,
+    )
     off_id = off.get_item_pk()
 
-    offer = await user_create_offer(maker_token,maker_csrf, [str(off_id)],str(req_id),"Try reconfirming")
+    offer = await user_create_offer(
+        maker_token, maker_csrf, [str(off_id)], str(req_id), "Try reconfirming"
+    )
     offer_key = offer.get_offer_pk()
 
     await user_accept_offer(owner_token, owner_csrf, str(offer_key))
@@ -502,26 +564,51 @@ async def test_repeated_confirmation():
     await user_confirm_offer(owner_token, owner_csrf, str(offer_key))
 
     with pytest.raises(HTTPException) as excinfo:
-        await user_confirm_offer(owner_token, owner_csrf,str(offer_key))
+        await user_confirm_offer(owner_token, owner_csrf, str(offer_key))
     assert "already been confirmed" in excinfo.value.description
+
 
 @pytest.mark.asyncio
 async def test_repeated_completion():
-    owner_token, owner_csrf = await user_auth_register("recompowner@test.com", "Password1!", "Owner", "Recomp")
-    maker_token, maker_csrf = await user_auth_register("recompmaker@test.com", "Password1!", "Maker", "Recomp")
+    owner_token, owner_csrf = await user_auth_register(
+        "recompowner@test.com", "Password1!", "Owner", "Recomp"
+    )
+    maker_token, maker_csrf = await user_auth_register(
+        "recompmaker@test.com", "Password1!", "Maker", "Recomp"
+    )
 
     owner_csrf = re.escape(owner_csrf)
     maker_csrf = re.escape(maker_csrf)
     owner_token = re.escape(owner_token)
     maker_token = re.escape(maker_token)
 
-    req_item = await user_create_item("Recomp Req", "Complete again test", "used-Good", "VIC", "Exchange", ["http://imgur.com/3.png"], owner_token, owner_csrf)
+    req_item = await user_create_item(
+        "Recomp Req",
+        "Complete again test",
+        "used-Good",
+        "VIC",
+        "Exchange",
+        ["http://imgur.com/3.png"],
+        owner_token,
+        owner_csrf,
+    )
     req_id = req_item.get_item_pk()
 
-    off_item = await user_create_item("Recomp Offer", "Complete again test", "used-fair", "NSW", "Exchange", ["http://imgur.com/4.png"], maker_token, maker_csrf)
+    off_item = await user_create_item(
+        "Recomp Offer",
+        "Complete again test",
+        "used-fair",
+        "NSW",
+        "Exchange",
+        ["http://imgur.com/4.png"],
+        maker_token,
+        maker_csrf,
+    )
     off_id = off_item.get_item_pk()
 
-    offer = await user_create_offer(maker_token, maker_csrf, [str(off_id)], str(req_id), "Try recompleting")
+    offer = await user_create_offer(
+        maker_token, maker_csrf, [str(off_id)], str(req_id), "Try recompleting"
+    )
     offer_key = offer.get_offer_pk()
 
     await user_accept_offer(owner_token, owner_csrf, str(offer_key))
@@ -531,71 +618,138 @@ async def test_repeated_completion():
         await user_complete_offer(maker_token, maker_csrf, str(offer_key))
     assert "already been completed" in excinfo.value.description
 
+
 @pytest.mark.asyncio
 async def test_invalid_offer_id():
-    user_token, user_csrf = await user_auth_register("invalidid@test.com", "Password1!", "Invalid", "ID")
+    user_token, user_csrf = await user_auth_register(
+        "invalidid@test.com", "Password1!", "Invalid", "ID"
+    )
     user_csrf = re.escape(user_csrf)
     user_token = re.escape(user_token)
     with pytest.raises(HTTPException) as excinfo:
         await user_accept_offer(user_token, user_csrf, "999")
     assert "does not exist" in excinfo.value.description
 
+
 @pytest.mark.asyncio
 async def test_create_exchange_offer_missing_items():
-    owner_token, owner_csrf = await user_auth_register("recompowner@test.com", "Password1!", "Owner", "Recomp")
-    maker_token, maker_csrf = await user_auth_register("recompmaker@test.com", "Password1!", "Maker", "Recomp")
+    owner_token, owner_csrf = await user_auth_register(
+        "recompowner@test.com", "Password1!", "Owner", "Recomp"
+    )
+    maker_token, maker_csrf = await user_auth_register(
+        "recompmaker@test.com", "Password1!", "Maker", "Recomp"
+    )
 
     owner_csrf = re.escape(owner_csrf)
     maker_csrf = re.escape(maker_csrf)
     owner_token = re.escape(owner_token)
     maker_token = re.escape(maker_token)
-    
-    item = await user_create_item("Valid Item", "Used ilwjdijaliwdjlaidjlawjdiwj", "Used-fair", "SAS", "Exchange", ["http://imgur.com/6.png"], owner_token, owner_csrf)
+
+    item = await user_create_item(
+        "Valid Item",
+        "Used ilwjdijaliwdjlaidjlawjdiwj",
+        "Used-fair",
+        "SAS",
+        "Exchange",
+        ["http://imgur.com/6.png"],
+        owner_token,
+        owner_csrf,
+    )
     valid_id = item.get_item_pk()
 
     with pytest.raises(HTTPException) as excinfo:
-        await user_create_offer(maker_token, maker_csrf, [], str(valid_id), "Can't trade without items")
-    assert "You must offer at least one item in exchange for this item." in excinfo.value.description
-    
+        await user_create_offer(
+            maker_token, maker_csrf, [], str(valid_id), "Can't trade without items"
+        )
+    assert (
+        "You must offer at least one item in exchange for this item."
+        in excinfo.value.description
+    )
+
 
 @pytest.mark.asyncio
 async def test_create_free_offer_having_items():
-    owner_token, owner_csrf = await user_auth_register("recompowner@test.com", "Password1!", "Owner", "Recomp")
-    maker_token, maker_csrf = await user_auth_register("recompmaker@test.com", "Password1!", "Maker", "Recomp")
+    owner_token, owner_csrf = await user_auth_register(
+        "recompowner@test.com", "Password1!", "Owner", "Recomp"
+    )
+    maker_token, maker_csrf = await user_auth_register(
+        "recompmaker@test.com", "Password1!", "Maker", "Recomp"
+    )
 
     owner_csrf = re.escape(owner_csrf)
     maker_csrf = re.escape(maker_csrf)
     owner_token = re.escape(owner_token)
     maker_token = re.escape(maker_token)
-    
-    item = await user_create_item("Valid Item", "Used ilwjdijaliwdjlaidjlawjdiwj", "Used-fair", "SAS", "Free", ["http://imgur.com/6.png"], owner_token, owner_csrf)
+
+    item = await user_create_item(
+        "Valid Item",
+        "Used ilwjdijaliwdjlaidjlawjdiwj",
+        "Used-fair",
+        "SAS",
+        "Free",
+        ["http://imgur.com/6.png"],
+        owner_token,
+        owner_csrf,
+    )
     valid_id = item.get_item_pk()
 
-    await user_create_offer(maker_token, maker_csrf, [], str(valid_id), "Can't trade without items")
+    await user_create_offer(
+        maker_token, maker_csrf, [], str(valid_id), "Can't trade without items"
+    )
     assert len(exchange_offers) == 1
+
 
 @pytest.mark.asyncio
 async def test_accepting_own_offer():
-    user_token, user_csrf = await user_auth_register("selfaccept@test.com", "Password1!", "Self", "Accept")
+    user_token, user_csrf = await user_auth_register(
+        "selfaccept@test.com", "Password1!", "Self", "Accept"
+    )
     user_csrf = re.escape(user_csrf)
     user_token = re.escape(user_token)
-    
-    req_item = await user_create_item("Self Request", "Self owned", "used-Good", "WAT", "Exchange", ["http://imgur.com/selfreq.png"], user_token, user_csrf)
+
+    req_item = await user_create_item(
+        "Self Request",
+        "Self owned",
+        "used-Good",
+        "WAT",
+        "Exchange",
+        ["http://imgur.com/selfreq.png"],
+        user_token,
+        user_csrf,
+    )
     req_id = req_item.get_item_pk()
-    
-    off_item = await user_create_item("Self Offer", "Self owned", "Used-fair", "WAT", "Exchange", ["http://imgur.com/selfoff.png"], user_token, user_csrf)
+
+    off_item = await user_create_item(
+        "Self Offer",
+        "Self owned",
+        "Used-fair",
+        "WAT",
+        "Exchange",
+        ["http://imgur.com/selfoff.png"],
+        user_token,
+        user_csrf,
+    )
     off_id = off_item.get_item_pk()
-    
+
     with pytest.raises(HTTPException) as excinfo:
-        await user_create_offer(user_token, user_csrf, [str(off_id)], str(req_id), "Trade with myself")
+        await user_create_offer(
+            user_token, user_csrf, [str(off_id)], str(req_id), "Trade with myself"
+        )
     assert "cannot exchange your own item" in excinfo.value.description
+
 
 @pytest.mark.asyncio
 async def test_offer_with_already_used_item():
-    owner_token, owner_csrf = await user_auth_register("reuseowner@test.com", "Password1!", "Reuse", "Owner")
-    maker1_token, maker1_csrf = await user_auth_register("reusemaker1@test.com", "Password1!", "Reuse", "Makerone")
-    maker2_token, maker2_csrf = await user_auth_register("reusemaker2@test.com", "Password1!", "Reuse", "Makertwo")
-    
+    owner_token, owner_csrf = await user_auth_register(
+        "reuseowner@test.com", "Password1!", "Reuse", "Owner"
+    )
+    maker1_token, maker1_csrf = await user_auth_register(
+        "reusemaker1@test.com", "Password1!", "Reuse", "Makerone"
+    )
+    maker2_token, maker2_csrf = await user_auth_register(
+        "reusemaker2@test.com", "Password1!", "Reuse", "Makertwo"
+    )
+
     owner_csrf = re.escape(owner_csrf)
     maker1_csrf = re.escape(maker1_csrf)
     maker2_csrf = re.escape(maker2_csrf)
@@ -603,13 +757,33 @@ async def test_offer_with_already_used_item():
     maker1_token = re.escape(maker1_token)
     maker2_token = re.escape(maker2_token)
 
-    req_item = await user_create_item("Requested", "Base item xxxxxx", "new", "NTT", "Exchange", ["http://imgur.com/basereq.png"], owner_token, owner_csrf)
+    req_item = await user_create_item(
+        "Requested",
+        "Base item xxxxxx",
+        "new",
+        "NTT",
+        "Exchange",
+        ["http://imgur.com/basereq.png"],
+        owner_token,
+        owner_csrf,
+    )
     req_id = req_item.get_item_pk()
-    
-    shared_item = await user_create_item("Shared Offer", "Item to reuse xxxxxx", "new", "TAS", "Exchange", ["http://imgur.com/shared.png"], maker1_token, maker1_csrf)
+
+    shared_item = await user_create_item(
+        "Shared Offer",
+        "Item to reuse xxxxxx",
+        "new",
+        "TAS",
+        "Exchange",
+        ["http://imgur.com/shared.png"],
+        maker1_token,
+        maker1_csrf,
+    )
     shared_id = shared_item.get_item_pk()
 
-    first_offer = await user_create_offer(maker1_token, maker1_csrf, [str(shared_id)], str(req_id), "First user offer")
+    first_offer = await user_create_offer(
+        maker1_token, maker1_csrf, [str(shared_id)], str(req_id), "First user offer"
+    )
     first_offer_key = first_offer.get_offer_pk()
 
     await user_accept_offer(owner_token, owner_csrf, str(first_offer_key))
@@ -617,31 +791,61 @@ async def test_offer_with_already_used_item():
     await user_confirm_offer(owner_token, owner_csrf, str(first_offer_key))
 
     with pytest.raises(HTTPException) as excinfo:
-        await user_create_offer( maker2_token, maker2_csrf, [str(shared_id)],str(req_id), "Second user reuse")
+        await user_create_offer(
+            maker2_token,
+            maker2_csrf,
+            [str(shared_id)],
+            str(req_id),
+            "Second user reuse",
+        )
     assert "Requested item is not available for exchange." in excinfo.value.description
 
 
 @pytest.mark.asyncio
 async def test_user_get_offers_and_offer_details():
     # Register users
-    owner_token, owner_csrf = await user_auth_register("getoffersowner@test.com", "Password1!", "Owner", "Get")
-    maker_token, maker_csrf = await user_auth_register("getoffersmaker@test.com", "Password1!", "Maker", "Get")
-    
+    owner_token, owner_csrf = await user_auth_register(
+        "getoffersowner@test.com", "Password1!", "Owner", "Get"
+    )
+    maker_token, maker_csrf = await user_auth_register(
+        "getoffersmaker@test.com", "Password1!", "Maker", "Get"
+    )
+
     owner_csrf = re.escape(owner_csrf)
     maker_csrf = re.escape(maker_csrf)
     owner_token = re.escape(owner_token)
     maker_token = re.escape(maker_token)
 
     # Owner creates an item
-    req_item = await user_create_item("Detail Request", "Item to test get", "new", "QLD", "Exchange", ["http://imgur.com/reqget.png"], owner_token, owner_csrf)
+    req_item = await user_create_item(
+        "Detail Request",
+        "Item to test get",
+        "new",
+        "QLD",
+        "Exchange",
+        ["http://imgur.com/reqget.png"],
+        owner_token,
+        owner_csrf,
+    )
     req_id = req_item.get_item_pk()
 
     # Maker creates an item
-    off_item = await user_create_item("Detail Offer", "Item to test get", "Used-fair", "VIC", "Exchange", ["http://imgur.com/offerget.png"], maker_token, maker_csrf)
+    off_item = await user_create_item(
+        "Detail Offer",
+        "Item to test get",
+        "Used-fair",
+        "VIC",
+        "Exchange",
+        ["http://imgur.com/offerget.png"],
+        maker_token,
+        maker_csrf,
+    )
     off_id = off_item.get_item_pk()
 
     # Maker creates offer
-    offer = await user_create_offer(maker_token, maker_csrf, [str(off_id)], str(req_id), "Testing offer retrieval")
+    offer = await user_create_offer(
+        maker_token, maker_csrf, [str(off_id)], str(req_id), "Testing offer retrieval"
+    )
     offer_key = offer.get_offer_pk()
 
     # Maker retrieves all offers
@@ -650,7 +854,7 @@ async def test_user_get_offers_and_offer_details():
     assert len(incoming_off) == 0
 
     # Maker retrieves offer details
-    offer_detail = await user_get_offer_details( maker_token, maker_csrf,str(offer_key))
+    offer_detail = await user_get_offer_details(maker_token, maker_csrf, str(offer_key))
     assert offer_detail["id"] == offer_key
     assert offer_detail["message"] == "testing offer retrieval"
     assert offer_detail["status"] == "pending"

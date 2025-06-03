@@ -23,8 +23,7 @@ async def user_create_offer(
     requested_item_id: str,
     message: str,
 ) -> ExchangeOffer:
-    
-    
+
     new_offered_by_id = admin_retrieve_user_id(session_token, csrf_token)
 
     if not requested_item_id.isdigit():
@@ -32,7 +31,9 @@ async def user_create_offer(
     else:
         new_requested_item_id = int(requested_item_id)
         if new_requested_item_id not in items:
-            abort(404, f"Requested item with ID {new_requested_item_id} does not exist.")
+            abort(
+                404, f"Requested item with ID {new_requested_item_id} does not exist."
+            )
 
     if items[new_requested_item_id].get_type() == "exchange" and not offered_item_ids:
         abort(400, "You must offer at least one item in exchange for this item.")
@@ -40,7 +41,7 @@ async def user_create_offer(
     new_offered_item_ids = [
         int(item_id) for item_id in offered_item_ids if item_id.isdigit()
     ]
-    
+
     for offered_item_id in offered_item_ids:
         if not offered_item_id.isdigit():
             abort(400, "Offered item IDs must be integers.")
@@ -220,7 +221,8 @@ async def user_cancel_offer(
 
     if offer.get_status() in ["completed", "confirmed", "accepted"]:
         abort(
-            400, "Offer cannot be cancelled after it has been completed, confirmed, or accepted."
+            400,
+            "Offer cannot be cancelled after it has been completed, confirmed, or accepted.",
         )
 
     offer.set_status("cancelled")  # Update the status to cancelled
