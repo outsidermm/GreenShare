@@ -31,7 +31,7 @@ export default async function getItem({
     if (item_id) params.append("id", item_id);
     if (user_id) params.append("user_id", user_id);
 
-    const response = await fetch(`${API_BASE}/items?${params.toString()}`, {
+    const response = await fetch(`${API_BASE}/item?${params.toString()}`, {
       method: "GET",
       credentials: "include",
       headers: {
