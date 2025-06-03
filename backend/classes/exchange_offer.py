@@ -67,13 +67,11 @@ class ExchangeOffer:
         """
         return db.session.get(ExchangeOfferDB, self.get_offer_pk()).to_json()
 
-
     def get_status(self) -> str:
         """
         Returns the status of the exchange offer.
         """
         return db.session.get(ExchangeOfferDB, self.get_offer_pk()).status
-
 
     def set_status(self, status: str):
         """
@@ -87,7 +85,9 @@ class ExchangeOffer:
         """
         Returns a list of offered item IDs for the exchange offer.
         """
-        offered_items = db.session.get(ExchangeOfferDB, self.get_offer_pk()).offered_items
+        offered_items = db.session.get(
+            ExchangeOfferDB, self.get_offer_pk()
+        ).offered_items
         return [item.item_id for item in offered_items]
 
     def get_offered_by_id(self) -> int:
@@ -96,13 +96,11 @@ class ExchangeOffer:
         """
         return db.session.get(ExchangeOfferDB, self.get_offer_pk()).offered_by_id
 
-
     def get_requested_item_id(self) -> int:
         """
         Returns the ID of the requested item in the exchange offer.
         """
         return db.session.get(ExchangeOfferDB, self.get_offer_pk()).requested_item_id
-
 
     def get_message(self) -> str:
         """
