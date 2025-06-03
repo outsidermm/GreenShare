@@ -1,4 +1,4 @@
-from typing import Optional, Tuple
+from typing import Tuple
 
 from flask import abort
 
@@ -19,22 +19,28 @@ def validate_offer_id(offer_id: str) -> int:
 async def user_create_offer(
     session_token: str,
     csrf_token: str,
-    offered_item_ids: Optional[list[str]],
+    offered_item_ids: list[str],
     requested_item_id: str,
     message: str,
-):
+) -> ExchangeOffer:
+    
+    
     new_offered_by_id = admin_retrieve_user_id(session_token, csrf_token)
-    new_message = message.lower()
-    if len(new_message) > 1000 or len(new_message) < 10:
-        abort(400, "Message must be between 10 and 1000 characters.")
 
     if not requested_item_id.isdigit():
         abort(400, "Requested item ID must be an integer.")
     else:
         new_requested_item_id = int(requested_item_id)
-        if requested_item_id not in items:
-            abort(404, f"Requested item with ID {requested_item_id} does not exist.")
+        if new_requested_item_id not in items:
+            abort(404, f"Requested item with ID {new_requested_item_id} does not exist.")
 
+    if items[new_requested_item_id].get_type() == "exchange" and not offered_item_ids:
+        abort(400, "You must offer at least one item in exchange for this item.")
+
+    new_offered_item_ids = [
+        int(item_id) for item_id in offered_item_ids if item_id.isdigit()
+    ]
+    
     for offered_item_id in offered_item_ids:
         if not offered_item_id.isdigit():
             abort(400, "Offered item IDs must be integers.")
@@ -43,33 +49,31 @@ async def user_create_offer(
             if offered_item_id not in items:
                 abort(404, f"Offered item with ID {offered_item_id} does not exist.")
 
-            if offered_item_id == requested_item_id:
+            if offered_item_id == new_requested_item_id:
                 abort(400, "Offered item cannot be the same as the requested item.")
 
-    requested_item_id = int(requested_item_id)
-    new_offered_item_ids = [
-        int(item_id) for item_id in offered_item_ids if item_id.isdigit()
-    ]
-
-    if items[requested_item_id].get_statis() != "available":
+    if items[new_requested_item_id].get_status() != "available":
         abort(400, "Requested item is not available for exchange.")
 
-    if items[requested_item_id].get_user_id() == new_offered_by_id:
+    if items[new_requested_item_id].get_user_id() == new_offered_by_id:
         abort(400, "You cannot exchange your own item.")
 
-    if items[requested_item_id].get_type() == "free" and offered_item_ids:
+    if items[new_requested_item_id].get_type() == "free" and offered_item_ids:
         abort(400, "This item is free, you cannot offer items in exchange.")
 
-    if items[requested_item_id].get_type() == "exchange" and not offered_item_ids:
-        abort(400, "You must offer at least one item in exchange for this item.")
+    new_message = message.lower()
+    if len(new_message) > 1000 or len(new_message) < 10:
+        abort(400, "Message must be between 10 and 1000 characters.")
+
     try:
         new_offer = ExchangeOffer(
             offered_by_id=new_offered_by_id,
             requested_item_id=new_requested_item_id,
             message=new_message,
-            offered_items=new_offered_item_ids,
+            offered_item_ids=new_offered_item_ids,
         )
         exchange_offers[new_offer.get_offer_pk()] = new_offer
+        return new_offer
     except Exception as e:
         abort(500, f"Failed to create a offer: {str(e)}")
 
@@ -110,20 +114,22 @@ async def user_accept_offer(session_token: str, csrf_token: str, offer_id: str):
             )
 
     if offer.get_requested_item_id() not in items:
-        await user_cancel_offer(session_token, csrf_token, offer_id)
+        await user_cancel_offer(session_token, csrf_token, str(offer_id))
         abort(404, "Requested item does not exist.")
 
     if items[offer.get_requested_item_id()].get_user_id() != new_user_id:
-        abort(403, "You are not authorized to accept this offer.")
+        abort(403, "You are not authorised to accept this offer.")
 
     if offer.get_status() != "pending":
         abort(400, "Offer is not in a pending state.")
 
-    offer.set_status("accepted")  # Update the status to accepted
     for offered_item_id in offer.get_offered_items():
         if offered_item_id not in items:
-            await user_cancel_offer(session_token, csrf_token, offer_id)
+            await user_cancel_offer(session_token, csrf_token, str(offer_id))
             abort(404, f"Offered item with ID {offered_item_id} does not exist.")
+
+    offer.set_status("accepted")  # Update the status to accepted
+
     return {
         "message": "Offer accepted successfully.",
         "location": items[offer.get_requested_item_id()].get_location(),
@@ -139,9 +145,11 @@ async def user_complete_offer(session_token: str, csrf_token: str, offer_id: str
         abort(404, "Requested item does not exist.")
 
     if offer.get_offered_by_id() != new_user_id:
-        abort(403, "You are not authorized to complete this offer.")
+        abort(403, "You are not authorised to complete this offer.")
 
     if offer.get_status() != "accepted":
+        if offer.get_status() == "completed":
+            abort(400, "Offer has already been completed.")
         abort(400, "Offer is not in an accepted state.")
 
     offer.set_status("completed")  # Update the status to completed
@@ -160,18 +168,22 @@ async def user_confirm_offer(session_token: str, csrf_token: str, offer_id: str)
     offer = exchange_offers[offer_id]
 
     if items[offer.get_requested_item_id()].get_user_id() != new_user_id:
-        abort(403, "You are not authorized to confirm this offer.")
+        abort(403, "You are not authorised to confirm this offer.")
 
     if offer.get_status() != "completed":
+        if offer.get_status() == "confirmed":
+            abort(400, "Offer has already been confirmed.")
         abort(400, "Offer is not in a completed state.")
 
     offer.set_status("confirmed")  # Update the status to confirmed
-    items[offer.get_requested_item_id()].set_statis(
+    items[offer.get_requested_item_id()].set_status(
         "offer_complete"
     )  # Mark requested item as available
+
     for offered_item_id in offer.get_offered_items():
         if offered_item_id in items:
-            items[offered_item_id].set_statis("offer_complete")
+            items[offered_item_id].set_status("offer_complete")
+
     return {
         "message": "Offer confirmed successfully.",
         "offer_id": offer.get_offer_pk(),
@@ -188,13 +200,13 @@ async def user_get_offer_details(session_token: str, csrf_token: str, offer_id: 
         offer.get_requested_item_id() not in items
         or items[offer.get_requested_item_id()].get_user_id() != new_user_id
     ):
-        abort(403, "You are not authorized to view this offer.")
+        abort(403, "You are not authorised to view this offer.")
 
     return offer.to_json()
 
 
 async def user_cancel_offer(
-    session_token: str, csrf_token: str, offer_id: str, message: Optional[str] = None
+    session_token: str, csrf_token: str, offer_id: str, message: str = None
 ):
     new_user_id = admin_retrieve_user_id(session_token, csrf_token)
     offer_id = validate_offer_id(offer_id)
@@ -206,9 +218,9 @@ async def user_cancel_offer(
     ):
         abort(403, "You are not authorised to cancel this offer.")
 
-    if offer.get_status() in ["completed", "confirmed"]:
+    if offer.get_status() in ["completed", "confirmed", "accepted"]:
         abort(
-            400, "Offer cannot be cancelled after it has been completed or confirmed."
+            400, "Offer cannot be cancelled after it has been completed, confirmed, or accepted."
         )
 
     offer.set_status("cancelled")  # Update the status to cancelled
