@@ -65,89 +65,56 @@ class ExchangeOffer:
         """
         Converts the exchange offer to a JSON serializable dictionary.
         """
+        return db.session.get(ExchangeOfferDB, self.get_offer_pk()).to_json()
 
-        offer_record = ExchangeOfferDB.query.get(self.__offer_pk)
-        if not offer_record:
-            raise ValueError("Exchange offer not found in the database.")
-
-        return offer_record.to_json()
 
     def get_status(self) -> str:
         """
         Returns the status of the exchange offer.
         """
+        return db.session.get(ExchangeOfferDB, self.get_offer_pk()).status
 
-        offer_record = ExchangeOfferDB.query.get(self.__offer_pk)
-        if not offer_record:
-            raise ValueError("Exchange offer not found in the database.")
-
-        return offer_record.status
 
     def set_status(self, status: str):
         """
         Sets the status of the exchange offer.
         """
 
-        offer_record = ExchangeOfferDB.query.get(self.__offer_pk)
-        if not offer_record:
-            raise ValueError("Exchange offer not found in the database.")
-
-        offer_record.status = status
+        db.session.get(ExchangeOfferDB, self.get_offer_pk()).status = status
         db.session.commit()
 
     def get_offered_items(self) -> list[int]:
         """
         Returns a list of offered item IDs for the exchange offer.
         """
-
-        offer_record = ExchangeOfferDB.query.get(self.__offer_pk)
-        if not offer_record:
-            raise ValueError("Exchange offer not found in the database.")
-
-        return [item.item_id for item in offer_record.offered_items]
+        offered_items = db.session.get(ExchangeOfferDB, self.get_offer_pk()).offered_items
+        return [item.item_id for item in offered_items]
 
     def get_offered_by_id(self) -> int:
         """
         Returns the user ID of the person who made the offer.
         """
+        return db.session.get(ExchangeOfferDB, self.get_offer_pk()).offered_by_id
 
-        offer_record = ExchangeOfferDB.query.get(self.__offer_pk)
-        if not offer_record:
-            raise ValueError("Exchange offer not found in the database.")
-
-        return offer_record.offered_by_id
 
     def get_requested_item_id(self) -> int:
         """
         Returns the ID of the requested item in the exchange offer.
         """
+        return db.session.get(ExchangeOfferDB, self.get_offer_pk()).requested_item_id
 
-        offer_record = ExchangeOfferDB.query.get(self.__offer_pk)
-        if not offer_record:
-            raise ValueError("Exchange offer not found in the database.")
-
-        return offer_record.requested_item_id
 
     def get_message(self) -> str:
         """
         Returns the message associated with the exchange offer.
         """
-        offer_record = db.session.get(ExchangeOfferDB, self.__offer_pk)
-        if not offer_record:
-            raise ValueError("Exchange offer not found in the database.")
-
-        return offer_record.message
+        return db.session.get(ExchangeOfferDB, self.get_offer_pk()).message
 
     def set_message(self, message: str):
         """
         Sets the message for the exchange offer.
         """
-
-        offer_record = ExchangeOfferDB.query.get(self.__offer_pk)
-        if not offer_record:
-            raise ValueError("Exchange offer not found in the database.")
-
-        offer_record.message = message
+        db.session.get(ExchangeOfferDB, self.get_offer_pk()).message = message
         db.session.commit()
 
     def delete(self):
@@ -155,9 +122,6 @@ class ExchangeOffer:
         Deletes the exchange offer from the database.
         """
 
-        offer_record = ExchangeOfferDB.query.get(self.__offer_pk)
-        if not offer_record:
-            raise ValueError("Exchange offer not found in the database.")
-
+        offer_record = db.session.get(ExchangeOfferDB, self.__offer_pk)
         db.session.delete(offer_record)
         db.session.commit()
