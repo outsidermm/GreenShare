@@ -60,7 +60,7 @@ class User:
         """
         user_record = UserDB.query.all()
         if not user_record:
-            return None
+            return {}
 
         user_dict = {}
         for user in user_record:
