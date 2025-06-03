@@ -1,16 +1,19 @@
 import pytest
 import re
 from backend.config import app, db
-from backend.models import UserDB, ItemDB, ItemImageDB
+from backend.models import UserDB, ItemDB, ItemImageDB, OfferedItemDB, ExchangeOfferDB
 from backend.auth import user_auth_register
 from werkzeug.exceptions import HTTPException
-from backend.data import users, items
+from backend.data import users, items, exchange_offers
 from backend.items import user_create_item, user_get_browse_items, user_modify_item, user_delete_item
 
 @pytest.fixture(autouse=True)
 def clear_data():
     users.clear()
     items.clear()
+    exchange_offers.clear()
+    db.session.query(OfferedItemDB).delete()
+    db.session.query(ExchangeOfferDB).delete()
     db.session.query(ItemImageDB).delete()
     db.session.query(ItemDB).delete()
     db.session.query(UserDB).delete()

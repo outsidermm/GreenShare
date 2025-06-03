@@ -12,9 +12,9 @@ from backend.auth import (
 )
 
 # Import the global users dictionary so we can reset it between tests.
-from backend.data import users, items
+from backend.data import users, items, exchange_offers
 from backend.config import app, db
-from backend.models import UserDB, ItemDB, ItemImageDB
+from backend.models import ExchangeOfferDB, UserDB, ItemDB, ItemImageDB, OfferedItemDB
 
 
 # -----------------------------------------------------------------------------
@@ -27,6 +27,9 @@ def clear_users():
     """
     users.clear()
     items.clear()
+    exchange_offers.clear()
+    db.session.query(OfferedItemDB).delete()
+    db.session.query(ExchangeOfferDB).delete()
     db.session.query(ItemImageDB).delete()
     db.session.query(ItemDB).delete()
     db.session.query(UserDB).delete()
