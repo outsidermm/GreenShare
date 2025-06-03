@@ -19,7 +19,9 @@ def validate_condition(condition: str) -> str:
     valid_conditions = ["new", "like-new", "used-good", "used-fair", "poor"]
     condition = condition.lower()
     if condition not in valid_conditions:
-        abort(400, "Condition must be one of: new, like-new, used-good, used-fair, poor.")
+        abort(
+            400, "Condition must be one of: new, like-new, used-good, used-fair, poor."
+        )
     return sanitize_input(condition)
 
 
@@ -41,7 +43,10 @@ def validate_category(category: str) -> str:
     ]
     category = category.lower()
     if category not in valid_categories:
-        abort(400, "Category must be one of: essentials, living, tools-tech, style-expression, leisure-learning.")
+        abort(
+            400,
+            "Category must be one of: essentials, living, tools-tech, style-expression, leisure-learning.",
+        )
     return sanitize_input(category)
 
 
@@ -49,9 +54,11 @@ def validate_string_length(
     value: str, field_name: str, min_length: int, max_length: int
 ) -> str:
     if not (min_length <= len(value) <= max_length):
-        abort(400, f"{field_name} must be between {min_length} and {max_length} characters.")
+        abort(
+            400,
+            f"{field_name} must be between {min_length} and {max_length} characters.",
+        )
     return sanitize_input(value.lower())
-
 
 
 def title_matches(user_input: str, item_title: str, threshold: float = 0.7) -> bool:

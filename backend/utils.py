@@ -5,10 +5,10 @@ def sanitize_input(user_input: str) -> str:
     """
     Properly sanitize user input to prevent XSS attacks.
     Uses MarkupSafe's escape function which converts dangerous characters to HTML entities.
-    
+
     Args:
         user_input (str): Raw user input
-        
+
     Returns:
         str: Sanitized input safe for HTML rendering
     """
@@ -21,10 +21,10 @@ def sanitize_email(email: str) -> str:
     """
     Sanitize email input while preserving valid email characters.
     Emails don't need HTML escaping but should be lowercased for consistency.
-    
+
     Args:
         email (str): Raw email input
-        
+
     Returns:
         str: Sanitized and lowercased email
     """
