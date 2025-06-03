@@ -328,7 +328,7 @@ async def delete_item():
         return jsonify({"error": str(e)}), 400
 
 
-@app.route("offer/create", methods=["POST"])
+@app.route("/offer/create", methods=["POST"])
 async def create_exchange_offer():
     """
     Creates a new exchange offer with the provided details.
@@ -359,7 +359,7 @@ async def create_exchange_offer():
         return jsonify({"error": str(e)}), 400
 
 
-@app.route("offer/userview", methods=["GET"])
+@app.route("/offer/userview", methods=["GET"])
 async def view_exchange_offers():
     """
     Retrieves all exchange offers from the database.
