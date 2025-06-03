@@ -63,12 +63,12 @@ class ExchangeOfferDB(db.Model):
 
     offered_by_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     requested_item_id = db.Column(db.Integer, db.ForeignKey("items.id"), nullable=False)
-    message = db.Column(db.Text, nullable=False)
+    message = db.Column(db.String, nullable=False)
     status = db.Column(
         db.String(50), default="pending"
     )  # pending, accepted, cancelled, completed, confirmed
 
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.now)
 
     def to_json(self) -> dict:
         return {
