@@ -207,7 +207,10 @@ async def user_get_offer_details(session_token: str, csrf_token: str, offer_id: 
 
 
 async def user_cancel_offer(
-    session_token: str, csrf_token: str, offer_id: str, message: str = ""
+    session_token: str,
+    csrf_token: str,
+    offer_id: str,
+    message: str = "Offer cancelled by the user.",
 ):
     new_user_id = admin_retrieve_user_id(session_token, csrf_token)
     offer_id = validate_offer_id(offer_id)
@@ -226,10 +229,7 @@ async def user_cancel_offer(
         )
 
     offer.set_status("cancelled")  # Update the status to cancelled
-    offer.set_message(
-        message if message else "Offer cancelled by the user."
-    )  # Set cancellation message
-    message = message if message else "Offer cancelled by the user."
+    offer.set_message(message)
     return {
         "message": message,
         "offer_id": offer.get_offer_pk(),
