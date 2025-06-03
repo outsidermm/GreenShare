@@ -15,6 +15,7 @@ from backend.offers import (
     user_complete_offer,
     user_confirm_offer,
 )
+from backend.utils import sanitize_input
 
 
 @pytest.fixture(autouse=True)
@@ -44,10 +45,10 @@ async def test_offer_cancellation_by_offer_maker():
     owner_token, owner_csrf = await user_auth_register(
         "cancelowner@test.com", "Password1!", "Owner", "Cancel"
     )
-    maker_csrf = re.escape(maker_csrf)
-    owner_csrf = re.escape(owner_csrf)
-    maker_token = re.escape(maker_token)
-    owner_token = re.escape(owner_token)
+    maker_csrf = sanitize_input(maker_csrf)
+    owner_csrf = sanitize_input(owner_csrf)
+    maker_token = sanitize_input(maker_token)
+    owner_token = sanitize_input(owner_token)
 
     req_item = await user_create_item(
         new_title="Requested Cancel",
@@ -102,12 +103,12 @@ async def test_unauthorised_offer_acceptance():
     attacker_token, attacker_csrf = await user_auth_register(
         "attacker@test.com", "Password1!", "Bad", "Guy"
     )
-    owner_csrf = re.escape(owner_csrf)
-    maker_csrf = re.escape(maker_csrf)
-    attacker_csrf = re.escape(attacker_csrf)
-    owner_token = re.escape(owner_token)
-    maker_token = re.escape(maker_token)
-    attacker_token = re.escape(attacker_token)
+    owner_csrf = sanitize_input(owner_csrf)
+    maker_csrf = sanitize_input(maker_csrf)
+    attacker_csrf = sanitize_input(attacker_csrf)
+    owner_token = sanitize_input(owner_token)
+    maker_token = sanitize_input(maker_token)
+    attacker_token = sanitize_input(attacker_token)
 
     req_item = await user_create_item(
         new_title="Protected Request",
@@ -160,10 +161,10 @@ async def test_cancel_after_accept_fails():
     maker_token, maker_csrf = await user_auth_register(
         "cancelaccmaker@test.com", "Password1!", "Maker", "Accept"
     )
-    owner_csrf = re.escape(owner_csrf)
-    maker_csrf = re.escape(maker_csrf)
-    owner_token = re.escape(owner_token)
-    maker_token = re.escape(maker_token)
+    owner_csrf = sanitize_input(owner_csrf)
+    maker_csrf = sanitize_input(maker_csrf)
+    owner_token = sanitize_input(owner_token)
+    maker_token = sanitize_input(maker_token)
 
     req_item = await user_create_item(
         new_title="Cannot Cancel",
@@ -223,10 +224,10 @@ async def test_full_offer_flow():
         "offerer@test.com", "Password1!", "Offerer", "User"
     )
 
-    owner_csrf = re.escape(owner_csrf)
-    offerer_csrf = re.escape(offerer_csrf)
-    owner_token = re.escape(owner_token)
-    offerer_token = re.escape(offerer_token)
+    owner_csrf = sanitize_input(owner_csrf)
+    offerer_csrf = sanitize_input(offerer_csrf)
+    owner_token = sanitize_input(owner_token)
+    offerer_token = sanitize_input(offerer_token)
 
     # Owner creates item to be requested
     req_item = await user_create_item(
@@ -302,12 +303,12 @@ async def test_multiple_offers_conflict():
         "offerer2@test.com", "Password1!", "Offerertwo", "User"
     )
 
-    owner_csrf = re.escape(owner_csrf)
-    offerer1_csrf = re.escape(offerer1_csrf)
-    offerer2_csrf = re.escape(offerer2_csrf)
-    owner_token = re.escape(owner_token)
-    offerer1_token = re.escape(offerer1_token)
-    offerer2_token = re.escape(offerer2_token)
+    owner_csrf = sanitize_input(owner_csrf)
+    offerer1_csrf = sanitize_input(offerer1_csrf)
+    offerer2_csrf = sanitize_input(offerer2_csrf)
+    owner_token = sanitize_input(owner_token)
+    offerer1_token = sanitize_input(offerer1_token)
+    offerer2_token = sanitize_input(offerer2_token)
 
     # Owner creates item to be requested
     req_item = await user_create_item(
@@ -396,12 +397,12 @@ async def test_unauthorised_offer_confirmation():
         "stranger@test.com", "Password1!", "Strange", "Guy"
     )
 
-    owner_csrf = re.escape(owner_csrf)
-    maker_csrf = re.escape(maker_csrf)
-    stranger_csrf = re.escape(stranger_csrf)
-    owner_token = re.escape(owner_token)
-    maker_token = re.escape(maker_token)
-    stranger_token = re.escape(stranger_token)
+    owner_csrf = sanitize_input(owner_csrf)
+    maker_csrf = sanitize_input(maker_csrf)
+    stranger_csrf = sanitize_input(stranger_csrf)
+    owner_token = sanitize_input(owner_token)
+    maker_token = sanitize_input(maker_token)
+    stranger_token = sanitize_input(stranger_token)
 
     req_item = await user_create_item(
         new_title="Secure Request",
@@ -462,10 +463,10 @@ async def test_offer_confirmation_before_completion():
         "compmaker@test.com", "Password1!", "Maker", "Complete"
     )
 
-    owner_csrf = re.escape(owner_csrf)
-    maker_csrf = re.escape(maker_csrf)
-    owner_token = re.escape(owner_token)
-    maker_token = re.escape(maker_token)
+    owner_csrf = sanitize_input(owner_csrf)
+    maker_csrf = sanitize_input(maker_csrf)
+    owner_token = sanitize_input(owner_token)
+    maker_token = sanitize_input(maker_token)
 
     req_item = await user_create_item(
         new_title="Completion Attempt",
@@ -525,10 +526,10 @@ async def test_repeated_confirmation():
         "reconfmaker@test.com", "Password1!", "Maker", "Recon"
     )
 
-    owner_csrf = re.escape(owner_csrf)
-    maker_csrf = re.escape(maker_csrf)
-    owner_token = re.escape(owner_token)
-    maker_token = re.escape(maker_token)
+    owner_csrf = sanitize_input(owner_csrf)
+    maker_csrf = sanitize_input(maker_csrf)
+    owner_token = sanitize_input(owner_token)
+    maker_token = sanitize_input(maker_token)
 
     req_item = await user_create_item(
         "Recon Req",
@@ -577,10 +578,10 @@ async def test_repeated_completion():
         "recompmaker@test.com", "Password1!", "Maker", "Recomp"
     )
 
-    owner_csrf = re.escape(owner_csrf)
-    maker_csrf = re.escape(maker_csrf)
-    owner_token = re.escape(owner_token)
-    maker_token = re.escape(maker_token)
+    owner_csrf = sanitize_input(owner_csrf)
+    maker_csrf = sanitize_input(maker_csrf)
+    owner_token = sanitize_input(owner_token)
+    maker_token = sanitize_input(maker_token)
 
     req_item = await user_create_item(
         "Recomp Req",
@@ -624,8 +625,8 @@ async def test_invalid_offer_id():
     user_token, user_csrf = await user_auth_register(
         "invalidid@test.com", "Password1!", "Invalid", "ID"
     )
-    user_csrf = re.escape(user_csrf)
-    user_token = re.escape(user_token)
+    user_csrf = sanitize_input(user_csrf)
+    user_token = sanitize_input(user_token)
     with pytest.raises(HTTPException) as excinfo:
         await user_accept_offer(user_token, user_csrf, "999")
     assert "does not exist" in excinfo.value.description
@@ -640,10 +641,10 @@ async def test_create_exchange_offer_missing_items():
         "recompmaker@test.com", "Password1!", "Maker", "Recomp"
     )
 
-    owner_csrf = re.escape(owner_csrf)
-    maker_csrf = re.escape(maker_csrf)
-    owner_token = re.escape(owner_token)
-    maker_token = re.escape(maker_token)
+    owner_csrf = sanitize_input(owner_csrf)
+    maker_csrf = sanitize_input(maker_csrf)
+    owner_token = sanitize_input(owner_token)
+    maker_token = sanitize_input(maker_token)
 
     item = await user_create_item(
         "Valid Item",
@@ -676,10 +677,10 @@ async def test_create_free_offer_having_items():
         "recompmaker@test.com", "Password1!", "Maker", "Recomp"
     )
 
-    owner_csrf = re.escape(owner_csrf)
-    maker_csrf = re.escape(maker_csrf)
-    owner_token = re.escape(owner_token)
-    maker_token = re.escape(maker_token)
+    owner_csrf = sanitize_input(owner_csrf)
+    maker_csrf = sanitize_input(maker_csrf)
+    owner_token = sanitize_input(owner_token)
+    maker_token = sanitize_input(maker_token)
 
     item = await user_create_item(
         "Valid Item",
@@ -704,8 +705,8 @@ async def test_accepting_own_offer():
     user_token, user_csrf = await user_auth_register(
         "selfaccept@test.com", "Password1!", "Self", "Accept"
     )
-    user_csrf = re.escape(user_csrf)
-    user_token = re.escape(user_token)
+    user_csrf = sanitize_input(user_csrf)
+    user_token = sanitize_input(user_token)
 
     req_item = await user_create_item(
         "Self Request",
@@ -750,12 +751,12 @@ async def test_offer_with_already_used_item():
         "reusemaker2@test.com", "Password1!", "Reuse", "Makertwo"
     )
 
-    owner_csrf = re.escape(owner_csrf)
-    maker1_csrf = re.escape(maker1_csrf)
-    maker2_csrf = re.escape(maker2_csrf)
-    owner_token = re.escape(owner_token)
-    maker1_token = re.escape(maker1_token)
-    maker2_token = re.escape(maker2_token)
+    owner_csrf = sanitize_input(owner_csrf)
+    maker1_csrf = sanitize_input(maker1_csrf)
+    maker2_csrf = sanitize_input(maker2_csrf)
+    owner_token = sanitize_input(owner_token)
+    maker1_token = sanitize_input(maker1_token)
+    maker2_token = sanitize_input(maker2_token)
 
     req_item = await user_create_item(
         "Requested",
@@ -811,10 +812,10 @@ async def test_user_get_offers_and_offer_details():
         "getoffersmaker@test.com", "Password1!", "Maker", "Get"
     )
 
-    owner_csrf = re.escape(owner_csrf)
-    maker_csrf = re.escape(maker_csrf)
-    owner_token = re.escape(owner_token)
-    maker_token = re.escape(maker_token)
+    owner_csrf = sanitize_input(owner_csrf)
+    maker_csrf = sanitize_input(maker_csrf)
+    owner_token = sanitize_input(owner_token)
+    maker_token = sanitize_input(maker_token)
 
     # Owner creates an item
     req_item = await user_create_item(

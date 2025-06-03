@@ -11,6 +11,7 @@ from backend.items import (
     user_modify_item,
     user_delete_item,
 )
+from backend.utils import sanitize_input
 
 
 @pytest.fixture(autouse=True)
@@ -37,8 +38,8 @@ async def test_create_item_success():
     session_token, csrf_token = await user_auth_register(
         "creator@test.com", "Password1!", "John", "Doe"
     )
-    session_token = re.escape(session_token)
-    csrf_token = re.escape(csrf_token)
+    session_token = sanitize_input(session_token)
+    csrf_token = sanitize_input(csrf_token)
     await user_create_item(
         new_title="Test Item",
         new_description="A very useful item",
@@ -58,8 +59,8 @@ async def test_create_item_invalid_title_length():
         session_token, csrf_token = await user_auth_register(
             "creator@test.com", "Password1!", "John", "Doe"
         )
-        session_token = re.escape(session_token)
-        csrf_token = re.escape(csrf_token)
+        session_token = sanitize_input(session_token)
+        csrf_token = sanitize_input(csrf_token)
         await user_create_item(
             new_title="Te",
             new_description="A very useful item",
@@ -79,8 +80,8 @@ async def test_create_item_invalid_description_length():
         session_token, csrf_token = await user_auth_register(
             "creator@test.com", "Password1!", "John", "Doe"
         )
-        session_token = re.escape(session_token)
-        csrf_token = re.escape(csrf_token)
+        session_token = sanitize_input(session_token)
+        csrf_token = sanitize_input(csrf_token)
         await user_create_item(
             new_title="Teii",
             new_description="short",
@@ -103,8 +104,8 @@ async def test_create_item_invalid_condition():
         session_token, csrf_token = await user_auth_register(
             "creator@test.com", "Password1!", "John", "Doe"
         )
-        session_token = re.escape(session_token)
-        csrf_token = re.escape(csrf_token)
+        session_token = sanitize_input(session_token)
+        csrf_token = sanitize_input(csrf_token)
         await user_create_item(
             new_title="Legit",
             new_description="I love this item",
@@ -127,8 +128,8 @@ async def test_create_item_invalid_type():
         session_token, csrf_token = await user_auth_register(
             "creator@test.com", "Password1!", "John", "Doe"
         )
-        session_token = re.escape(session_token)
-        csrf_token = re.escape(csrf_token)
+        session_token = sanitize_input(session_token)
+        csrf_token = sanitize_input(csrf_token)
         await user_create_item(
             new_title="Legit",
             new_description="I love this item",
@@ -147,8 +148,8 @@ async def test_view_items_filter_by_location_and_type():
     session_token, csrf_token = await user_auth_register(
         "creator@test.com", "Password1!", "John", "Doe"
     )
-    session_token = re.escape(session_token)
-    csrf_token = re.escape(csrf_token)
+    session_token = sanitize_input(session_token)
+    csrf_token = sanitize_input(csrf_token)
     await user_create_item(
         new_title="Location Type Match",
         new_description="Description for location type match.",
@@ -186,8 +187,8 @@ async def test_modify_item_success():
     session_token, csrf_token = await user_auth_register(
         "modifier@test.com", "Password1!", "Alice", "Smith"
     )
-    session_token = re.escape(session_token)
-    csrf_token = re.escape(csrf_token)
+    session_token = sanitize_input(session_token)
+    csrf_token = sanitize_input(csrf_token)
 
     new_item = await user_create_item(
         new_title="Test Item",
@@ -202,7 +203,7 @@ async def test_modify_item_success():
 
     item_id = new_item.get_item_pk()
     modified_item = await user_get_browse_items(item_id=str(item_id))
-    assert modified_item[item_id].get_title() == re.escape("Test Item".lower())
+    assert modified_item[item_id].get_title() == sanitize_input("Test Item".lower())
 
     await user_modify_item(
         item_id=str(item_id),
@@ -216,8 +217,8 @@ async def test_modify_item_success():
     )
 
     updated_item = await user_get_browse_items(item_id=str(item_id))
-    assert updated_item[item_id].get_title() == re.escape("New Title".lower())
-    assert updated_item[item_id].get_location() == re.escape("Brisbane".lower())
+    assert updated_item[item_id].get_title() == sanitize_input("New Title".lower())
+    assert updated_item[item_id].get_location() == sanitize_input("Brisbane".lower())
 
 
 @pytest.mark.asyncio
@@ -225,8 +226,8 @@ async def test_delete_item_success():
     session_token, csrf_token = await user_auth_register(
         "deleter@test.com", "Password1!", "Bob", "Jones"
     )
-    session_token = re.escape(session_token)
-    csrf_token = re.escape(csrf_token)
+    session_token = sanitize_input(session_token)
+    csrf_token = sanitize_input(csrf_token)
 
     await user_create_item(
         new_title="Delete Me",
@@ -251,8 +252,8 @@ async def test_modify_item_invalid_user():
     session_token, csrf_token = await user_auth_register(
         "actualowner@test.com", "Password1!", "Emily", "White"
     )
-    session_token = re.escape(session_token)
-    csrf_token = re.escape(csrf_token)
+    session_token = sanitize_input(session_token)
+    csrf_token = sanitize_input(csrf_token)
 
     await user_create_item(
         new_title="Owner Title",
@@ -270,8 +271,8 @@ async def test_modify_item_invalid_user():
     new_token, new_csrf = await user_auth_register(
         "attacker@test.com", "Password1!", "Mallory", "Red"
     )
-    new_token = re.escape(new_token)
-    new_csrf = re.escape(new_csrf)
+    new_token = sanitize_input(new_token)
+    new_csrf = sanitize_input(new_csrf)
 
     with pytest.raises(HTTPException) as excinfo:
         await user_modify_item(

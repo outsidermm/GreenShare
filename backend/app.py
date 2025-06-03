@@ -278,8 +278,8 @@ async def edit_item():
     """
     try:
         data = request.json
-        session_token = re.escape(request.cookies.get("session_token"))
-        csrf_token = re.escape(request.headers.get("X-CSRF-TOKEN"))
+        session_token = sanitize_input(request.cookies.get("session_token"))
+        csrf_token = sanitize_input(request.headers.get("X-CSRF-TOKEN"))
         item_id = data["id"]
         title = data["title"]
         description = data["description"]
@@ -311,8 +311,8 @@ async def delete_item():
     """
     try:
         data = request.json
-        session_token = re.escape(request.cookies.get("session_token"))
-        csrf_token = re.escape(request.headers.get("X-CSRF-TOKEN"))
+        session_token = sanitize_input(request.cookies.get("session_token"))
+        csrf_token = sanitize_input(request.headers.get("X-CSRF-TOKEN"))
         item_id = data["id"]
 
         if not item_id:
@@ -337,8 +337,8 @@ async def create_exchange_offer():
     """
     try:
         data = request.json
-        session_token = re.escape(request.cookies.get("session_token"))
-        csrf_token = re.escape(request.headers.get("X-CSRF-TOKEN"))
+        session_token = sanitize_input(request.cookies.get("session_token"))
+        csrf_token = sanitize_input(request.headers.get("X-CSRF-TOKEN"))
         offered_item_ids = data["offeredItemIds"]
         requested_item_id = data["requestedItemId"]
         message = data["message"]
@@ -367,8 +367,8 @@ async def view_exchange_offers():
     Returns:
         List of exchange offers.
     """
-    session_token = re.escape(request.cookies.get("session_token"))
-    csrf_token = re.escape(request.headers.get("X-CSRF-TOKEN"))
+    session_token = sanitize_input(request.cookies.get("session_token"))
+    csrf_token = sanitize_input(request.headers.get("X-CSRF-TOKEN"))
 
     try:
         outgoing_offers, incoming_offers = await user_get_offers(
@@ -398,8 +398,8 @@ async def accept_exchange_offer():
     """
     data = request.json
     offer_id = data.get("offerId")
-    session_token = re.escape(request.cookies.get("session_token"))
-    csrf_token = re.escape(request.headers.get("X-CSRF-TOKEN"))
+    session_token = sanitize_input(request.cookies.get("session_token"))
+    csrf_token = sanitize_input(request.headers.get("X-CSRF-TOKEN"))
 
     try:
         message = await user_accept_offer(
@@ -421,8 +421,8 @@ async def complete_exchange_offer():
     """
     data = request.json
     offer_id = data.get("offerId")
-    session_token = re.escape(request.cookies.get("session_token"))
-    csrf_token = re.escape(request.headers.get("X-CSRF-TOKEN"))
+    session_token = sanitize_input(request.cookies.get("session_token"))
+    csrf_token = sanitize_input(request.headers.get("X-CSRF-TOKEN"))
 
     try:
         message = await user_complete_offer(
@@ -444,8 +444,8 @@ async def confirm_exchange_offer():
     """
     data = request.json
     offer_id = data.get("offerId")
-    session_token = re.escape(request.cookies.get("session_token"))
-    csrf_token = re.escape(request.headers.get("X-CSRF-TOKEN"))
+    session_token = sanitize_input(request.cookies.get("session_token"))
+    csrf_token = sanitize_input(request.headers.get("X-CSRF-TOKEN"))
 
     try:
         message = await user_confirm_offer(
@@ -494,8 +494,8 @@ async def cancel_exchange_offer():
     """
     data = request.json
     offer_id = data.get("offerId")
-    session_token = re.escape(request.cookies.get("session_token"))
-    csrf_token = re.escape(request.headers.get("X-CSRF-TOKEN"))
+    session_token = sanitize_input(request.cookies.get("session_token"))
+    csrf_token = sanitize_input(request.headers.get("X-CSRF-TOKEN"))
 
     try:
         message = await user_cancel_offer(
