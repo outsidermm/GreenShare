@@ -63,7 +63,7 @@ async def user_create_offer(
         abort(400, "This item is free, you cannot offer items in exchange.")
 
     new_message = message.lower()
-    if len(new_message) > 1000 or len(new_message) < 10:
+    if len(new_message) > 2000 or len(new_message) < 10:
         abort(400, "Message must be between 10 and 1000 characters.")
 
     try:
