@@ -7,6 +7,7 @@ import useAuth from "@/hooks/useAuth";
 import { useState, useEffect } from "react";
 import { Item } from "@/types/item";
 import getItems from "@/services/getItems";
+import getUserItems from "@/services/getUserItems";
 
 
 export default function AddOfferPage() {
@@ -30,7 +31,7 @@ export default function AddOfferPage() {
 				}
 				try {
 					const offerable_items_response = await getUserItems();
-						setRequestedItem(offerable_items_response);
+						setOfferableItems(offerable_items_response);
 				} catch (error) {
 					console.error("Error fetching user offerable item:", error);
 				}
