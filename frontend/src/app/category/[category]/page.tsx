@@ -5,7 +5,7 @@ import logoutUser from "@/services/logoutUser";
 import NavBar from "@/components/NavBar";
 import HeaderBar from "@/components/HeaderBar";
 import { useEffect, useState } from "react";
-import getItem from "@/services/getItem";
+import getItems from "@/services/getItems";
 import Link from "next/link";
 import Image from "next/image";
 import { Item } from "@/types/item";
@@ -22,7 +22,7 @@ export default function Home() {
       try {
         const category_filter = pathname.replace("/category/", "");
         console.log(category_filter);
-        const response = await getItem({ category: category_filter });
+        const response = await getItems({ category: category_filter });
         setItems(response);
       } catch (error) {
         console.error("Error fetching items:", error);

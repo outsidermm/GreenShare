@@ -5,7 +5,7 @@ import logoutUser from "@/services/logoutUser";
 import NavBar from "@/components/NavBar";
 import HeaderBar from "@/components/HeaderBar";
 import { useEffect, useState } from "react";
-import getItem from "@/services/getItem";
+import getItems from "@/services/getItems";
 import Image from "next/image";
 import { FaChevronLeft } from "react-icons/fa6";
 import "swiper/css";
@@ -25,7 +25,7 @@ export default function Home() {
   useEffect(() => {
     const fetchItems = async () => {
       try {
-        const response = await getItem({ item_id: item_id_filter });
+        const response = await getItems({ item_id: item_id_filter });
         if (response.length === 1) {
           setItem(response[0]);
         }
@@ -49,7 +49,7 @@ export default function Home() {
 
   const handleOffer = () => {
     if (isAuthenticated) {
-      router.push(`/offer/${item_id_filter}`);
+      router.push(`/add_offer/${item_id_filter}`);
     } else {
       swal("Please log in to make an offer.", {
         icon: "warning",

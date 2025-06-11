@@ -5,7 +5,7 @@ import NavBar from "@/components/NavBar";
 import logoutUser from "@/services/logoutUser";
 import HeaderBar from "@/components/HeaderBar";
 import { useEffect, useState } from "react";
-import getItem from "@/services/getItem";
+import getItems from "@/services/getItems";
 import Link from "next/link";
 import Image from "next/image";
 import { Item } from "@/types/item";
@@ -19,7 +19,7 @@ export default function Home() {
   useEffect(() => {
     const fetchItems = async () => {
       try {
-        const response = await getItem({});
+        const response = await getItems({});
         setItems(response);
       } catch (error) {
         console.error("Error fetching items:", error);
