@@ -47,7 +47,7 @@ class Item:
         self.set_item_pk(new_item.id)
 
     @classmethod
-    def backup(cls) -> dict[str, "Item"]:
+    def backup(cls) -> dict[int, "Item"]:
         """
         Loads all items from the database and returns a dictionary of Item instances keyed by item ID.
         """
@@ -59,7 +59,7 @@ class Item:
         for item in item_records:
             item_obj = cls.__new__(cls)
             item_obj.set_item_pk(item.id)
-            item_dict[str(item.id)] = item_obj
+            item_dict[item.id] = item_obj
 
         return item_dict
 
@@ -130,7 +130,7 @@ class Item:
             db.session.add(image)
         db.session.commit()
 
-    def get_user_id(self) -> str:
+    def get_user_id(self) -> int:
         return db.session.get(ItemDB, self.get_item_pk()).user_id
 
     def set_user_id(self, new_user_id: str) -> None:
