@@ -215,15 +215,16 @@ async def user_get_browse_items(
             if item.get_location() != safe_location_filter:
                 del filtered_items[item_key]
 
+    filtered_items_copy = (
+        filtered_items.copy()
+    )  # Create a copy to avoid modifying the original
+
     if type_filter is not None:
         safe_type_filter = validate_type(type_filter)
         for item_key, item in filtered_items_copy.items():
             if item.get_type() != safe_type_filter:
                 del filtered_items[item_key]
 
-    filtered_items_copy = (
-        filtered_items.copy()
-    )  # Create a copy to avoid modifying the original
 
     return filtered_items
 
