@@ -117,6 +117,28 @@ async def user_create_item(
     except Exception as e:
         abort(500, f"Failed to create an item: {str(e)}")
 
+async def user_view_item(session_token:str, csrf_token:str) -> list[Item]:
+    """
+    Retrieves all items from the database.
+
+    Args:
+        session_token (str): User's session token.
+        csrf_token (str): User's CSRF token.
+
+    Returns:
+        dict[int, Item]: Dictionary of all item data in dictionary format.
+    """
+    user_id = admin_retrieve_user_id(session_token, csrf_token)
+    if user_id is None:
+        abort(403, "You must be logged in to view items.")
+    
+    owned_items : list[Item] = []
+    for item in items.values():
+        if item.get_user_id() == user_id and item.get_status() == "available":
+            owned_items.append(item)
+
+    return owned_items
+
 
 async def user_get_browse_items(
     category_filter: str = None,
@@ -125,7 +147,6 @@ async def user_get_browse_items(
     type_filter: str = None,
     title_filter: str = None,
     item_id: str = None,
-    user_id: str = None,
 ) -> dict[int, Item]:
     """
     Retrieves filtered items from the database.
@@ -204,12 +225,6 @@ async def user_get_browse_items(
         filtered_items.copy()
     )  # Create a copy to avoid modifying the original
 
-    if user_id is not None:
-        if not user_id.isdigit() or int(user_id) <= 0:
-            abort(400, "User ID must be a positive integer.")
-        for item_key, item in filtered_items_copy.items():
-            if item.get_user_id() != int(user_id):
-                del filtered_items[item_key]
     return filtered_items
 
 

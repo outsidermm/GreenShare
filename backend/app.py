@@ -16,6 +16,7 @@ from backend.items import (
     user_delete_item,
     user_get_browse_items,
     user_modify_item,
+    user_view_item,
 )
 from backend.data import users, items, exchange_offers
 import os, requests
@@ -258,13 +259,32 @@ async def get_browse_items():
     type = request.args.get("type")
     title = request.args.get("title")
     item_id = request.args.get("id")
-    user_id = request.args.get("user_id")
 
     try:
         filtered_items = await user_get_browse_items(
-            category, condition, location, type, title, item_id, user_id
+            category, condition, location, type, title, item_id
         )
-        return jsonify([item.to_dict() for key, item in filtered_items.items()]), 200
+        return jsonify([item.to_dict() for item in filtered_items.values()]), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/item/userview", methods=["GET"])
+async def get_user_items():
+    """
+    Retrieves all items created by the user.
+
+    Returns:
+        List of items created by the user.
+    """
+    session_token = sanitize_input(request.cookies.get("session_token"))
+    csrf_token = sanitize_input(request.headers.get("X-CSRF-TOKEN"))
+
+    try:
+        user_items = await user_view_item(
+            session_token=session_token, csrf_token=csrf_token
+        )
+        return jsonify([item.to_dict() for item in user_items.values()]), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
