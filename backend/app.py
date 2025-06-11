@@ -284,7 +284,7 @@ async def get_user_items():
         user_items = await user_view_item(
             session_token=session_token, csrf_token=csrf_token
         )
-        return jsonify([item.to_dict() for item in user_items.values()]), 200
+        return jsonify([item.to_dict() for item in user_items]), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
