@@ -1,0 +1,48 @@
+const API_BASE = process.env.NEXT_PUBLIC_API_URL;
+
+interface cancelOfferInput {
+  offerId: number;
+  message: string;
+}
+
+interface cancelOfferResponse {
+  message: string;
+  offer_id: number;
+  status: string;
+}
+
+export default async function cancelOffer(input:cancelOfferInput): Promise<cancelOfferResponse> {
+  try {
+        const csrf_token = localStorage.getItem("csrfToken");
+    if (!csrf_token) {
+      throw new Error("No CSRF token found");
+    }
+
+    const data = {
+			offerId: input.offerId,
+			message: input.message,
+    };
+
+    const response = await fetch(`${API_BASE}/offer/exchange_confirmed`, {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRF-Token": csrf_token,
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Unknown error occurred");
+    }
+
+    const result: cancelOfferResponse = await response.json();
+    console.log("Response from server:", result);
+    return result;
+  } catch (error) {
+    console.error("Error fetching item:", error);
+    throw error; // Re-throw the error so it can be handled by the caller
+  }
+}
