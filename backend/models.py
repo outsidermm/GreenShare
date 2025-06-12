@@ -71,6 +71,9 @@ class ExchangeOfferDB(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.now)
 
     def to_json(self) -> dict:
+        requested_item = ItemDB.query.get(self.requested_item_id)
+        offered_items = [ItemDB.query.get(item.item_id) for item in self.offered_items]
+
         return {
             "id": self.id,
             "offered_by_id": self.offered_by_id,
@@ -81,6 +84,9 @@ class ExchangeOfferDB(db.Model):
                 offered_item.item_id for offered_item in self.offered_items
             ],
             "requested_item_id": self.requested_item_id,
+            "requested_item_name": requested_item.title if requested_item else None,
+            "requested_item_location": requested_item.location if requested_item else None,
+            "offered_item_names": [item.title for item in offered_items if item],
         }
 
 

@@ -6,4 +6,7 @@ export interface Offer {
   created_at: string;
   offered_item_ids: number[];
   requested_item_id: number;
+  requested_item_name: string;
+  requested_item_location: string;
+  offered_item_names: string[];
 }
