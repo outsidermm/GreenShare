@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import loginUser from "../services/loginUser";
+import loginUser from "../services/user/loginUser";
 import PasswordInput from "./PasswordInput";
 import CredentialsInput from "./CredentialsInput";
 import { useRouter } from "next/navigation";

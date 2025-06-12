@@ -1,16 +1,16 @@
 "use client";
 import { useRouter, usePathname} from "next/navigation";
-import logoutUser from "@/services/logoutUser";
+import logoutUser from "@/services/user/logoutUser";
 import NavBar from "@/components/NavBar";
 import HeaderBar from "@/components/HeaderBar";
 import useAuth from "@/hooks/useAuth";
 import { useState, useEffect } from "react";
 import { Item } from "@/types/item";
-import getItems from "@/services/getItems";
-import getUserItems from "@/services/getUserItems";
+import getItems from "@/services/item/getItems";
+import getUserItems from "@/services/item/getUserItems";
 import { toTitleCase } from "@/utils/titleCase";
 import swal from "sweetalert";
-import createOffer from "@/services/createOffer";
+import createOffer from "@/services/offer/createOffer";
 
 
 export default function AddOfferPage() {

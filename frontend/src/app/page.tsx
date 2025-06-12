@@ -2,10 +2,10 @@
 import useAuth from "../hooks/useAuth";
 import { useRouter } from "next/navigation";
 import NavBar from "@/components/NavBar";
-import logoutUser from "@/services/logoutUser";
+import logoutUser from "@/services/user/logoutUser";
 import HeaderBar from "@/components/HeaderBar";
 import { useEffect, useState } from "react";
-import getItems from "@/services/getItems";
+import getItems from "@/services/item/getItems";
 import Link from "next/link";
 import Image from "next/image";
 import { Item } from "@/types/item";

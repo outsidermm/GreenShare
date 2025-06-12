@@ -2,7 +2,7 @@
 
 import useAuth from "@/hooks/useAuth";
 import { useRouter, usePathname } from "next/navigation";
-import logoutUser from "@/services/logoutUser";
+import logoutUser from "@/services/user/logoutUser";
 import NavBar from "@/components/NavBar";
 import HeaderBar from "@/components/HeaderBar";
 import { IoMdCheckmark } from "react-icons/io";
@@ -11,7 +11,7 @@ import { useState } from "react";
 import Image from "next/image";
 import LocationSelect from "@/components/LocationSelect";
 import DropDown from "@/components/DropDown";
-import createItem from "@/services/createItem";
+import createItem from "@/services/item/createItem";
 import swal from "sweetalert";
 import { Option } from "@/types/option";
 

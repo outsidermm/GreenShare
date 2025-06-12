@@ -1,11 +1,11 @@
 "use client";
 import useAuth from "@/hooks/useAuth";
 import { useRouter, usePathname } from "next/navigation";
-import logoutUser from "@/services/logoutUser";
+import logoutUser from "@/services/user/logoutUser";
 import NavBar from "@/components/NavBar";
 import HeaderBar from "@/components/HeaderBar";
 import { useEffect, useState } from "react";
-import getItems from "@/services/getItems";
+import getItems from "@/services/item/getItems";
 import Link from "next/link";
 import Image from "next/image";
 import { Item } from "@/types/item";

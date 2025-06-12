@@ -1,11 +1,11 @@
 "use client";
 import useAuth from "@/hooks/useAuth";
 import { useRouter, usePathname } from "next/navigation";
-import logoutUser from "@/services/logoutUser";
+import logoutUser from "@/services/user/logoutUser";
 import NavBar from "@/components/NavBar";
 import HeaderBar from "@/components/HeaderBar";
 import { useEffect, useState } from "react";
-import getItems from "@/services/getItems";
+import getItems from "@/services/item/getItems";
 import Image from "next/image";
 import { FaChevronLeft } from "react-icons/fa6";
 import "swiper/css";
@@ -20,7 +20,7 @@ export default function Home() {
   const router = useRouter();
   const pathname = usePathname();
   const [item, setItem] = useState<Item>();
-  const item_id_filter = pathname.replace("/view_product/", "");
+  const item_id_filter = Number(pathname.replace("/view_product/", ""));
 
   useEffect(() => {
     const fetchItems = async () => {
