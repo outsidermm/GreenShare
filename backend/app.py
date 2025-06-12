@@ -416,7 +416,7 @@ async def accept_exchange_offer():
     Expects offer ID in JSON format and returns a success message.
     """
     data = request.json
-    offer_id = data.get("offerId")
+    offer_id = data["offerId"]
     session_token = sanitize_input(request.cookies.get("session_token"))
     csrf_token = sanitize_input(request.headers.get("X-CSRF-TOKEN"))
 
@@ -426,7 +426,7 @@ async def accept_exchange_offer():
             csrf_token=csrf_token,
             offer_id=offer_id,
         )
-        return jsonify({"message": message}), 200
+        return jsonify(message), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -439,7 +439,7 @@ async def complete_exchange_offer():
     Expects offer ID in JSON format and returns a success message.
     """
     data = request.json
-    offer_id = data.get("offerId")
+    offer_id = data["offerId"]
     session_token = sanitize_input(request.cookies.get("session_token"))
     csrf_token = sanitize_input(request.headers.get("X-CSRF-TOKEN"))
 
@@ -449,7 +449,7 @@ async def complete_exchange_offer():
             csrf_token=csrf_token,
             offer_id=offer_id,
         )
-        return jsonify({"message": message}), 200
+        return jsonify(message), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -462,7 +462,7 @@ async def confirm_exchange_offer():
     Expects offer ID in JSON format and returns a success message.
     """
     data = request.json
-    offer_id = data.get("offerId")
+    offer_id = data["offerId"]
     session_token = sanitize_input(request.cookies.get("session_token"))
     csrf_token = sanitize_input(request.headers.get("X-CSRF-TOKEN"))
 
@@ -472,7 +472,7 @@ async def confirm_exchange_offer():
             csrf_token=csrf_token,
             offer_id=offer_id,
         )
-        return jsonify({"message": message}), 200
+        return jsonify(message), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -512,9 +512,10 @@ async def cancel_exchange_offer():
     Expects offer ID in JSON format and returns a success message.
     """
     data = request.json
-    offer_id = data.get("offerId")
     session_token = sanitize_input(request.cookies.get("session_token"))
     csrf_token = sanitize_input(request.headers.get("X-CSRF-TOKEN"))
+    message = sanitize_input(data["message"])
+    offer_id = data["offerId"]
 
     try:
         message = await user_cancel_offer(
@@ -522,7 +523,7 @@ async def cancel_exchange_offer():
             csrf_token=csrf_token,
             offer_id=offer_id,
         )
-        return jsonify({"message": message}), 200
+        return jsonify(message), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
