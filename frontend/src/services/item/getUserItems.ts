@@ -2,7 +2,7 @@ import { Item } from "@/types/item";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
-export default async function getItems(): Promise<Item[]> {
+export default async function getUserItems(): Promise<Item[]> {
   try {
 		const csrf_token = localStorage.getItem("csrfToken");
     if (!csrf_token) {

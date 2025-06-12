@@ -1,13 +1,8 @@
+import { StandardBackendResponse } from "@/types/standardBackendResponse";
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
 
-interface completeOfferResponse {
-  message: string;
-  offer_id: number;
-  status: string;
-}
-
-export default async function completeOffer(offerId : number): Promise<completeOfferResponse> {
+export default async function completeOffer(offerId : number): Promise<StandardBackendResponse> {
   try {
         const csrf_token = localStorage.getItem("csrfToken");
     if (!csrf_token) {
@@ -33,7 +28,7 @@ export default async function completeOffer(offerId : number): Promise<completeO
       throw new Error(errorData.error || "Unknown error occurred");
     }
 
-    const result: completeOfferResponse = await response.json();
+    const result: StandardBackendResponse = await response.json();
     console.log("Response from server:", result);
     return result;
   } catch (error) {

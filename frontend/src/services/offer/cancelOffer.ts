@@ -1,3 +1,4 @@
+import { StandardBackendResponse } from "@/types/standardBackendResponse";
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
 interface cancelOfferInput {
@@ -5,13 +6,8 @@ interface cancelOfferInput {
   message: string;
 }
 
-interface cancelOfferResponse {
-  message: string;
-  offer_id: number;
-  status: string;
-}
 
-export default async function cancelOffer(input:cancelOfferInput): Promise<cancelOfferResponse> {
+export default async function cancelOffer(input:cancelOfferInput): Promise<StandardBackendResponse> {
   try {
         const csrf_token = localStorage.getItem("csrfToken");
     if (!csrf_token) {
@@ -38,7 +34,7 @@ export default async function cancelOffer(input:cancelOfferInput): Promise<cance
       throw new Error(errorData.error || "Unknown error occurred");
     }
 
-    const result: cancelOfferResponse = await response.json();
+    const result: StandardBackendResponse = await response.json();
     console.log("Response from server:", result);
     return result;
   } catch (error) {

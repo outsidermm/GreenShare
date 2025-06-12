@@ -1,11 +1,9 @@
+import { StandardBackendResponse } from "@/types/standardBackendResponse";
+
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
-interface logoutResponse {
-  message?: string;
-  error?: string;
-}
 
-export default async function authUser() {
+export default async function logoutUser(): Promise<StandardBackendResponse> {
   try {
     const csrf_token = localStorage.getItem("csrfToken");
 
@@ -27,11 +25,11 @@ export default async function authUser() {
       throw new Error(errorData.error || "Unknown error occurred");
     }
 
-    const result: logoutResponse = await response.json();
+    const result: StandardBackendResponse = await response.json();
     console.log("Response from server:", result);
     return result;
   } catch (error) {
     console.error("Error during token validation:", error);
-    return false;
+    throw error; // Re-throw the error so it can be handled by the caller
   }
 }

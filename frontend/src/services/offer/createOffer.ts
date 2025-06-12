@@ -1,3 +1,4 @@
+import { StandardBackendResponse } from "@/types/standardBackendResponse";
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
 interface createOfferInput {
@@ -6,12 +7,7 @@ interface createOfferInput {
     message: string;
 }
 
-interface createOfferResponse {
-  message?: string;
-  error?: string;
-}
-
-export default async function createOffer(input : createOfferInput): Promise<createOfferResponse> {
+export default async function createOffer(input : createOfferInput): Promise<StandardBackendResponse> {
   try {
         const csrf_token = localStorage.getItem("csrfToken");
     if (!csrf_token) {
@@ -39,7 +35,7 @@ export default async function createOffer(input : createOfferInput): Promise<cre
       throw new Error(errorData.error || "Unknown error occurred");
     }
 
-    const result: createOfferResponse = await response.json();
+    const result: StandardBackendResponse = await response.json();
     console.log("Response from server:", result);
     return result;
   } catch (error) {
