@@ -10,7 +10,6 @@ from backend.auth import (
 from backend.classes.user import User
 from backend.classes.item import Item
 from backend.classes.exchange_offer import ExchangeOffer
-import re
 from backend.items import (
     user_create_item,
     user_delete_item,
