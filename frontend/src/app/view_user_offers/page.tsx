@@ -40,6 +40,25 @@ export default function AddOfferPage() {
     router.refresh();
   };
 
+  const getOfferActionLabel= (toggleOffer: boolean, status: string) => {
+    if(status === "cancelled") {
+      return "Offer Cancelled";
+    }
+    
+    if (toggleOffer) {
+      if (status === "pending") {
+        return "Accept Offer";
+      } else if (status === "completed") {
+        return "Confirm Offer Completion";
+      }
+    } else {
+      if (status === "accepted") {
+        return "Complete Offer";
+      }
+    }
+    return "Await Other Party Action"
+  };
+
   return (
     <div className="bg-slate-100 w-screen min-h-screen pt-16">
       <div className="fixed top-0 left-0 w-full bg-slate-900 shadow z-50 px-6 py-4 flex items-center justify-between gap-4 sm:gap-10">
@@ -81,32 +100,49 @@ export default function AddOfferPage() {
             (toggleOffer ? incomingOffers : outgoingOffers).map((offer) => (
               <div
                 key={offer.id}
-                className="bg-white p-4 mb-4 rounded-lg shadow"
+                className="bg-white p-4 mb-4 rounded-lg shadow flex justify-between gap-10"
               >
-                <p className="text-slate-800">
-                  <strong>Offered To:</strong>{" "}
-                  {toTitleCase(offer.requested_item_name)}
-                </p>
-                <p className="text-slate-800">
-                  <strong>Offered Items:</strong>{" "}
-                  {toTitleCase(offer.offered_item_names.join(", "))}
-                </p>
-                <p className="text-slate-800">
-                  <strong>Message:</strong> {toTitleCase(offer.message)}
-                </p>
-                <p className="text-slate-800">
-                  <strong>Status:</strong> {toTitleCase(offer.status)}
-                </p>
-                {offer.status !== "pending" && (
+                <div className="flex-1">
                   <p className="text-slate-800">
-                    <strong>Requested Item Location:</strong>{" "}
-                    {toTitleCase(offer.requested_item_location)}
+                    <strong>Offered To:</strong>{" "}
+                    {toTitleCase(offer.requested_item_name)}
                   </p>
-                )}
-                <p className="text-slate-800">
-                  <strong>Created At:</strong>{" "}
-                  {new Date(offer.created_at).toLocaleDateString()}
-                </p>
+                  <p className="text-slate-800">
+                    <strong>Offered Items:</strong>{" "}
+                    {toTitleCase(offer.offered_item_names.join(", "))}
+                  </p>
+                  <p className="text-slate-800">
+                    <strong>Message:</strong> {toTitleCase(offer.message)}
+                  </p>
+                  <p className="text-slate-800">
+                    <strong>Status:</strong> {toTitleCase(offer.status)}
+                  </p>
+                  {offer.status !== "pending" && (
+                    <p className="text-slate-800">
+                      <strong>Requested Item Location:</strong>{" "}
+                      {toTitleCase(offer.requested_item_location)}
+                    </p>
+                  )}
+                  <p className="text-slate-800">
+                    <strong>Created At:</strong>{" "}
+                    {new Date(offer.created_at).toLocaleDateString()}
+                  </p>
+                </div>
+                <div className="flex-2">
+                  <button
+                    disabled={offer.status === "cancelled"}
+                    className={`w-full rounded ${offer.status === "cancelled" ? "bg-red-600 text-white border-red-600" : "bg-green-600 hover:bg-green-500 text-slate-900 border-green-600"} font-bold py-2 px-4 border-solid border-2 transition-all mt-4`}
+                  >
+                    {getOfferActionLabel(toggleOffer, offer.status)}
+                  </button>
+                  {offer.status !== "cancelled" && (<button
+                    className="w-full rounded bg-red-600 hover:bg-red-500 text-white font-bold py-2 px-2 border-solid border-2 border-red-600 transition-all mt-4"
+                  >
+                    Cancel
+                  </button>)}
+                </div>
+                
+                
               </div>
             ))
           ) : (
