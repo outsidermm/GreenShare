@@ -2,18 +2,21 @@ import { Offer } from "@/types/offer";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
-export default async function getOfferDetail(offerId : number): Promise<Offer> {
+export default async function getOfferDetail(offerId: number): Promise<Offer> {
   try {
     const params: URLSearchParams = new URLSearchParams();
     params.append("offerId", offerId.toString());
 
-    const response = await fetch(`${API_BASE}/offer/details?${params.toString()}`, {
-      method: "GET",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
+    const response = await fetch(
+      `${API_BASE}/offer/details?${params.toString()}`,
+      {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
       },
-    });
+    );
 
     if (!response.ok) {
       const errorData = await response.json();

@@ -1,10 +1,11 @@
 import { StandardBackendResponse } from "@/types/standardBackendResponse";
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
-
-export default async function completeOffer(offerId : number): Promise<StandardBackendResponse> {
+export default async function completeOffer(
+  offerId: number,
+): Promise<StandardBackendResponse> {
   try {
-        const csrf_token = localStorage.getItem("csrfToken");
+    const csrf_token = localStorage.getItem("csrfToken");
     if (!csrf_token) {
       throw new Error("No CSRF token found");
     }

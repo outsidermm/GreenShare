@@ -4,7 +4,7 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
 export default async function getUserItems(): Promise<Item[]> {
   try {
-		const csrf_token = localStorage.getItem("csrfToken");
+    const csrf_token = localStorage.getItem("csrfToken");
     if (!csrf_token) {
       throw new Error("No CSRF token found");
     }
@@ -14,7 +14,7 @@ export default async function getUserItems(): Promise<Item[]> {
       credentials: "include",
       headers: {
         "Content-Type": "application/json",
-				"X-CSRF-Token": csrf_token,
+        "X-CSRF-Token": csrf_token,
       },
     });
 

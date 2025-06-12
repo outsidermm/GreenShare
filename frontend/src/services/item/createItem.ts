@@ -11,8 +11,6 @@ interface createItemInput {
   type: string;
 }
 
-
-
 export default async function createItem(
   input: createItemInput,
 ): Promise<StandardBackendResponse> {

@@ -2,14 +2,16 @@ import { StandardBackendResponse } from "@/types/standardBackendResponse";
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
 interface createOfferInput {
-    requestedItemId: number;
-    offeredItemIds: number[];
-    message: string;
+  requestedItemId: number;
+  offeredItemIds: number[];
+  message: string;
 }
 
-export default async function createOffer(input : createOfferInput): Promise<StandardBackendResponse> {
+export default async function createOffer(
+  input: createOfferInput,
+): Promise<StandardBackendResponse> {
   try {
-        const csrf_token = localStorage.getItem("csrfToken");
+    const csrf_token = localStorage.getItem("csrfToken");
     if (!csrf_token) {
       throw new Error("No CSRF token found");
     }
@@ -25,7 +27,7 @@ export default async function createOffer(input : createOfferInput): Promise<Sta
       credentials: "include",
       headers: {
         "Content-Type": "application/json",
-                "X-CSRF-Token": csrf_token,
+        "X-CSRF-Token": csrf_token,
       },
       body: JSON.stringify(data),
     });

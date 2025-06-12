@@ -24,12 +24,12 @@ export default function RegisterPage() {
 
   const handleSubmit = async () => {
     try {
-      const csrf_token = await registerUser(
-        {email,
+      const csrf_token = await registerUser({
+        email,
         password,
         firstName,
-        lastName,}
-      );
+        lastName,
+      });
       localStorage.setItem("csrfToken", csrf_token);
       setPassword("");
       setEmail("");

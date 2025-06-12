@@ -85,7 +85,9 @@ class ExchangeOfferDB(db.Model):
             ],
             "requested_item_id": self.requested_item_id,
             "requested_item_name": requested_item.title if requested_item else None,
-            "requested_item_location": requested_item.location if requested_item else None,
+            "requested_item_location": (
+                requested_item.location if requested_item else None
+            ),
             "offered_item_names": [item.title for item in offered_items if item],
         }
 

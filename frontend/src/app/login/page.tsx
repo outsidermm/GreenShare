@@ -78,7 +78,9 @@ export default function LoginPage() {
             setCredential={setEmail}
             credentialChanged={emailChanged}
             setCredentialChanged={setEmailChanged}
-            credentialError={errorType === "email" ? "Email does not exist" : ""}
+            credentialError={
+              errorType === "email" ? "Email does not exist" : ""
+            }
             label="Email Address"
           />
           <PasswordInput

@@ -6,17 +6,18 @@ interface cancelOfferInput {
   message: string;
 }
 
-
-export default async function cancelOffer(input:cancelOfferInput): Promise<StandardBackendResponse> {
+export default async function cancelOffer(
+  input: cancelOfferInput,
+): Promise<StandardBackendResponse> {
   try {
-        const csrf_token = localStorage.getItem("csrfToken");
+    const csrf_token = localStorage.getItem("csrfToken");
     if (!csrf_token) {
       throw new Error("No CSRF token found");
     }
 
     const data = {
-			offerId: input.offerId,
-			message: input.message,
+      offerId: input.offerId,
+      message: input.message,
     };
 
     const response = await fetch(`${API_BASE}/offer/exchange_confirmed`, {

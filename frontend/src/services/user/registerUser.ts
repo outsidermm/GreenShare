@@ -11,7 +11,8 @@ interface registerResponse {
   csrf_token: string;
 }
 
-export default async function registerUser(input: registerUserInput
+export default async function registerUser(
+  input: registerUserInput,
 ): Promise<string> {
   const data = {
     email: input.email,

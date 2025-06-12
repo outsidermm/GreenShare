@@ -350,7 +350,7 @@ async def test_multiple_offers_conflict():
     # Both users make offers
     offer1 = await user_create_offer(
         requested_item_id=(requested_item_id),
-        offered_item_ids=[(offer_a_id)],
+        offered_item_ids=[offer_a_id],
         message="Offer from A",
         session_token=offerer1_token,
         csrf_token=offerer1_csrf,
@@ -359,7 +359,7 @@ async def test_multiple_offers_conflict():
 
     offer2 = await user_create_offer(
         requested_item_id=(requested_item_id),
-        offered_item_ids=[(offer_b_id)],
+        offered_item_ids=[offer_b_id],
         message="Offer from B",
         session_token=offerer2_token,
         csrf_token=offerer2_csrf,
@@ -429,7 +429,7 @@ async def test_unauthorised_offer_confirmation():
 
     offer = await user_create_offer(
         requested_item_id=(req_id),
-        offered_item_ids=[(off_id)],
+        offered_item_ids=[off_id],
         message="Please confirm this offer.",
         session_token=maker_token,
         csrf_token=maker_csrf,
@@ -495,7 +495,7 @@ async def test_offer_confirmation_before_completion():
         session_token=maker_token,
         csrf_token=maker_csrf,
         requested_item_id=(req_id),
-        offered_item_ids=[(offer_id)],
+        offered_item_ids=[offer_id],
         message="Try completing early",
     )
     offer_key = offer.get_offer_pk()
@@ -555,7 +555,7 @@ async def test_repeated_confirmation():
     off_id = off.get_item_pk()
 
     offer = await user_create_offer(
-        maker_token, maker_csrf, [(off_id)], (req_id), "Try reconfirming"
+        maker_token, maker_csrf, [off_id], (req_id), "Try reconfirming"
     )
     offer_key = offer.get_offer_pk()
 
@@ -607,7 +607,7 @@ async def test_repeated_completion():
     off_id = off_item.get_item_pk()
 
     offer = await user_create_offer(
-        maker_token, maker_csrf, [(off_id)], (req_id), "Try recompleting"
+        maker_token, maker_csrf, [off_id], (req_id), "Try recompleting"
     )
     offer_key = offer.get_offer_pk()
 
@@ -733,7 +733,7 @@ async def test_accepting_own_offer():
 
     with pytest.raises(HTTPException) as excinfo:
         await user_create_offer(
-            user_token, user_csrf, [(off_id)], (req_id), "Trade with myself"
+            user_token, user_csrf, [off_id], (req_id), "Trade with myself"
         )
     assert "cannot exchange your own item" in excinfo.value.description
 
@@ -782,7 +782,7 @@ async def test_offer_with_already_used_item():
     shared_id = shared_item.get_item_pk()
 
     first_offer = await user_create_offer(
-        maker1_token, maker1_csrf, [(shared_id)], (req_id), "First user offer"
+        maker1_token, maker1_csrf, [shared_id], (req_id), "First user offer"
     )
     first_offer_key = first_offer.get_offer_pk()
 
@@ -794,7 +794,7 @@ async def test_offer_with_already_used_item():
         await user_create_offer(
             maker2_token,
             maker2_csrf,
-            [(shared_id)],
+            [shared_id],
             (req_id),
             "Second user reuse",
         )
@@ -844,7 +844,7 @@ async def test_user_get_offers_and_offer_details():
 
     # Maker creates offer
     offer = await user_create_offer(
-        maker_token, maker_csrf, [(off_id)], (req_id), "Testing offer retrieval"
+        maker_token, maker_csrf, [off_id], (req_id), "Testing offer retrieval"
     )
     offer_key = offer.get_offer_pk()
 

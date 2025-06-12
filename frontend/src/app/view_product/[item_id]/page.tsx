@@ -98,23 +98,21 @@ export default function Home() {
               showThumbs={false}
               className="w-full rounded-xl shadow-xl"
             >
-              {item && 
-                (item.images.map((image, index) => (
-                    <div
-                      key={index}
-                      className="flex justify-center items-center w-full h-full bg-white overflow-hidden rounded"
-                    >
-                      <Image
-                        src={image}
-                        alt={item.title}
-                        width={500}
-                        height={500}
-                        className="object-contain mx-auto h-auto w-auto"
-                      />
-                    </div>
-                  ))
-                )
-              }
+              {item &&
+                item.images.map((image, index) => (
+                  <div
+                    key={index}
+                    className="flex justify-center items-center w-full h-full bg-white overflow-hidden rounded"
+                  >
+                    <Image
+                      src={image}
+                      alt={item.title}
+                      width={500}
+                      height={500}
+                      className="object-contain mx-auto h-auto w-auto"
+                    />
+                  </div>
+                ))}
             </Carousel>
           </div>
           <div className="flex-1">

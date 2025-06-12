@@ -24,9 +24,7 @@ async def user_create_offer(
 
     requested_item_id = int(requested_item_id)
     if requested_item_id not in items:
-        abort(
-            404, f"Requested item with ID {requested_item_id} does not exist."
-        )
+        abort(404, f"Requested item with ID {requested_item_id} does not exist.")
 
     if items[requested_item_id].get_type() == "exchange" and not offered_item_ids:
         abort(400, "You must offer at least one item in exchange for this item.")
@@ -116,7 +114,9 @@ async def user_accept_offer(session_token: str, csrf_token: str, offer_id: int) 
     offer.set_status("accepted")  # Update the status to accepted
 
 
-async def user_complete_offer(session_token: str, csrf_token: str, offer_id: int) -> None:
+async def user_complete_offer(
+    session_token: str, csrf_token: str, offer_id: int
+) -> None:
     new_user_id = admin_retrieve_user_id(session_token, csrf_token)
     validate_offer_id(offer_id)
 
@@ -135,7 +135,9 @@ async def user_complete_offer(session_token: str, csrf_token: str, offer_id: int
     offer.set_status("completed")  # Update the status to completed
 
 
-async def user_confirm_offer(session_token: str, csrf_token: str, offer_id: int) -> None:
+async def user_confirm_offer(
+    session_token: str, csrf_token: str, offer_id: int
+) -> None:
     new_user_id = admin_retrieve_user_id(session_token, csrf_token)
     validate_offer_id(offer_id)
 

@@ -2,7 +2,6 @@ import { StandardBackendResponse } from "@/types/standardBackendResponse";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
-
 export default async function authUser(): Promise<StandardBackendResponse> {
   try {
     const csrf_token = localStorage.getItem("csrfToken");

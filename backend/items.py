@@ -117,7 +117,8 @@ async def user_create_item(
     except Exception as e:
         abort(500, f"Failed to create an item: {str(e)}")
 
-async def user_view_item(session_token:str, csrf_token:str) -> list[Item]:
+
+async def user_view_item(session_token: str, csrf_token: str) -> list[Item]:
     """
     Retrieves all items from the database.
 
@@ -131,8 +132,8 @@ async def user_view_item(session_token:str, csrf_token:str) -> list[Item]:
     user_id = admin_retrieve_user_id(session_token, csrf_token)
     if user_id is None:
         abort(403, "You must be logged in to view items.")
-    
-    owned_items : list[Item] = []
+
+    owned_items: list[Item] = []
     for item in items.values():
         if item.get_user_id() == user_id and item.get_status() == "available":
             owned_items.append(item)
@@ -224,7 +225,6 @@ async def user_get_browse_items(
         for item_key, item in filtered_items_copy.items():
             if item.get_type() != safe_type_filter:
                 del filtered_items[item_key]
-
 
     return filtered_items
 

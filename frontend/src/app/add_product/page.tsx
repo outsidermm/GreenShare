@@ -92,13 +92,12 @@ export default function Home() {
         type: selectedType.value,
         location: selectedLocation.label,
         images: selectedFiles,
-      })
-        .then((response) => {
-          if (response.message) {
-            swal("Success!", "Product added successfully!", "success");
-            router.push("/");
-          }
-        });
+      }).then((response) => {
+        if (response.message) {
+          swal("Success!", "Product added successfully!", "success");
+          router.push("/");
+        }
+      });
       setTitle("");
       setDescription("");
       setSelectedCondition(null);
@@ -108,8 +107,8 @@ export default function Home() {
       setIsTitleChanged(false);
       setIsDescriptionChanged(false);
     } catch (error) {
-        console.error("Error creating item:", error);
-        swal("Error!", "Failed to add product. Please try again.", "error");
+      console.error("Error creating item:", error);
+      swal("Error!", "Failed to add product. Please try again.", "error");
     }
   };
 

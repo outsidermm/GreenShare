@@ -2,13 +2,13 @@ import { Offer } from "@/types/offer";
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
 interface getUserOffersResponse {
-    outgoingOffers: Offer[];
-    incomingOffers: Offer[];
+  outgoingOffers: Offer[];
+  incomingOffers: Offer[];
 }
 
 export default async function getUserOffers(): Promise<getUserOffersResponse> {
   try {
-        const csrf_token = localStorage.getItem("csrfToken");
+    const csrf_token = localStorage.getItem("csrfToken");
     if (!csrf_token) {
       throw new Error("No CSRF token found");
     }
