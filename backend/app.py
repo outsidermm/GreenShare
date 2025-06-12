@@ -421,12 +421,12 @@ async def accept_exchange_offer():
     csrf_token = sanitize_input(request.headers.get("X-CSRF-TOKEN"))
 
     try:
-        message = await user_accept_offer(
+        await user_accept_offer(
             session_token=session_token,
             csrf_token=csrf_token,
             offer_id=offer_id,
         )
-        return jsonify(message), 200
+        return jsonify({"message": "Offer accepted successfully."}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -444,12 +444,12 @@ async def complete_exchange_offer():
     csrf_token = sanitize_input(request.headers.get("X-CSRF-TOKEN"))
 
     try:
-        message = await user_complete_offer(
+        await user_complete_offer(
             session_token=session_token,
             csrf_token=csrf_token,
             offer_id=offer_id,
         )
-        return jsonify(message), 200
+        return jsonify({"message": "Offer completed successfully."}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -467,12 +467,12 @@ async def confirm_exchange_offer():
     csrf_token = sanitize_input(request.headers.get("X-CSRF-TOKEN"))
 
     try:
-        message = await user_confirm_offer(
+        await user_confirm_offer(
             session_token=session_token,
             csrf_token=csrf_token,
             offer_id=offer_id,
         )
-        return jsonify(message), 200
+        return jsonify({"message": "Offer completion confirmed successfully."}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -518,12 +518,13 @@ async def cancel_exchange_offer():
     offer_id = data["offerId"]
 
     try:
-        message = await user_cancel_offer(
+        await user_cancel_offer(
             session_token=session_token,
             csrf_token=csrf_token,
             offer_id=offer_id,
+            message=message,
         )
-        return jsonify(message), 200
+        return jsonify({"message": "Offer cancelled successfully"}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 

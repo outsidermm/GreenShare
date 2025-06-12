@@ -78,11 +78,10 @@ async def user_get_offers(
             and items[offer.get_requested_item_id()].get_user_id() == new_user_id
         ):
             incoming_offers.append(offer)
-
     return outgoing_offers, incoming_offers
 
 
-async def user_accept_offer(session_token: str, csrf_token: str, offer_id: int):
+async def user_accept_offer(session_token: str, csrf_token: str, offer_id: int) -> None:
     new_user_id = admin_retrieve_user_id(session_token, csrf_token)
     validate_offer_id(offer_id)
 
@@ -116,13 +115,8 @@ async def user_accept_offer(session_token: str, csrf_token: str, offer_id: int):
 
     offer.set_status("accepted")  # Update the status to accepted
 
-    return {
-        "message": "Offer accepted successfully.",
-        "location": items[offer.get_requested_item_id()].get_location(),
-    }
 
-
-async def user_complete_offer(session_token: str, csrf_token: str, offer_id: int):
+async def user_complete_offer(session_token: str, csrf_token: str, offer_id: int) -> None:
     new_user_id = admin_retrieve_user_id(session_token, csrf_token)
     validate_offer_id(offer_id)
 
@@ -140,14 +134,8 @@ async def user_complete_offer(session_token: str, csrf_token: str, offer_id: int
 
     offer.set_status("completed")  # Update the status to completed
 
-    return {
-        "message": "Offer completed successfully.",
-        "offer_id": offer.get_offer_pk(),
-        "status": offer.get_status(),
-    }
 
-
-async def user_confirm_offer(session_token: str, csrf_token: str, offer_id: int):
+async def user_confirm_offer(session_token: str, csrf_token: str, offer_id: int) -> None:
     new_user_id = admin_retrieve_user_id(session_token, csrf_token)
     validate_offer_id(offer_id)
 
@@ -170,12 +158,6 @@ async def user_confirm_offer(session_token: str, csrf_token: str, offer_id: int)
         if offered_item_id in items:
             items[offered_item_id].set_status("offer_complete")
 
-    return {
-        "message": "Offer confirmed successfully.",
-        "offer_id": offer.get_offer_pk(),
-        "status": offer.get_status(),
-    }
-
 
 async def user_get_offer_details(session_token: str, csrf_token: str, offer_id: int):
     new_user_id = admin_retrieve_user_id(session_token, csrf_token)
@@ -196,7 +178,7 @@ async def user_cancel_offer(
     csrf_token: str,
     offer_id: int,
     message: str = "Offer cancelled by the user.",
-):
+) -> None:
     new_user_id = admin_retrieve_user_id(session_token, csrf_token)
     validate_offer_id(offer_id)
 
@@ -215,8 +197,3 @@ async def user_cancel_offer(
 
     offer.set_status("cancelled")  # Update the status to cancelled
     offer.set_message(message)
-    return {
-        "message": message,
-        "offer_id": offer.get_offer_pk(),
-        "status": offer.get_status(),
-    }
