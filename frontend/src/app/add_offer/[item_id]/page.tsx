@@ -95,7 +95,7 @@ export default function AddOfferPage() {
 		}
 		catch (error) {
 			console.error("Error submitting offer:", error);
-			alert("An error occurred while submitting your offer. Please try again.");
+			swal("Error", "An error occurred while submitting your offer. Please try again.", "error");
 		}
 	}
 

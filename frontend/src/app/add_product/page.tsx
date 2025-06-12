@@ -60,58 +60,57 @@ export default function Home() {
   };
 
   const handleSubmit = async () => {
-    if (!isAuthenticated) {
-      swal("Please log in to add a product.", {
-        icon: "warning",
-        buttons: ["Cancel", "Login"], // [cancel, confirm]
-      }).then((willLogin) => {
-        if (willLogin) {
-          router.push("/login");
-        }
-      });
-      return;
-    }
-    if (
-      !title ||
-      !description ||
-      !selectedCondition ||
-      !selectedType ||
-      !selectedLocation ||
-      !selectedFiles.length
-    ) {
-      swal("Please fill in all fields and select at least one image.", {
-        icon: "warning",
-      });
-      return;
-    }
-    await createItem({
-      title,
-      description,
-      condition: selectedCondition.value,
-      type: selectedType.value,
-      location: selectedLocation.label,
-      images: selectedFiles,
-    })
-      .then((response) => {
-        if (response.error) {
-          alert(`Error: ${response.error}`);
-        } else {
-          swal("Success!", "Product added successfully!", "success");
-          router.push("/");
-        }
+    try {
+      if (!isAuthenticated) {
+        swal("Please log in to add a product.", {
+          icon: "warning",
+          buttons: ["Cancel", "Login"], // [cancel, confirm]
+        }).then((willLogin) => {
+          if (willLogin) {
+            router.push("/login");
+          }
+        });
+        return;
+      }
+      if (
+        !title ||
+        !description ||
+        !selectedCondition ||
+        !selectedType ||
+        !selectedLocation ||
+        !selectedFiles.length
+      ) {
+        swal("Please fill in all fields and select at least one image.", {
+          icon: "warning",
+        });
+        return;
+      }
+      await createItem({
+        title,
+        description,
+        condition: selectedCondition.value,
+        type: selectedType.value,
+        location: selectedLocation.label,
+        images: selectedFiles,
       })
-      .catch((error) => {
+        .then((response) => {
+          if (response.message) {
+            swal("Success!", "Product added successfully!", "success");
+            router.push("/");
+          }
+        });
+      setTitle("");
+      setDescription("");
+      setSelectedCondition(null);
+      setSelectedType(null);
+      setSelectedLocation(null);
+      setSelectedFiles([]);
+      setIsTitleChanged(false);
+      setIsDescriptionChanged(false);
+    } catch (error) {
         console.error("Error creating item:", error);
         swal("Error!", "Failed to add product. Please try again.", "error");
-      });
-    setTitle("");
-    setDescription("");
-    setSelectedCondition(null);
-    setSelectedType(null);
-    setSelectedLocation(null);
-    setSelectedFiles([]);
-    setIsTitleChanged(false);
-    setIsDescriptionChanged(false);
+    }
   };
 
   return (

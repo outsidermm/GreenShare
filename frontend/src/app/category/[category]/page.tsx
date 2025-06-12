@@ -21,7 +21,6 @@ export default function Home() {
     const fetchItems = async () => {
       try {
         const category_filter = pathname.replace("/category/", "");
-        console.log(category_filter);
         const response = await getItems({ category: category_filter });
         setItems(response);
       } catch (error) {
