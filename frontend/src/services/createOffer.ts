@@ -1,8 +1,8 @@
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
 interface createOfferInput {
-    requestedItemId: string;
-    offeredItemIds: string[];
+    requestedItemId: number;
+    offeredItemIds: number[];
     message: string;
 }
 

@@ -8,7 +8,7 @@ interface getItemsInput {
   location?: string;
   type?: string;
   title?: string;
-  item_id?: string;
+  item_id?: number;
 }
 
 export default async function getItems({
@@ -26,7 +26,7 @@ export default async function getItems({
     if (location) params.append("location", location);
     if (type) params.append("type", type);
     if (title) params.append("title", title);
-    if (item_id) params.append("id", item_id);
+    if (item_id) params.append("id", item_id.toString());
 
     const response = await fetch(`${API_BASE}/item?${params.toString()}`, {
       method: "GET",

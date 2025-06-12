@@ -16,7 +16,10 @@ import createOffer from "@/services/createOffer";
 export default function AddOfferPage() {
 	const router = useRouter();
 	const pathname = usePathname();
-	const requested_item_id = pathname.replace("/add_offer/", "");
+	const requested_item_id = Number(pathname.replace("/add_offer/", ""));
+	if (isNaN(requested_item_id)) {
+		throw new Error("Invalid item ID in URL");
+	}
 	const { isAuthenticated, refreshAuth } = useAuth();
 	const [offerMessage, setOfferMessage] = useState("");
 	const [outgoingItems, setOutgoingItems] = useState<Item[]>([]);
@@ -75,17 +78,20 @@ export default function AddOfferPage() {
 					buttons: ["Cancel", "OK"],
 				});
 			}
-			await createOffer({
-				requestedItemId: requestedItem ? requestedItem.id : "",
-				offeredItemIds: outgoingItems.map(item => item.id),
-				message: offerMessage,
-			})
-			.then((response) => {
-				if (response.message) {
-					swal("Success!", "Offer submitted successfully!", "success");
-					router.push("/");
-				}
-			})
+			if(requestedItem) {
+				await createOffer({
+					requestedItemId: requestedItem.id,
+					offeredItemIds: outgoingItems.map(item => item.id),
+					message: offerMessage,
+				})
+				.then((response) => {
+					if (response.message) {
+						swal("Success!", "Offer submitted successfully!", "success");
+						router.push("/");
+					}
+				})				
+			}
+
 		}
 		catch (error) {
 			console.error("Error submitting offer:", error);

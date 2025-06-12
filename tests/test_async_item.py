@@ -198,7 +198,7 @@ async def test_modify_item_success():
     assert modified_item[item_id].get_title() == sanitize_input("Test Item".lower())
 
     await user_modify_item(
-        item_id=str(item_id),
+        item_id=item_id,
         new_title="New Title",
         new_description="New Description for the item",
         new_condition="used-good",
@@ -268,7 +268,7 @@ async def test_modify_item_invalid_user():
 
     with pytest.raises(HTTPException) as excinfo:
         await user_modify_item(
-            item_id=str(item_id),
+            item_id=item_id,
             new_title="Hacked Title",
             new_description="Hacked Description",
             new_condition="Poor",

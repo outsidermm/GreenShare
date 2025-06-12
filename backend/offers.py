@@ -7,59 +7,44 @@ from backend.data import admin_retrieve_user_id
 from backend.classes.exchange_offer import ExchangeOffer
 
 
-def validate_offer_id(offer_id: str) -> int:
-    if not offer_id.isdigit():
-        abort(400, "Offer ID must be an integer.")
-    offer_id_int = int(offer_id)
-    if offer_id_int not in exchange_offers:
-        abort(404, f"Offer with ID {offer_id_int} does not exist.")
-    return offer_id_int
+def validate_offer_id(offer_id: int) -> None:
+    if offer_id not in exchange_offers:
+        abort(404, f"Offer with ID {offer_id} does not exist.")
 
 
 async def user_create_offer(
     session_token: str,
     csrf_token: str,
-    offered_item_ids: list[str],
-    requested_item_id: str,
+    offered_item_ids: list[int],
+    requested_item_id: int,
     message: str,
 ) -> ExchangeOffer:
 
     new_offered_by_id = admin_retrieve_user_id(session_token, csrf_token)
 
-    if not requested_item_id.isdigit():
-        abort(400, "Requested item ID must be an integer.")
-    else:
-        new_requested_item_id = int(requested_item_id)
-        if new_requested_item_id not in items:
-            abort(
-                404, f"Requested item with ID {new_requested_item_id} does not exist."
-            )
+    requested_item_id = int(requested_item_id)
+    if requested_item_id not in items:
+        abort(
+            404, f"Requested item with ID {requested_item_id} does not exist."
+        )
 
-    if items[new_requested_item_id].get_type() == "exchange" and not offered_item_ids:
+    if items[requested_item_id].get_type() == "exchange" and not offered_item_ids:
         abort(400, "You must offer at least one item in exchange for this item.")
 
-    new_offered_item_ids = [
-        int(item_id) for item_id in offered_item_ids if item_id.isdigit()
-    ]
-
     for offered_item_id in offered_item_ids:
-        if not offered_item_id.isdigit():
-            abort(400, "Offered item IDs must be integers.")
-        else:
-            offered_item_id = int(offered_item_id)
-            if offered_item_id not in items:
-                abort(404, f"Offered item with ID {offered_item_id} does not exist.")
+        if offered_item_id not in items:
+            abort(404, f"Offered item with ID {offered_item_id} does not exist.")
 
-            if offered_item_id == new_requested_item_id:
-                abort(400, "Offered item cannot be the same as the requested item.")
+        if offered_item_id == requested_item_id:
+            abort(400, "Offered item cannot be the same as the requested item.")
 
-    if items[new_requested_item_id].get_status() != "available":
+    if items[requested_item_id].get_status() != "available":
         abort(400, "Requested item is not available for exchange.")
 
-    if items[new_requested_item_id].get_user_id() == new_offered_by_id:
+    if items[requested_item_id].get_user_id() == new_offered_by_id:
         abort(400, "You cannot exchange your own item.")
 
-    if items[new_requested_item_id].get_type() == "free" and offered_item_ids:
+    if items[requested_item_id].get_type() == "free" and offered_item_ids:
         abort(400, "This item is free, you cannot offer items in exchange.")
 
     new_message = message.lower()
@@ -69,9 +54,9 @@ async def user_create_offer(
     try:
         new_offer = ExchangeOffer(
             offered_by_id=new_offered_by_id,
-            requested_item_id=new_requested_item_id,
+            requested_item_id=requested_item_id,
             message=new_message,
-            offered_item_ids=new_offered_item_ids,
+            offered_item_ids=offered_item_ids,
         )
         exchange_offers[new_offer.get_offer_pk()] = new_offer
         return new_offer
@@ -97,9 +82,9 @@ async def user_get_offers(
     return outgoing_offers, incoming_offers
 
 
-async def user_accept_offer(session_token: str, csrf_token: str, offer_id: str):
+async def user_accept_offer(session_token: str, csrf_token: str, offer_id: int):
     new_user_id = admin_retrieve_user_id(session_token, csrf_token)
-    offer_id = validate_offer_id(offer_id)
+    validate_offer_id(offer_id)
 
     offer = exchange_offers[offer_id]
 
@@ -115,7 +100,7 @@ async def user_accept_offer(session_token: str, csrf_token: str, offer_id: str):
             )
 
     if offer.get_requested_item_id() not in items:
-        await user_cancel_offer(session_token, csrf_token, str(offer_id))
+        await user_cancel_offer(session_token, csrf_token, offer_id)
         abort(404, "Requested item does not exist.")
 
     if items[offer.get_requested_item_id()].get_user_id() != new_user_id:
@@ -126,7 +111,7 @@ async def user_accept_offer(session_token: str, csrf_token: str, offer_id: str):
 
     for offered_item_id in offer.get_offered_items():
         if offered_item_id not in items:
-            await user_cancel_offer(session_token, csrf_token, str(offer_id))
+            await user_cancel_offer(session_token, csrf_token, offer_id)
             abort(404, f"Offered item with ID {offered_item_id} does not exist.")
 
     offer.set_status("accepted")  # Update the status to accepted
@@ -137,9 +122,9 @@ async def user_accept_offer(session_token: str, csrf_token: str, offer_id: str):
     }
 
 
-async def user_complete_offer(session_token: str, csrf_token: str, offer_id: str):
+async def user_complete_offer(session_token: str, csrf_token: str, offer_id: int):
     new_user_id = admin_retrieve_user_id(session_token, csrf_token)
-    offer_id = validate_offer_id(offer_id)
+    validate_offer_id(offer_id)
 
     offer = exchange_offers[offer_id]
     if offer.get_requested_item_id() not in items:
@@ -162,9 +147,9 @@ async def user_complete_offer(session_token: str, csrf_token: str, offer_id: str
     }
 
 
-async def user_confirm_offer(session_token: str, csrf_token: str, offer_id: str):
+async def user_confirm_offer(session_token: str, csrf_token: str, offer_id: int):
     new_user_id = admin_retrieve_user_id(session_token, csrf_token)
-    offer_id = validate_offer_id(offer_id)
+    validate_offer_id(offer_id)
 
     offer = exchange_offers[offer_id]
 
@@ -192,9 +177,9 @@ async def user_confirm_offer(session_token: str, csrf_token: str, offer_id: str)
     }
 
 
-async def user_get_offer_details(session_token: str, csrf_token: str, offer_id: str):
+async def user_get_offer_details(session_token: str, csrf_token: str, offer_id: int):
     new_user_id = admin_retrieve_user_id(session_token, csrf_token)
-    offer_id = validate_offer_id(offer_id)
+    validate_offer_id(offer_id)
 
     offer = exchange_offers[offer_id]
     if offer.get_offered_by_id() != new_user_id and (
@@ -209,11 +194,11 @@ async def user_get_offer_details(session_token: str, csrf_token: str, offer_id: 
 async def user_cancel_offer(
     session_token: str,
     csrf_token: str,
-    offer_id: str,
+    offer_id: int,
     message: str = "Offer cancelled by the user.",
 ):
     new_user_id = admin_retrieve_user_id(session_token, csrf_token)
-    offer_id = validate_offer_id(offer_id)
+    validate_offer_id(offer_id)
 
     offer = exchange_offers[offer_id]
     if (

@@ -360,10 +360,8 @@ async def create_exchange_offer():
         session_token = sanitize_input(request.cookies.get("session_token"))
         csrf_token = sanitize_input(request.headers.get("X-CSRF-TOKEN"))
         offered_item_ids = data["offeredItemIds"]
-        offered_item_ids = [str(offered_item_id) for offered_item_id in offered_item_ids]
-        requested_item_id = str(data["requestedItemId"])
+        requested_item_id = data["requestedItemId"]
         message = sanitize_input(data["message"])
-        print(type(requested_item_id))
 
         await user_create_offer(
             session_token=session_token,
