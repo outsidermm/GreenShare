@@ -179,7 +179,7 @@ export default function AddOfferPage() {
                   <p className="text-slate-800">
                     <strong>Status:</strong> {toTitleCase(offer.status)}
                   </p>
-                  {offer.status !== "pending" && (
+                  {offer.status !== "pending" && offer.status !== "cancelled" && (
                     <p className="text-slate-800">
                       <strong>Requested Item Location:</strong>{" "}
                       {toTitleCase(offer.requested_item_location)}
