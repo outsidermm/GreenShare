@@ -14,6 +14,7 @@ import DropDown from "@/components/DropDown";
 import createItem from "@/services/item/createItem";
 import swal from "sweetalert";
 import { Option } from "@/types/option";
+import { extractErrorMessage } from "@/utils/extractErrorMsg";
 
 export default function Home() {
   const { isAuthenticated, refreshAuth } = useAuth();
@@ -108,7 +109,15 @@ export default function Home() {
       setIsDescriptionChanged(false);
     } catch (error) {
       console.error("Error creating item:", error);
-      swal("Error!", "Failed to add product. Please try again.", "error");
+      if(error instanceof Error) {
+        swal("Error", extractErrorMessage(error.message), "error");
+      } else {
+        swal(
+          "Error",
+          "An error occurred while creating your item. Please try again.",
+          "error"
+        );
+      }
     }
   };
 

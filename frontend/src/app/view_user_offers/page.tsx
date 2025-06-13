@@ -13,6 +13,7 @@ import acceptOffer from "@/services/offer/acceptOffer";
 import completeOffer from "@/services/offer/completeOffer";
 import confirmOfferComplete from "@/services/offer/confirmOfferComplete";
 import swal from "sweetalert";
+import { extractErrorMessage } from "@/utils/extractErrorMsg";
 
 export default function AddOfferPage() {
   const router = useRouter();
@@ -90,8 +91,16 @@ export default function AddOfferPage() {
         }
       }
     } catch (error) {
-      console.error("Error performing actions on offer:", error);
-      swal("Error", "Failed to pursue actions on offer.", "error");
+      console.error("Error performing actions on your offer:", error);
+      if(error instanceof Error) {
+        swal("Error", extractErrorMessage(error.message), "error");
+      } else {
+        swal(
+          "Error",
+          "Failed to pursue actions on offer.",
+          "error"
+        );
+      }
     }
   };
 
@@ -117,7 +126,11 @@ export default function AddOfferPage() {
       }
     } catch (error) {
       console.error("Error cancelling offer:", error);
-      swal("Error", "Failed to cancel the offer.", "error");
+      if (error instanceof Error) {
+        swal("Error", extractErrorMessage(error.message), "error");
+      } else {
+        swal("Error", "Failed to cancel the offer. Please try again.", "error");
+      }
     }
   };
 
