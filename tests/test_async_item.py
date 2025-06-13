@@ -175,14 +175,6 @@ async def test_view_items_invalid_item_id():
 
 
 @pytest.mark.asyncio
-async def test_view_items_invalid_user_id():
-    invalid_id = "-5"
-    with pytest.raises(HTTPException) as excinfo:
-        await user_get_browse_items(user_id=invalid_id)
-    assert "User ID must be a positive integer." in excinfo.value.description
-
-
-@pytest.mark.asyncio
 async def test_modify_item_success():
     session_token, csrf_token = await user_auth_register(
         "modifier@test.com", "Password1!", "Alice", "Smith"
@@ -206,7 +198,7 @@ async def test_modify_item_success():
     assert modified_item[item_id].get_title() == sanitize_input("Test Item".lower())
 
     await user_modify_item(
-        item_id=str(item_id),
+        item_id=item_id,
         new_title="New Title",
         new_description="New Description for the item",
         new_condition="used-good",
@@ -276,7 +268,7 @@ async def test_modify_item_invalid_user():
 
     with pytest.raises(HTTPException) as excinfo:
         await user_modify_item(
-            item_id=str(item_id),
+            item_id=item_id,
             new_title="Hacked Title",
             new_description="Hacked Description",
             new_condition="Poor",

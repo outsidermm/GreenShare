@@ -71,9 +71,9 @@ export default function NavBar(props: NavBarProps) {
         {isAuthenticated && (
           <h2 className="text-sm font-bold mb-2 mt-6">
             <Link
-              href="/offers"
+              href="/view_user_offers"
               className={`block px-4 py-1 rounded transition-all ${
-                pathname === "/offers"
+                pathname === "/view_user_offers"
                   ? "bg-slate-800 border-l-4 border-green-400 text-green-400 font-semibold"
                   : "hover:text-green-400"
               }`}

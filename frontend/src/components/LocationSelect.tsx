@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import autocompleteAddress from "@/services/autocompleteAddress";
+import autocompleteAddress from "@/services/api/autocompleteAddress";
 import DropDown from "./DropDown";
 import { Option } from "@/types/option";
 

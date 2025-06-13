@@ -1,3 +1,5 @@
+import { StandardBackendResponse } from "@/types/standardBackendResponse";
+
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
 interface createItemInput {
@@ -9,14 +11,9 @@ interface createItemInput {
   type: string;
 }
 
-interface createItemResponse {
-  message?: string;
-  error?: string;
-}
-
 export default async function createItem(
   input: createItemInput,
-): Promise<createItemResponse> {
+): Promise<StandardBackendResponse> {
   try {
     const { title, description, condition, location, images, type } = input;
     const csrf_token = localStorage.getItem("csrfToken");
@@ -49,7 +46,7 @@ export default async function createItem(
       throw new Error(errorData.error || "Unknown error occurred");
     }
 
-    const result: createItemResponse = await response.json(); // Parse JSON response
+    const result: StandardBackendResponse = await response.json(); // Parse JSON response
     console.log("Response from server:", result);
     return result;
   } catch (error) {

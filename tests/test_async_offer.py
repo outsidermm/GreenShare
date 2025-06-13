@@ -61,7 +61,6 @@ async def test_offer_cancellation_by_offer_maker():
         csrf_token=owner_csrf,
     )
     req_id = req_item.get_item_pk()
-    print(req_id)
 
     offer_item = await user_create_item(
         new_title="Offered Cancel",
@@ -76,8 +75,8 @@ async def test_offer_cancellation_by_offer_maker():
     offer_id = offer_item.get_item_pk()
 
     offer = await user_create_offer(
-        requested_item_id=str(req_id),
-        offered_item_ids=[str(offer_id)],
+        requested_item_id=req_id,
+        offered_item_ids=[offer_id],
         message="cancel this please",
         session_token=maker_token,
         csrf_token=maker_csrf,
@@ -85,7 +84,7 @@ async def test_offer_cancellation_by_offer_maker():
     offer_key = offer.get_offer_pk()
 
     await user_cancel_offer(
-        offer_id=str(offer_key),
+        offer_id=offer_key,
         session_token=maker_token,
         csrf_token=maker_csrf,
     )
@@ -135,8 +134,8 @@ async def test_unauthorised_offer_acceptance():
     offer_id = offer_item.get_item_pk()
 
     offer = await user_create_offer(
-        requested_item_id=str(req_id),
-        offered_item_ids=[str(offer_id)],
+        requested_item_id=req_id,
+        offered_item_ids=[offer_id],
         message="Hope this goes through",
         session_token=maker_token,
         csrf_token=maker_csrf,
@@ -145,7 +144,7 @@ async def test_unauthorised_offer_acceptance():
 
     with pytest.raises(HTTPException) as excinfo:
         await user_accept_offer(
-            offer_id=str(offer_key),
+            offer_id=(offer_key),
             session_token=attacker_token,
             csrf_token=attacker_csrf,
         )
@@ -191,8 +190,8 @@ async def test_cancel_after_accept_fails():
     off_id = offer_item.get_item_pk()
 
     offer = await user_create_offer(
-        requested_item_id=str(req_id),
-        offered_item_ids=[str(off_id)],
+        requested_item_id=req_id,
+        offered_item_ids=[off_id],
         message="I might cancel",
         session_token=maker_token,
         csrf_token=maker_csrf,
@@ -200,14 +199,14 @@ async def test_cancel_after_accept_fails():
     key = offer.get_offer_pk()
 
     await user_accept_offer(
-        offer_id=str(key),
+        offer_id=key,
         session_token=owner_token,
         csrf_token=owner_csrf,
     )
 
     with pytest.raises(HTTPException) as excinfo:
         await user_cancel_offer(
-            offer_id=str(key),
+            offer_id=key,
             session_token=maker_token,
             csrf_token=maker_csrf,
         )
@@ -257,8 +256,8 @@ async def test_full_offer_flow():
 
     # Offerer creates offer
     offer = await user_create_offer(
-        requested_item_id=str(requested_item_id),
-        offered_item_ids=[str(offered_item_id)],
+        requested_item_id=requested_item_id,
+        offered_item_ids=[offered_item_id],
         message="Please accept this trade!",
         session_token=offerer_token,
         csrf_token=offerer_csrf,
@@ -267,7 +266,7 @@ async def test_full_offer_flow():
 
     # Owner accepts offer
     await user_accept_offer(
-        offer_id=str(offer_id),
+        offer_id=offer_id,
         session_token=owner_token,
         csrf_token=owner_csrf,
     )
@@ -275,7 +274,7 @@ async def test_full_offer_flow():
 
     # Offerer completes the offer
     await user_complete_offer(
-        offer_id=str(offer_id),
+        offer_id=offer_id,
         session_token=offerer_token,
         csrf_token=offerer_csrf,
     )
@@ -283,7 +282,7 @@ async def test_full_offer_flow():
 
     # Owner confirms offer
     await user_confirm_offer(
-        offer_id=str(offer_id),
+        offer_id=offer_id,
         session_token=owner_token,
         csrf_token=owner_csrf,
     )
@@ -350,8 +349,8 @@ async def test_multiple_offers_conflict():
 
     # Both users make offers
     offer1 = await user_create_offer(
-        requested_item_id=str(requested_item_id),
-        offered_item_ids=[str(offer_a_id)],
+        requested_item_id=(requested_item_id),
+        offered_item_ids=[offer_a_id],
         message="Offer from A",
         session_token=offerer1_token,
         csrf_token=offerer1_csrf,
@@ -359,8 +358,8 @@ async def test_multiple_offers_conflict():
     offer1_id = offer1.get_offer_pk()
 
     offer2 = await user_create_offer(
-        requested_item_id=str(requested_item_id),
-        offered_item_ids=[str(offer_b_id)],
+        requested_item_id=(requested_item_id),
+        offered_item_ids=[offer_b_id],
         message="Offer from B",
         session_token=offerer2_token,
         csrf_token=offerer2_csrf,
@@ -369,7 +368,7 @@ async def test_multiple_offers_conflict():
 
     # Accepting first offer
     await user_accept_offer(
-        offer_id=str(offer1_id),
+        offer_id=(offer1_id),
         session_token=owner_token,
         csrf_token=owner_csrf,
     )
@@ -378,7 +377,7 @@ async def test_multiple_offers_conflict():
     # Trying to accept the second offer must fail
     with pytest.raises(HTTPException) as excinfo:
         await user_accept_offer(
-            offer_id=str(offer2_id),
+            offer_id=(offer2_id),
             session_token=owner_token,
             csrf_token=owner_csrf,
         )
@@ -429,8 +428,8 @@ async def test_unauthorised_offer_confirmation():
     off_id = offer_item.get_item_pk()
 
     offer = await user_create_offer(
-        requested_item_id=str(req_id),
-        offered_item_ids=[str(off_id)],
+        requested_item_id=(req_id),
+        offered_item_ids=[off_id],
         message="Please confirm this offer.",
         session_token=maker_token,
         csrf_token=maker_csrf,
@@ -440,14 +439,14 @@ async def test_unauthorised_offer_confirmation():
     await user_accept_offer(
         session_token=owner_token,
         csrf_token=owner_csrf,
-        offer_id=str(offer_key),
+        offer_id=(offer_key),
     )
 
     with pytest.raises(HTTPException) as excinfo:
         await user_confirm_offer(
             session_token=stranger_token,
             csrf_token=stranger_csrf,
-            offer_id=str(offer_key),
+            offer_id=(offer_key),
         )
     assert "not authorised to confirm" in excinfo.value.description
     assert exchange_offers[offer_key].get_status() == "accepted"
@@ -495,8 +494,8 @@ async def test_offer_confirmation_before_completion():
     offer = await user_create_offer(
         session_token=maker_token,
         csrf_token=maker_csrf,
-        requested_item_id=str(req_id),
-        offered_item_ids=[str(offer_id)],
+        requested_item_id=(req_id),
+        offered_item_ids=[offer_id],
         message="Try completing early",
     )
     offer_key = offer.get_offer_pk()
@@ -504,14 +503,14 @@ async def test_offer_confirmation_before_completion():
     await user_accept_offer(
         session_token=owner_token,
         csrf_token=owner_csrf,
-        offer_id=str(offer_key),
+        offer_id=(offer_key),
     )
 
     with pytest.raises(HTTPException) as excinfo:
         await user_confirm_offer(
             session_token=owner_token,
             csrf_token=owner_csrf,
-            offer_id=str(offer_key),
+            offer_id=(offer_key),
         )
     assert "not in a completed state" in excinfo.value.description
     assert exchange_offers[offer_key].get_status() == "accepted"
@@ -556,16 +555,16 @@ async def test_repeated_confirmation():
     off_id = off.get_item_pk()
 
     offer = await user_create_offer(
-        maker_token, maker_csrf, [str(off_id)], str(req_id), "Try reconfirming"
+        maker_token, maker_csrf, [off_id], (req_id), "Try reconfirming"
     )
     offer_key = offer.get_offer_pk()
 
-    await user_accept_offer(owner_token, owner_csrf, str(offer_key))
-    await user_complete_offer(maker_token, maker_csrf, str(offer_key))
-    await user_confirm_offer(owner_token, owner_csrf, str(offer_key))
+    await user_accept_offer(owner_token, owner_csrf, (offer_key))
+    await user_complete_offer(maker_token, maker_csrf, (offer_key))
+    await user_confirm_offer(owner_token, owner_csrf, (offer_key))
 
     with pytest.raises(HTTPException) as excinfo:
-        await user_confirm_offer(owner_token, owner_csrf, str(offer_key))
+        await user_confirm_offer(owner_token, owner_csrf, (offer_key))
     assert "already been confirmed" in excinfo.value.description
 
 
@@ -608,15 +607,15 @@ async def test_repeated_completion():
     off_id = off_item.get_item_pk()
 
     offer = await user_create_offer(
-        maker_token, maker_csrf, [str(off_id)], str(req_id), "Try recompleting"
+        maker_token, maker_csrf, [off_id], (req_id), "Try recompleting"
     )
     offer_key = offer.get_offer_pk()
 
-    await user_accept_offer(owner_token, owner_csrf, str(offer_key))
-    await user_complete_offer(maker_token, maker_csrf, str(offer_key))
+    await user_accept_offer(owner_token, owner_csrf, (offer_key))
+    await user_complete_offer(maker_token, maker_csrf, (offer_key))
 
     with pytest.raises(HTTPException) as excinfo:
-        await user_complete_offer(maker_token, maker_csrf, str(offer_key))
+        await user_complete_offer(maker_token, maker_csrf, (offer_key))
     assert "already been completed" in excinfo.value.description
 
 
@@ -660,7 +659,7 @@ async def test_create_exchange_offer_missing_items():
 
     with pytest.raises(HTTPException) as excinfo:
         await user_create_offer(
-            maker_token, maker_csrf, [], str(valid_id), "Can't trade without items"
+            maker_token, maker_csrf, [], (valid_id), "Can't trade without items"
         )
     assert (
         "You must offer at least one item in exchange for this item."
@@ -695,7 +694,7 @@ async def test_create_free_offer_having_items():
     valid_id = item.get_item_pk()
 
     await user_create_offer(
-        maker_token, maker_csrf, [], str(valid_id), "Can't trade without items"
+        maker_token, maker_csrf, [], (valid_id), "Can't trade without items"
     )
     assert len(exchange_offers) == 1
 
@@ -734,7 +733,7 @@ async def test_accepting_own_offer():
 
     with pytest.raises(HTTPException) as excinfo:
         await user_create_offer(
-            user_token, user_csrf, [str(off_id)], str(req_id), "Trade with myself"
+            user_token, user_csrf, [off_id], (req_id), "Trade with myself"
         )
     assert "cannot exchange your own item" in excinfo.value.description
 
@@ -783,20 +782,20 @@ async def test_offer_with_already_used_item():
     shared_id = shared_item.get_item_pk()
 
     first_offer = await user_create_offer(
-        maker1_token, maker1_csrf, [str(shared_id)], str(req_id), "First user offer"
+        maker1_token, maker1_csrf, [shared_id], (req_id), "First user offer"
     )
     first_offer_key = first_offer.get_offer_pk()
 
-    await user_accept_offer(owner_token, owner_csrf, str(first_offer_key))
-    await user_complete_offer(maker1_token, maker1_csrf, str(first_offer_key))
-    await user_confirm_offer(owner_token, owner_csrf, str(first_offer_key))
+    await user_accept_offer(owner_token, owner_csrf, (first_offer_key))
+    await user_complete_offer(maker1_token, maker1_csrf, (first_offer_key))
+    await user_confirm_offer(owner_token, owner_csrf, (first_offer_key))
 
     with pytest.raises(HTTPException) as excinfo:
         await user_create_offer(
             maker2_token,
             maker2_csrf,
-            [str(shared_id)],
-            str(req_id),
+            [shared_id],
+            (req_id),
             "Second user reuse",
         )
     assert "Requested item is not available for exchange." in excinfo.value.description
@@ -845,7 +844,7 @@ async def test_user_get_offers_and_offer_details():
 
     # Maker creates offer
     offer = await user_create_offer(
-        maker_token, maker_csrf, [str(off_id)], str(req_id), "Testing offer retrieval"
+        maker_token, maker_csrf, [off_id], (req_id), "Testing offer retrieval"
     )
     offer_key = offer.get_offer_pk()
 
@@ -855,7 +854,7 @@ async def test_user_get_offers_and_offer_details():
     assert len(incoming_off) == 0
 
     # Maker retrieves offer details
-    offer_detail = await user_get_offer_details(maker_token, maker_csrf, str(offer_key))
+    offer_detail = await user_get_offer_details(maker_token, maker_csrf, (offer_key))
     assert offer_detail["id"] == offer_key
     assert offer_detail["message"] == "testing offer retrieval"
     assert offer_detail["status"] == "pending"

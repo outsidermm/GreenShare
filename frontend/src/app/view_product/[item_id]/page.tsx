@@ -1,11 +1,11 @@
 "use client";
 import useAuth from "@/hooks/useAuth";
 import { useRouter, usePathname } from "next/navigation";
-import logoutUser from "@/services/logoutUser";
+import logoutUser from "@/services/user/logoutUser";
 import NavBar from "@/components/NavBar";
 import HeaderBar from "@/components/HeaderBar";
 import { useEffect, useState } from "react";
-import getItem from "@/services/getItem";
+import getItems from "@/services/item/getItems";
 import Image from "next/image";
 import { FaChevronLeft } from "react-icons/fa6";
 import "swiper/css";
@@ -20,12 +20,12 @@ export default function Home() {
   const router = useRouter();
   const pathname = usePathname();
   const [item, setItem] = useState<Item>();
-  const item_id_filter = pathname.replace("/view_product/", "");
+  const item_id_filter = Number(pathname.replace("/view_product/", ""));
 
   useEffect(() => {
     const fetchItems = async () => {
       try {
-        const response = await getItem({ item_id: item_id_filter });
+        const response = await getItems({ item_id: item_id_filter });
         if (response.length === 1) {
           setItem(response[0]);
         }
@@ -49,7 +49,7 @@ export default function Home() {
 
   const handleOffer = () => {
     if (isAuthenticated) {
-      router.push(`/offer/${item_id_filter}`);
+      router.push(`/add_offer/${item_id_filter}`);
     } else {
       swal("Please log in to make an offer.", {
         icon: "warning",
@@ -98,23 +98,21 @@ export default function Home() {
               showThumbs={false}
               className="w-full rounded-xl shadow-xl"
             >
-              {item && 
-                (item.images.map((image, index) => (
-                    <div
-                      key={index}
-                      className="flex justify-center items-center w-full h-full bg-white overflow-hidden rounded"
-                    >
-                      <Image
-                        src={image}
-                        alt={item.title}
-                        width={500}
-                        height={500}
-                        className="object-contain mx-auto h-auto w-auto"
-                      />
-                    </div>
-                  ))
-                )
-              }
+              {item &&
+                item.images.map((image, index) => (
+                  <div
+                    key={index}
+                    className="flex justify-center items-center w-full h-full bg-white overflow-hidden rounded"
+                  >
+                    <Image
+                      src={image}
+                      alt={item.title}
+                      width={500}
+                      height={500}
+                      className="object-contain mx-auto h-auto w-auto"
+                    />
+                  </div>
+                ))}
             </Carousel>
           </div>
           <div className="flex-1">

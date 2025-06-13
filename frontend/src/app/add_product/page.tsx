@@ -2,7 +2,7 @@
 
 import useAuth from "@/hooks/useAuth";
 import { useRouter, usePathname } from "next/navigation";
-import logoutUser from "@/services/logoutUser";
+import logoutUser from "@/services/user/logoutUser";
 import NavBar from "@/components/NavBar";
 import HeaderBar from "@/components/HeaderBar";
 import { IoMdCheckmark } from "react-icons/io";
@@ -11,9 +11,10 @@ import { useState } from "react";
 import Image from "next/image";
 import LocationSelect from "@/components/LocationSelect";
 import DropDown from "@/components/DropDown";
-import createItem from "@/services/createItem";
+import createItem from "@/services/item/createItem";
 import swal from "sweetalert";
 import { Option } from "@/types/option";
+import { extractErrorMessage } from "@/utils/extractErrorMsg";
 
 export default function Home() {
   const { isAuthenticated, refreshAuth } = useAuth();
@@ -60,58 +61,64 @@ export default function Home() {
   };
 
   const handleSubmit = async () => {
-    if (!isAuthenticated) {
-      swal("Please log in to add a product.", {
-        icon: "warning",
-        buttons: ["Cancel", "Login"], // [cancel, confirm]
-      }).then((willLogin) => {
-        if (willLogin) {
-          router.push("/login");
-        }
-      });
-      return;
-    }
-    if (
-      !title ||
-      !description ||
-      !selectedCondition ||
-      !selectedType ||
-      !selectedLocation ||
-      !selectedFiles.length
-    ) {
-      swal("Please fill in all fields and select at least one image.", {
-        icon: "warning",
-      });
-      return;
-    }
-    await createItem({
-      title,
-      description,
-      condition: selectedCondition.value,
-      type: selectedType.value,
-      location: selectedLocation.label,
-      images: selectedFiles,
-    })
-      .then((response) => {
-        if (response.error) {
-          alert(`Error: ${response.error}`);
-        } else {
+    try {
+      if (!isAuthenticated) {
+        swal("Please log in to add a product.", {
+          icon: "warning",
+          buttons: ["Cancel", "Login"], // [cancel, confirm]
+        }).then((willLogin) => {
+          if (willLogin) {
+            router.push("/login");
+          }
+        });
+        return;
+      }
+      if (
+        !title ||
+        !description ||
+        !selectedCondition ||
+        !selectedType ||
+        !selectedLocation ||
+        !selectedFiles.length
+      ) {
+        swal("Please fill in all fields and select at least one image.", {
+          icon: "warning",
+        });
+        return;
+      }
+      await createItem({
+        title,
+        description,
+        condition: selectedCondition.value,
+        type: selectedType.value,
+        location: selectedLocation.label,
+        images: selectedFiles,
+      }).then((response) => {
+        if (response.message) {
           swal("Success!", "Product added successfully!", "success");
           router.push("/");
         }
-      })
-      .catch((error) => {
-        console.error("Error creating item:", error);
-        swal("Error!", "Failed to add product. Please try again.", "error");
       });
-    setTitle("");
-    setDescription("");
-    setSelectedCondition(null);
-    setSelectedType(null);
-    setSelectedLocation(null);
-    setSelectedFiles([]);
-    setIsTitleChanged(false);
-    setIsDescriptionChanged(false);
+      setTitle("");
+      setDescription("");
+      setSelectedCondition(null);
+      setSelectedType(null);
+      setSelectedLocation(null);
+      setSelectedFiles([]);
+      setIsTitleChanged(false);
+      setIsDescriptionChanged(false);
+    } catch (error) {
+      console.error("Error creating item:", error);
+      if (error instanceof Error) {
+        swal("Error", extractErrorMessage(error.message), "error");
+      } else {
+        swal(
+          "Error",
+          "An error occurred while creating your item. Please try again.",
+          "error",
+        );
+      }
+    }
   };
 
   return (

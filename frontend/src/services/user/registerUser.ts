@@ -1,20 +1,24 @@
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
+interface registerUserInput {
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+}
+
 interface registerResponse {
   csrf_token: string;
 }
 
 export default async function registerUser(
-  email: string,
-  password: string,
-  firstName: string,
-  lastName: string,
+  input: registerUserInput,
 ): Promise<string> {
   const data = {
-    email: email,
-    password: password,
-    firstName: firstName,
-    lastName: lastName,
+    email: input.email,
+    password: input.password,
+    firstName: input.firstName,
+    lastName: input.lastName,
   };
   try {
     const response = await fetch(`${API_BASE}/auth/register`, {

@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { usePathname } from "next/navigation";
-import authUser from "../services/authUser";
+import authUser from "../services/user/authUser";
 
 interface UseAuthResult {
   isAuthenticated: boolean;
