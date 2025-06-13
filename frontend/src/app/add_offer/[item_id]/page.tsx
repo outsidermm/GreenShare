@@ -101,13 +101,13 @@ export default function AddOfferPage() {
       }
     } catch (error) {
       console.error("Error submitting offer:", error);
-      if(error instanceof Error) {
+      if (error instanceof Error) {
         swal("Error", extractErrorMessage(error.message), "error");
       } else {
         swal(
           "Error",
           "An error occurred while submitting your offer. Please try again.",
-          "error"
+          "error",
         );
       }
     }

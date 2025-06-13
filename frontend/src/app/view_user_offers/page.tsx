@@ -51,8 +51,8 @@ export default function AddOfferPage() {
       return "Offer Cancelled";
     }
 
-    if(status === "confirmed") {
-      return "Exchange Complete and Confirmed"
+    if (status === "confirmed") {
+      return "Exchange Complete and Confirmed";
     }
 
     if (toggleOffer) {
@@ -78,11 +78,9 @@ export default function AddOfferPage() {
         if (offer.status === "pending") {
           await acceptOffer(offer.id);
           router.refresh();
-
         } else if (offer.status === "completed") {
           await confirmOfferComplete(offer.id);
           router.refresh();
-
         }
       } else {
         if (offer.status === "accepted") {
@@ -92,14 +90,10 @@ export default function AddOfferPage() {
       }
     } catch (error) {
       console.error("Error performing actions on your offer:", error);
-      if(error instanceof Error) {
+      if (error instanceof Error) {
         swal("Error", extractErrorMessage(error.message), "error");
       } else {
-        swal(
-          "Error",
-          "Failed to pursue actions on offer.",
-          "error"
-        );
+        swal("Error", "Failed to pursue actions on offer.", "error");
       }
     }
   };
@@ -114,7 +108,8 @@ export default function AddOfferPage() {
           attributes: {
             placeholder: "Reason for cancelling...",
             type: "text",
-            className: "border-slate-500 rounded-lg py-2 px-3 w-full border-2 text-slate-500 focus:outline-green-500",
+            className:
+              "border-slate-500 rounded-lg py-2 px-3 w-full border-2 text-slate-500 focus:outline-green-500",
           },
         },
         buttons: ["No", "Yes"],
@@ -192,12 +187,13 @@ export default function AddOfferPage() {
                   <p className="text-slate-800">
                     <strong>Status:</strong> {toTitleCase(offer.status)}
                   </p>
-                  {offer.status !== "pending" && offer.status !== "cancelled" && (
-                    <p className="text-slate-800">
-                      <strong>Requested Item Location:</strong>{" "}
-                      {toTitleCase(offer.requested_item_location)}
-                    </p>
-                  )}
+                  {offer.status !== "pending" &&
+                    offer.status !== "cancelled" && (
+                      <p className="text-slate-800">
+                        <strong>Requested Item Location:</strong>{" "}
+                        {toTitleCase(offer.requested_item_location)}
+                      </p>
+                    )}
                   <p className="text-slate-800">
                     <strong>Created At:</strong>{" "}
                     {new Date(offer.created_at).toLocaleDateString()}

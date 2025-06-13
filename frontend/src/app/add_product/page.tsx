@@ -109,13 +109,13 @@ export default function Home() {
       setIsDescriptionChanged(false);
     } catch (error) {
       console.error("Error creating item:", error);
-      if(error instanceof Error) {
+      if (error instanceof Error) {
         swal("Error", extractErrorMessage(error.message), "error");
       } else {
         swal(
           "Error",
           "An error occurred while creating your item. Please try again.",
-          "error"
+          "error",
         );
       }
     }
