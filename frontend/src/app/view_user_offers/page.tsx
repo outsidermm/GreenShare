@@ -105,6 +105,7 @@ export default function AddOfferPage() {
           attributes: {
             placeholder: "Reason for cancelling...",
             type: "text",
+            className: "border-slate-500 rounded-lg py-2 px-3 w-full border-2 text-slate-500 focus:outline-green-500",
           },
         },
         buttons: ["No", "Yes"],
