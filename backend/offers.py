@@ -181,6 +181,7 @@ async def user_cancel_offer(
     offer_id: int,
     message: str = "Offer cancelled by the user.",
 ) -> None:
+    message = message.lower()
     new_user_id = admin_retrieve_user_id(session_token, csrf_token)
     validate_offer_id(offer_id)
 
