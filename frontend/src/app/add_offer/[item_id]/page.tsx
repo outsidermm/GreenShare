@@ -11,6 +11,7 @@ import getUserItems from "@/services/item/getUserItems";
 import { toTitleCase } from "@/utils/titleCase";
 import swal from "sweetalert";
 import createOffer from "@/services/offer/createOffer";
+import { extractErrorMessage } from "@/utils/extractErrorMsg";
 
 export default function AddOfferPage() {
   const router = useRouter();
@@ -100,11 +101,15 @@ export default function AddOfferPage() {
       }
     } catch (error) {
       console.error("Error submitting offer:", error);
-      swal(
-        "Error",
-        "An error occurred while submitting your offer. Please try again.",
-        "error",
-      );
+      if(error instanceof Error) {
+        swal("Error", extractErrorMessage(error.message), "error");
+      } else {
+        swal(
+          "Error",
+          "An error occurred while submitting your offer. Please try again.",
+          "error"
+        );
+      }
     }
   };
 
