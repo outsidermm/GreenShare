@@ -8,6 +8,11 @@ import getUserOffers from "@/services/offer/getUserOffers";
 import { useState, useEffect } from "react";
 import { toTitleCase } from "@/utils/titleCase";
 import { Offer } from "@/types/offer";
+import cancelOffer from "@/services/offer/cancelOffer";
+import acceptOffer from "@/services/offer/acceptOffer";
+import completeOffer from "@/services/offer/completeOffer";
+import confirmOfferComplete from "@/services/offer/confirmOfferComplete";
+import swal from "sweetalert";
 
 export default function AddOfferPage() {
   const router = useRouter();
@@ -40,11 +45,15 @@ export default function AddOfferPage() {
     router.refresh();
   };
 
-  const getOfferActionLabel= (toggleOffer: boolean, status: string) => {
-    if(status === "cancelled") {
+  const getOfferActionLabel = (toggleOffer: boolean, status: string) => {
+    if (status === "cancelled") {
       return "Offer Cancelled";
     }
-    
+
+    if(status === "confirmed") {
+      return "Exchange Complete and Confirmed"
+    }
+
     if (toggleOffer) {
       if (status === "pending") {
         return "Accept Offer";
@@ -56,7 +65,59 @@ export default function AddOfferPage() {
         return "Complete Offer";
       }
     }
-    return "Await Other Party Action"
+    return "Await Other Party Action";
+  };
+
+  const handleCurrentUserOfferAction = async (
+    offer: Offer,
+    toggleOffer: boolean,
+  ) => {
+    try {
+      if (toggleOffer) {
+        if (offer.status === "pending") {
+          await acceptOffer(offer.id);
+          router.refresh();
+
+        } else if (offer.status === "completed") {
+          await confirmOfferComplete(offer.id);
+          router.refresh();
+
+        }
+      } else {
+        if (offer.status === "accepted") {
+          await completeOffer(offer.id);
+          router.refresh();
+        }
+      }
+    } catch (error) {
+      console.error("Error performing actions on offer:", error);
+      swal("Error", "Failed to pursue actions on offer.", "error");
+    }
+  };
+
+  const handleCancel = async (offerId: number) => {
+    try {
+      const message = await swal({
+        title: "Cancel Offer?",
+        text: "Provide a reason for cancelling the offer:",
+        content: {
+          element: "input",
+          attributes: {
+            placeholder: "Reason for cancelling...",
+            type: "text",
+          },
+        },
+        buttons: ["No", "Yes"],
+      });
+
+      if (typeof message === "string") {
+        await cancelOffer({ offerId, message });
+        router.refresh();
+      }
+    } catch (error) {
+      console.error("Error cancelling offer:", error);
+      swal("Error", "Failed to cancel the offer.", "error");
+    }
   };
 
   return (
@@ -100,9 +161,9 @@ export default function AddOfferPage() {
             (toggleOffer ? incomingOffers : outgoingOffers).map((offer) => (
               <div
                 key={offer.id}
-                className="bg-white p-4 mb-4 rounded-lg shadow flex justify-between gap-10"
+                className="bg-white p-4 mb-4 rounded-lg shadow flex justify-between gap-8 flex-col sm:flex-row"
               >
-                <div className="flex-1">
+                <div className="flex-2">
                   <p className="text-slate-800">
                     <strong>Offered To:</strong>{" "}
                     {toTitleCase(offer.requested_item_name)}
@@ -131,18 +192,22 @@ export default function AddOfferPage() {
                 <div className="flex-2">
                   <button
                     disabled={offer.status === "cancelled"}
+                    onClick={() =>
+                      handleCurrentUserOfferAction(offer, toggleOffer)
+                    }
                     className={`w-full rounded ${offer.status === "cancelled" ? "bg-red-600 text-white border-red-600" : "bg-green-600 hover:bg-green-500 text-slate-900 border-green-600"} font-bold py-2 px-4 border-solid border-2 transition-all mt-4`}
                   >
                     {getOfferActionLabel(toggleOffer, offer.status)}
                   </button>
-                  {offer.status !== "cancelled" && (<button
-                    className="w-full rounded bg-red-600 hover:bg-red-500 text-white font-bold py-2 px-2 border-solid border-2 border-red-600 transition-all mt-4"
-                  >
-                    Cancel
-                  </button>)}
+                  {offer.status === "pending" && (
+                    <button
+                      className="w-full rounded bg-red-600 hover:bg-red-500 text-white font-bold py-2 px-2 border-solid border-2 border-red-600 transition-all mt-4"
+                      onClick={() => handleCancel(offer.id)}
+                    >
+                      Cancel
+                    </button>
+                  )}
                 </div>
-                
-                
               </div>
             ))
           ) : (
