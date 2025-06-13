@@ -20,7 +20,7 @@ export default async function cancelOffer(
       message: input.message,
     };
 
-    const response = await fetch(`${API_BASE}/offer/exchange_confirmed`, {
+    const response = await fetch(`${API_BASE}/offer/cancel`, {
       method: "POST",
       credentials: "include",
       headers: {
