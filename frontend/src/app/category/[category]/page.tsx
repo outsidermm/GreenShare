@@ -63,7 +63,7 @@ export default function Home() {
           {items.length > 0 ? (
             items.map((item) => (
               <Link key={item.id} href={`/view_product/${item.id}`}>
-                <div className="bg-white rounded shadow p-4 cursor-pointer hover:shadow-lg transition">
+                <div className="bg-white rounded shadow p-4 cursor-pointer hover:shadow-lg transition-all h-full">
                   <Image
                     src={item.images[0]}
                     alt={item.title}
