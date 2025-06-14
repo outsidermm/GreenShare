@@ -1,9 +1,10 @@
 import { StandardBackendResponse } from "@/types/standardBackendResponse";
 
-
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
-export default async function deleteItem(item_id:number): Promise<StandardBackendResponse> {
+export default async function deleteItem(
+  item_id: number,
+): Promise<StandardBackendResponse> {
   try {
     const csrf_token = localStorage.getItem("csrfToken");
     if (!csrf_token) {
@@ -21,7 +22,7 @@ export default async function deleteItem(item_id:number): Promise<StandardBacken
         "Content-Type": "application/json",
         "X-CSRF-Token": csrf_token,
       },
-        body: JSON.stringify(data),
+      body: JSON.stringify(data),
     });
 
     if (!response.ok) {
