@@ -232,7 +232,7 @@ async def user_get_browse_items(
 async def user_modify_item(
     session_token: str,
     csrf_token: str,
-    item_id: int,
+    item_id: str,
     new_title: str = None,
     new_description: str = None,
     new_condition: str = None,
@@ -257,43 +257,32 @@ async def user_modify_item(
     Returns:
         Item: The modified item object.
     """
+    user_id = admin_retrieve_user_id(session_token, csrf_token)
+    item_id = validate_item_id(item_id)
+    if items[item_id].get_user_id() != user_id:
+        abort(403, "You do not have permission to modify this item.")
 
-    if session_token and csrf_token:
-        user_id = admin_retrieve_user_id(session_token, csrf_token)
-        if items[item_id].get_user_id() != user_id:
-            abort(403, "You do not have permission to modify this item.")
-
-    if new_title is not None:
-        if len(new_title) > 100 or len(new_title) < 3:
-            abort(400, "Title must be between 3 and 100 characters.")
+    if new_title:
+        new_title = validate_string_length(new_title, "Title", 3, 100)
         items[item_id].set_title(sanitize_input(new_title.lower()))
 
-    if new_description is not None:
-        if len(new_description) > 1000 or len(new_description) < 10:
-            abort(400, "Description must be between 10 and 1000 characters.")
+    if new_description:
+        new_description=validate_string_length(
+            new_description, "Description", 10, 1000)
         items[item_id].set_description(sanitize_input(new_description.lower()))
 
-    if new_condition is not None:
-        if new_condition not in [
-            "new",
-            "like-new",
-            "used-good",
-            "used-fair",
-            "poor",
-        ]:
-            abort
-            400, "Condition must be one of: New, Like New, Good, Fair, Poor."
+    if new_condition:
+        new_condition = validate_condition(new_condition)  # This will raise an error if invalid
         items[item_id].set_condition(sanitize_input(new_condition.lower()))
 
-    if new_location is not None:
+    if new_location:
         items[item_id].set_location(sanitize_input(new_location.lower()))
 
-    if new_type is not None:
-        if new_type not in ["free", "exchange"]:
-            abort(400, "Type must be either 'Free' or 'Exchange'.")
+    if new_type:
+        new_type = validate_type(new_type)  # This will raise an error if invalid
         items[item_id].set_type(sanitize_input(new_type.lower()))
 
-    if new_images is not None:
+    if new_images:
         if not isinstance(new_images, list):
             abort(400, "Images must be a list of URLs.")
         if len(new_images) > 10:
