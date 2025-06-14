@@ -296,15 +296,34 @@ async def edit_item():
     Expects item data in JSON format and returns a success message.
     """
     try:
-        data = request.json
-        session_token = sanitize_input(request.cookies.get("session_token"))
-        csrf_token = sanitize_input(request.headers.get("X-CSRF-TOKEN"))
+        data = request.form
+        
+        session_token = request.cookies.get("session_token")
+        csrf_token = request.headers.get("X-CSRF-TOKEN")
+    
+        # Get raw input data - sanitization happens in user_create_item    
         item_id = data["id"]
         title = data["title"]
         description = data["description"]
         condition = data["condition"]
         location = data["location"]
         type = data["type"]
+        images_file = request.files.getlist("images")
+        headers = {"Authorization": f"Client-ID {IMGUR_CLIENT_ID}"}
+
+        # Upload each image to Imgur and collect URLs
+        image_urls = []
+        for file in images_file:
+            upload_response = requests.post(
+                "https://api.imgur.com/3/image",
+                headers=headers,
+                files={"image": file.read()},
+            )
+            if upload_response.status_code == 200:
+                image_urls.append(upload_response.json()["data"]["link"])
+                print(f"Image uploaded successfully: {image_urls[-1]}")
+            else:
+                return jsonify({"error": "Failed to upload image to Imgur"}), 500
 
         await user_modify_item(
             item_id=item_id,
@@ -315,7 +334,9 @@ async def edit_item():
             new_type=type,
             session_token=session_token,
             csrf_token=csrf_token,
+            new_images=image_urls,
         )
+        
         return jsonify({"message": "Item has been successfully edited."}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 400
