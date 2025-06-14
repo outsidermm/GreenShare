@@ -3,7 +3,7 @@ import { StandardBackendResponse } from "@/types/standardBackendResponse";
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
 interface editItemInput {
-  id:number;
+  id: number;
   title?: string;
   description?: string;
   condition?: string;
