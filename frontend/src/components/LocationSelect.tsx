@@ -8,9 +8,12 @@ import { Option } from "@/types/option";
 interface LocationSelectProps {
   value: Option | null;
   onChange: (value: Option | null) => void;
+  placeholder?: string;
+  required?: boolean;
 }
 
-const LocationSelect = ({ value, onChange }: LocationSelectProps) => {
+export default function LocationSelect(input: LocationSelectProps) {
+  const { value, onChange, placeholder, required } = input;
   const [inputValue, setInputValue] = useState("");
   const [options, setOptions] = useState<Option[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -52,7 +55,7 @@ const LocationSelect = ({ value, onChange }: LocationSelectProps) => {
       setSelectedOption={onChange}
       options={options}
       label_text="Location"
-      placeholder="Search for a location..."
+      placeholder={placeholder || "Search for a location..."}
       isClearable
       isSearchable
       noOptionsMessage={() =>
@@ -63,8 +66,7 @@ const LocationSelect = ({ value, onChange }: LocationSelectProps) => {
       loadingMessage={() => "Searching locations..."}
       onInputChange={setInputValue}
       isLoading={isLoading}
+      required={required || true}
     />
   );
-};
-
-export default LocationSelect;
+}
