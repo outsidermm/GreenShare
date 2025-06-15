@@ -130,8 +130,6 @@ async def user_view_item(session_token: str, csrf_token: str) -> list[Item]:
         dict[int, Item]: Dictionary of all item data in dictionary format.
     """
     user_id = admin_retrieve_user_id(session_token, csrf_token)
-    if user_id is None:
-        abort(403, "You must be logged in to view items.")
 
     owned_items: list[Item] = []
     for item in items.values():

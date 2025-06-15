@@ -37,5 +37,5 @@ def admin_retrieve_user_id(session_token: str, csrf_token: str) -> int:
             return user_obj.get_user_pk()
     # Return None if no valid tokens are found
     abort (
-        401, "Invalid session or CSRF token. Please log in again."
+        403, "Invalid credentials. Please log in again."
     )  # Raise an error if no valid user is found
