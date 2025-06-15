@@ -16,7 +16,12 @@ import { extractErrorMessage } from "@/utils/extractErrorMsg";
 import { Item } from "@/types/item";
 import { toTitleCase } from "@/utils/titleCase";
 
-export default function ProductForm(item?: Item) {
+interface ProductFormProps {
+  item?: Item; // Optional item prop for editing
+}
+
+export default function ProductForm(input: ProductFormProps) {
+  const { item } = input;
   const { isAuthenticated, refreshAuth } = useAuth();
   const router = useRouter();
 

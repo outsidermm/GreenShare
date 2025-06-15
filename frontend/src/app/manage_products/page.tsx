@@ -146,7 +146,7 @@ export default function AddOfferPage() {
             <p className="text-slate-800">You do not own any items.</p>
           )}
         </div>
-        {isEditOpen && selectedItem && (
+        {isEditOpen && (
           <div className="fixed top-16 left-60 w-full h-full z-50 flex items-center justify-center backdrop-blur-sm bg-black bg-opacity-40 transition-all">
             <div className="bg-white p-12 rounded-xl shadow-xl w-full max-w-3xl relative">
               <button
@@ -156,11 +156,22 @@ export default function AddOfferPage() {
                 &times;
               </button>
               <ProductForm
-                {...selectedItem}
+                {...(selectedItem ? { item: selectedItem } : {})}
               />
             </div>
           </div>
         )}
+        <div className = "fixed bottom-4 right-4 z-50">
+          <button
+            onClick={() => {
+              setSelectedItem(undefined);
+              setIsEditOpen(true);
+            }}
+            className="bg-green-600 text-slate-800 px-4 py-2 rounded-full hover:bg-green-500 flex items-center gap-2 transition-all border-2 border-green-600 font-bold shadow-xl"
+          >
+            Add New Item
+          </button>
+        </div>
       </div>
     </div>
   );
