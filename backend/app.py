@@ -18,7 +18,7 @@ from backend.items import (
     user_modify_item,
     user_view_item,
 )
-from backend.data import users, items, exchange_offers
+from backend.data import image_upload, users, items, exchange_offers
 import os, requests
 from backend.utils import sanitize_input
 
@@ -32,7 +32,6 @@ from backend.offers import (
 )
 
 PLACES_API_KEY = os.getenv("PLACES_API_KEY")
-IMGUR_CLIENT_ID = os.getenv("IMGUR_CLIENT_ID")
 
 
 @app.route("/")
@@ -207,21 +206,12 @@ async def create_item():
         if not all([title, description, condition, location, type]):
             return jsonify({"error": "All fields are required"}), 400
 
-        headers = {"Authorization": f"Client-ID {IMGUR_CLIENT_ID}"}
 
         # Upload each image to Imgur and collect URLs
         image_urls = []
-        for file in images_file:
-            upload_response = requests.post(
-                "https://api.imgur.com/3/image",
-                headers=headers,
-                files={"image": file.read()},
-            )
-            if upload_response.status_code == 200:
-                image_urls.append(upload_response.json()["data"]["link"])
-                print(f"Image uploaded successfully: {image_urls[-1]}")
-            else:
-                return jsonify({"error": "Failed to upload image to Imgur"}), 500
+        for image in images_file:
+            image_url = await image_upload(image)
+            image_urls.append(image_url)
 
         # Create a new item using the provided data
         await user_create_item(
@@ -312,22 +302,13 @@ async def edit_item():
         location = data["location"]
         type = data["type"]
         images_file = request.files.getlist("images")
-        headers = {"Authorization": f"Client-ID {IMGUR_CLIENT_ID}"}
 
         # Upload each image to Imgur and collect URLs
         image_urls = []
-        for file in images_file:
-            upload_response = requests.post(
-                "https://api.imgur.com/3/image",
-                headers=headers,
-                files={"image": file.read()},
-            )
-            if upload_response.status_code == 200:
-                image_urls.append(upload_response.json()["data"]["link"])
-                print(f"Image uploaded successfully: {image_urls[-1]}")
-            else:
-                return jsonify({"error": "Failed to upload image to Imgur"}), 500
-
+        for image in images_file:
+            image_url = await image_upload(image)
+            image_urls.append(image_url)
+            
         await user_modify_item(
             item_id=item_id,
             new_title=title,
