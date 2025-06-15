@@ -1,9 +1,5 @@
 "use client";
 
-import { FaRegHeart } from "react-icons/fa";
-import { IoMdNotificationsOutline } from "react-icons/io";
-import { MdOutlineShoppingCart } from "react-icons/md";
-
 interface HeaderBarProps {
   isAuthenticated: boolean;
   handleLogin: () => void;
@@ -23,16 +19,7 @@ export default function HeaderBar(HeaderBarProps: HeaderBarProps) {
         />
       </div>
 
-      <div className="flex items-center gap-2 sm:gap-6">
-        <button>
-          <FaRegHeart />
-        </button>
-        <button>
-          <MdOutlineShoppingCart />
-        </button>
-        <button>
-          <IoMdNotificationsOutline />
-        </button>
+      <div className="flex items-center gap-2 sm:gap-6 pr-4">
         {isAuthenticated ? (
           <button className="text-sm">Profile</button>
         ) : (
