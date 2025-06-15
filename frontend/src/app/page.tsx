@@ -57,14 +57,24 @@ export default function Home() {
       </div>
 
       <div className="ml-60 p-6">
-        <div className="bg-blue-400 text-white rounded-lg p-6 mb-8">
-          <h2 className="text-2xl font-bold">Free Delivery!</h2>
-          <p className="text-sm">
-            Today only - next-day delivery on all orders.
+        <div className="bg-green-600 text-white rounded-lg p-6 mb-8">
+          <h2 className="text-2xl font-bold">Welcome to GreenShare 🌱</h2>
+          <p>
+            Where communities thrive by giving goods a second life. Join us in reducing waste, sharing with purpose, and building a more sustainable tomorrow.
           </p>
-          <button className="mt-4 bg-white text-blue-500 px-4 py-2 rounded">
-            Browse products
-          </button>
+          {isAuthenticated?(
+            <Link href="/manage_products">
+              <button className="mt-4 bg-white hover:bg-slate-200 text-green-700 font-semibold px-4 py-2 rounded transition-all">
+                Add a New Item
+              </button>
+            </Link>
+          ) : (
+            <Link href="/login">
+              <button className="mt-4 bg-white hover:bg-slate-200 text-green-700 font-semibold px-4 py-2 rounded transition-all">
+                Login to Add a New Item
+              </button>
+            </Link>
+          )}
         </div>
 
         <h3 className="text-xl text-slate-800 font-semibold mb-4">

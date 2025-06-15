@@ -23,18 +23,31 @@ export default function AddOfferPage() {
   const [incomingOffers, setIncomingOffers] = useState<Offer[]>([]);
   const [outgoingOffers, setOutgoingOffers] = useState<Offer[]>([]);
   useEffect(() => {
-    const fetchItems = async () => {
+    (async () => {
       try {
         const requested_user_offer_response = await getUserOffers();
         setIncomingOffers(requested_user_offer_response.incomingOffers);
         setOutgoingOffers(requested_user_offer_response.outgoingOffers);
       } catch (error) {
-        console.error("Error fetching requested item:", error);
+        console.error("Error fetching requested offers:", error);
+        if (error instanceof Error) {
+          if (!isAuthenticated) {
+            swal("Please log in to manage your items.", {
+              icon: "warning",
+              buttons: ["Cancel", "Login"],
+            }).then((willLogin) => {
+              if (willLogin === "Login") {
+                router.push("/login");
+              }
+            });
+            return;
+          }
+          swal("Error", extractErrorMessage(error.message), "error");
+        }
       }
-    };
+    })();
 
-    fetchItems();
-  }, [pathname]);
+  }, [pathname, isAuthenticated,router]);
 
   const handleLogin = async () => {
     router.push("/login");

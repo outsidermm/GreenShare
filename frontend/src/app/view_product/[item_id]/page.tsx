@@ -79,8 +79,8 @@ export default function Home() {
         />
       </div>
 
-      <div className="ml-60 p-6">
-        <div className="p-2 mb-40">
+      <div className="ml-60 p-6 h-[calc(100vh-4rem)]">
+        <div className="p-2 mb-4">
           <div
             onClick={() => router.back()}
             className="cursor-pointer w-fit p-1 hover:bg-slate-300 rounded"
@@ -102,14 +102,13 @@ export default function Home() {
                 item.images.map((image, index) => (
                   <div
                     key={index}
-                    className="flex justify-center items-center w-full h-full bg-white overflow-hidden rounded"
+                    className="relative w-full aspect-[4/3] bg-white overflow-hidden rounded"
                   >
                     <Image
                       src={image}
                       alt={item.title}
-                      width={500}
-                      height={500}
-                      className="object-contain mx-auto h-auto w-auto"
+                      fill
+                      className="object-contain"
                     />
                   </div>
                 ))}

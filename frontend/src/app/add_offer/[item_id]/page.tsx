@@ -46,11 +46,25 @@ export default function AddOfferPage() {
         setOfferableItems(offerable_items_response);
       } catch (error) {
         console.error("Error fetching user offerable item:", error);
+        if (error instanceof Error) {
+          if (!isAuthenticated) {
+            swal("Please log in to make an offer.", {
+              icon: "warning",
+              buttons: ["Cancel", "Login"],
+            }).then((willLogin) => {
+              if (willLogin === "Login") {
+                router.push("/login");
+              }
+            });
+            return;
+          }
+          swal("Error", extractErrorMessage(error.message), "error");
+        }
       }
     };
 
     fetchItems();
-  }, [pathname, requested_item_id]);
+  }, [pathname, requested_item_id, isAuthenticated, router]);
 
   const handleLogin = async () => {
     router.push("/login");
