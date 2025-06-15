@@ -1,5 +1,7 @@
 from backend.data import admin_retrieve_user_id, items
-import re
+from backend.models import ItemDB
+from sqlalchemy import select, func, desc
+from backend.config import db
 from backend.classes.item import Item
 from difflib import SequenceMatcher
 from flask import abort
@@ -311,3 +313,33 @@ async def user_delete_item(
             abort(403, "You do not have permission to delete this item.")
 
     del items[item_id]  # Remove the item from the dictionary
+
+
+async def search_item_similarity_pg(
+    search_query: str,
+    threshold: float = 0.2,
+    limit: int = 6
+) -> list[str]:
+    """
+    Search items using PostgreSQL trigram similarity.
+
+    Args:
+        search_query (str): The query string to match.
+        threshold (float): Minimum similarity threshold.
+        limit (int): Maximum number of results.
+
+    Returns:
+        list[str]: Sorted list of item titles with similarity above the threshold.
+    """
+    if not search_query or len(search_query) < 3:
+        return []
+
+    stmt = (
+        select(ItemDB.title, func.similarity(ItemDB.title, search_query).label("sim_score"))
+        .where(func.similarity(ItemDB.title, search_query) > threshold)
+        .order_by(desc("sim_score"))
+        .limit(limit)
+    )
+
+    result = db.session.execute(stmt)
+    return [row.title for row in result]

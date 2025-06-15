@@ -33,6 +33,16 @@ class ItemDB(db.Model):
     updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
     type = db.Column(db.String(100), nullable=False)
 
+    __table_args__ = (
+        db.Index("idx_item_title_trgm", "title", postgresql_using="gin", postgresql_ops={"title": "gin_trgm_ops"}),
+        db.Index("idx_item_location", "location"),
+        db.Index("idx_item_condition", "condition"),
+        db.Index("idx_item_category", "category"),
+        db.Index("idx_item_type", "type"),
+        db.Index("idx_item_status", "status"),
+        db.Index("idx_item_user_id", "user_id"),
+    )
+
     def to_json(self) -> dict:
         return {
             "id": self.id,
@@ -69,6 +79,12 @@ class ExchangeOfferDB(db.Model):
     )  # pending, accepted, cancelled, completed, confirmed
 
     created_at = db.Column(db.DateTime, default=datetime.now)
+
+    __table_args__ = (
+        db.Index("idx_offer_by_user", "offered_by_id"),
+        db.Index("idx_offer_requested_item", "requested_item_id"),
+        db.Index("idx_offer_status", "status"),
+    )
 
     def to_json(self) -> dict:
         requested_item = ItemDB.query.get(self.requested_item_id)

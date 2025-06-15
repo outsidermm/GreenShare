@@ -11,6 +11,7 @@ from backend.classes.user import User
 from backend.classes.item import Item
 from backend.classes.exchange_offer import ExchangeOffer
 from backend.items import (
+    search_item_similarity_pg,
     user_create_item,
     user_delete_item,
     user_get_browse_items,
@@ -568,6 +569,20 @@ async def address_autocomplete():
     response = requests.get(google_url, params=params)
     return jsonify(response.json())
 
+@app.route("/api/item_search", methods=["POST"])
+async def search_items():
+    """
+    Searches for items based on the provided search term.
+
+    Expects search term in JSON format and returns a list of matching items.
+    """
+    data = request.json
+    search = sanitize_input(data["input"])
+    try:
+        recommendation_list = await search_item_similarity_pg(search)
+        return jsonify(recommendation_list), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 # Entry point to run the Flask app
 if __name__ == "__main__":
