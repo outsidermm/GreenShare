@@ -267,12 +267,15 @@ async def user_modify_item(
         items[item_id].set_title(sanitize_input(new_title.lower()))
 
     if new_description:
-        new_description=validate_string_length(
-            new_description, "Description", 10, 1000)
+        new_description = validate_string_length(
+            new_description, "Description", 10, 1000
+        )
         items[item_id].set_description(sanitize_input(new_description.lower()))
 
     if new_condition:
-        new_condition = validate_condition(new_condition)  # This will raise an error if invalid
+        new_condition = validate_condition(
+            new_condition
+        )  # This will raise an error if invalid
         items[item_id].set_condition(sanitize_input(new_condition.lower()))
 
     if new_location:
@@ -316,9 +319,7 @@ async def user_delete_item(
 
 
 async def search_item_similarity_pg(
-    search_query: str,
-    threshold: float = 0.2,
-    limit: int = 6
+    search_query: str, threshold: float = 0.2, limit: int = 6
 ) -> list[str]:
     """
     Search items using PostgreSQL trigram similarity.
@@ -335,7 +336,9 @@ async def search_item_similarity_pg(
         return []
 
     stmt = (
-        select(ItemDB.title, func.similarity(ItemDB.title, search_query).label("sim_score"))
+        select(
+            ItemDB.title, func.similarity(ItemDB.title, search_query).label("sim_score")
+        )
         .where(func.similarity(ItemDB.title, search_query) > threshold)
         .order_by(desc("sim_score"))
         .limit(limit)

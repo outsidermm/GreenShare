@@ -34,7 +34,12 @@ class ItemDB(db.Model):
     type = db.Column(db.String(100), nullable=False)
 
     __table_args__ = (
-        db.Index("idx_item_title_trgm", "title", postgresql_using="gin", postgresql_ops={"title": "gin_trgm_ops"}),
+        db.Index(
+            "idx_item_title_trgm",
+            "title",
+            postgresql_using="gin",
+            postgresql_ops={"title": "gin_trgm_ops"},
+        ),
         db.Index("idx_item_location", "location"),
         db.Index("idx_item_condition", "condition"),
         db.Index("idx_item_category", "category"),
