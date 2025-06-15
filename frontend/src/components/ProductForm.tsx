@@ -168,23 +168,22 @@ export default function ProductForm(item?: Item) {
         handleSubmit();
       }}
     >
-      <div className="flex justify-between p-2 pb-6">
-        <div className="flex items-center gap-2">
-          <AiOutlineShop color="black" />
-          <h2 className="text-slate-800 text-lg font-bold">
-            {item ? "Edit Product" : "Add New Product"}
-          </h2>
+      <div className="p-4">
+        <div className="flex justify-between">
+          <div className="flex items-center gap-2">
+            <AiOutlineShop color="black" />
+            <h2 className="text-slate-800 text-lg font-bold">
+              {item ? "Edit Product" : "Add New Product"}
+            </h2>
+          </div>
+          <button
+            type="submit"
+            className="bg-green-600 text-slate-800 px-4 py-2 rounded-full hover:bg-green-500 flex items-center gap-2 transition-all border-2 border-green-600 font-bold"
+          >
+            <IoMdCheckmark />
+            <p>{item ? "Update Product" : "Add Product"}</p>
+          </button>
         </div>
-        <button
-          type="submit"
-          className="bg-green-600 text-slate-800 px-4 py-2 rounded-full hover:bg-green-500 flex items-center gap-2 transition-all border-2 border-green-600 font-bold"
-        >
-          <IoMdCheckmark />
-          <p>{item ? "Update Product" : "Add Product"}</p>
-        </button>
-      </div>
-      <div className="bg-white shadow-slate-200 shadow-sm rounded-2xl p-4 mx-4">
-        <h2 className="text-slate-800 font-extrabold"> General Information </h2>
         <div className="pt-6">
           <label className="block mb-2 text-slate-800">
             Name Product (3-100 characters)
