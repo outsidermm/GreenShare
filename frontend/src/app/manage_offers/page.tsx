@@ -42,6 +42,7 @@ export default function AddOfferPage() {
             });
             return;
           }
+          swal("Error", extractErrorMessage(error.message), "error");
         }
       }
     })();
