@@ -62,7 +62,7 @@ export default function AddOfferPage() {
   };
 
   return (
-    <div className="bg-slate-100 w-screen min-h-screen pt-16">
+    <div className="bg-slate-100 w-screen h-screen pt-16">
       <div className="fixed top-0 left-0 w-full bg-slate-900 shadow z-50 px-6 py-4 flex items-center justify-between gap-4 sm:gap-10">
         <HeaderBar
           isAuthenticated={isAuthenticated}
@@ -78,7 +78,7 @@ export default function AddOfferPage() {
         />
       </div>
 
-      <div className="ml-60 p-6">
+      <div className="ml-60 p-6 relative h-[calc(100vh-4rem)] overflow-hidden">
         <h1 className="text-2xl font-bold mb-4 text-slate-800 px-4">
           View Your Items
         </h1>
@@ -146,23 +146,22 @@ export default function AddOfferPage() {
             <p className="text-slate-800">You do not own any items.</p>
           )}
         </div>
-      </div>
-
-      {isEditOpen && selectedItem && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-black bg-opacity-40">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-3xl relative">
-            <button
-              onClick={() => setIsEditOpen(false)}
-              className="absolute top-2 right-2 text-gray-600 hover:text-black text-xl font-bold"
-            >
-              &times;
-            </button>
-            <ProductForm
-              {...selectedItem}
-            />
+        {isEditOpen && selectedItem && (
+          <div className="fixed top-16 left-60 w-full h-full z-50 flex items-center justify-center backdrop-blur-sm bg-black bg-opacity-40 transition-all">
+            <div className="bg-white p-12 rounded-xl shadow-xl w-full max-w-3xl relative">
+              <button
+                onClick={() => setIsEditOpen(false)}
+                className="absolute top-4 right-4 text-slate-700 hover:text-slate-800 text-4xl font-bold"
+              >
+                &times;
+              </button>
+              <ProductForm
+                {...selectedItem}
+              />
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }
