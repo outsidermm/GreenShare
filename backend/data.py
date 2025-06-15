@@ -1,3 +1,5 @@
+from flask import abort
+
 from backend.classes.user import User
 from backend.classes.item import Item
 from backend.classes.exchange_offer import ExchangeOffer
@@ -34,4 +36,6 @@ def admin_retrieve_user_id(session_token: str, csrf_token: str) -> int:
             # Return the user's full name if tokens match
             return user_obj.get_user_pk()
     # Return None if no valid tokens are found
-    return None
+    abort (
+        401, "Invalid session or CSRF token. Please log in again."
+    )  # Raise an error if no valid user is found
