@@ -22,17 +22,29 @@ export default function AddOfferPage() {
   const [selectedItem, setSelectedItem] = useState<Item>();
 
   useEffect(() => {
-    const fetchItems = async () => {
+    (async () => {
       try {
         const requested_user_items_response = await getUserItems();
         setOwnedItems(requested_user_items_response);
       } catch (error) {
         console.error("Error fetching requested item:", error);
+        if (error instanceof Error) {
+          if (!isAuthenticated) {
+            swal("Please log in to manage your items.", {
+              icon: "warning",
+              buttons: ["Cancel", "Login"],
+            }).then((willLogin) => {
+              if (willLogin === "Login") {
+                router.push("/login");
+              }
+            });
+            return;
+          }
+          swal("Error", extractErrorMessage(error.message), "error");
+        }
       }
-    };
-
-    fetchItems();
-  }, [pathname]);
+    })();
+  }, [pathname,isAuthenticated, router]);
 
   const handleLogin = async () => {
     router.push("/login");
