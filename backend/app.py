@@ -176,6 +176,8 @@ async def validate_token():
             session_token
         ) and await user_auth_validate_csrf_token(csrf_token):
             return jsonify({"message": "Token is valid and user is in session"}), 200
+        else:
+            return jsonify({"message": "user is not in session"}), 200
     except Exception as e:
         # Return error response if tokens are invalid
         return jsonify({"error": str(e)}), 401
