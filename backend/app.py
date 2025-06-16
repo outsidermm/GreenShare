@@ -561,7 +561,7 @@ async def search_items():
     search = sanitize_input(data["input"])
     try:
         recommendation_list = await search_item_similarity_pg(search)
-        return jsonify(recommendation_list), 200
+        return jsonify({"predictions": recommendation_list}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 

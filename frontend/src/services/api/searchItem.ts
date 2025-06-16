@@ -27,7 +27,7 @@ export default async function autocompleteAddress(
     }
 
     const data: searchItemResponse = await response.json();
-    console.log("Item search response:", data);
+    console.log("Item search response:", data.predictions);
     return data;
   } catch (error) {
     console.error("Error fetching item search suggestions:", error);
