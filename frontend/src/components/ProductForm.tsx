@@ -51,7 +51,8 @@ export default function ProductForm(input: ProductFormProps) {
       );
       setSelectedType(
         item.type
-          ? typeOptions.find((opt) => opt.value === toTitleCase(item.type)) || null
+          ? typeOptions.find((opt) => opt.value === toTitleCase(item.type)) ||
+              null
           : null,
       );
       setImageURLs(Array.isArray(item.images) ? item.images : []);

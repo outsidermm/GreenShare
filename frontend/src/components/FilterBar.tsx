@@ -10,7 +10,12 @@ interface FilterBarProps {
 }
 
 export default function HeaderBar(FilterBarProps: FilterBarProps) {
-  const { conditionFilter, typeFilter, handleConditionFilter, handleTypeFilter} = FilterBarProps;
+  const {
+    conditionFilter,
+    typeFilter,
+    handleConditionFilter,
+    handleTypeFilter,
+  } = FilterBarProps;
 
   const conditionOptions: Array<Option> = [
     { value: "new", label: "New" },

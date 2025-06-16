@@ -31,7 +31,7 @@ export default function Home() {
   useEffect(() => {
     const fetchItems = async () => {
       try {
-        const filters: getItemsInput = {}
+        const filters: getItemsInput = {};
         if (titleFilter) {
           filters.title = titleFilter;
         }
@@ -42,7 +42,7 @@ export default function Home() {
           filters.type = typeFilter.value;
         }
         const category_filter = pathname.replace("/category/", "");
-        filters.category = category_filter
+        filters.category = category_filter;
         const response = await getItems({ category: category_filter });
         setItems(response);
       } catch (error) {
@@ -82,7 +82,7 @@ export default function Home() {
       </div>
 
       <div className="ml-60 p-6">
-        <FilterBar 
+        <FilterBar
           conditionFilter={conditionFilter}
           typeFilter={typeFilter}
           handleConditionFilter={setConditionFilter}

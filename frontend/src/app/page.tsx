@@ -31,7 +31,7 @@ export default function Home() {
   useEffect(() => {
     const fetchItems = async () => {
       try {
-        const filters: getItemsInput = {}
+        const filters: getItemsInput = {};
         if (titleFilter) {
           filters.title = titleFilter;
         }
@@ -83,9 +83,11 @@ export default function Home() {
         <div className="bg-green-600 text-white rounded-lg p-6 mb-8">
           <h2 className="text-2xl font-bold">Welcome to GreenShare 🌱</h2>
           <p>
-            Where communities thrive by giving goods a second life. Join us in reducing waste, sharing with purpose, and building a more sustainable tomorrow.
+            Where communities thrive by giving goods a second life. Join us in
+            reducing waste, sharing with purpose, and building a more
+            sustainable tomorrow.
           </p>
-          {isAuthenticated?(
+          {isAuthenticated ? (
             <Link href="/manage_products">
               <button className="mt-4 bg-white hover:bg-slate-200 text-green-700 font-semibold px-4 py-2 rounded transition-all">
                 Add a New Item
@@ -100,8 +102,7 @@ export default function Home() {
           )}
         </div>
 
-
-        <FilterBar 
+        <FilterBar
           conditionFilter={conditionFilter}
           typeFilter={typeFilter}
           handleConditionFilter={setConditionFilter}

@@ -46,8 +46,7 @@ export default function AddOfferPage() {
         }
       }
     })();
-
-  }, [pathname, isAuthenticated,router]);
+  }, [pathname, isAuthenticated, router]);
 
   const handleLogin = async () => {
     router.push("/login");
