@@ -1,4 +1,4 @@
-from backend.data import admin_retrieve_user_id, items
+from backend.data import admin_retrieve_user_id, item_categorisation, items
 from backend.models import ItemDB
 from sqlalchemy import select, func, desc
 from backend.config import db
@@ -45,10 +45,7 @@ def validate_category(category: str) -> str:
     ]
     category = category.lower()
     if category not in valid_categories:
-        abort(
-            400,
-            "Category must be one of: essentials, living, tools-tech, style-expression, leisure-learning.",
-        )
+        category = "essentials"  # Default category if invalid
     return sanitize_input(category)
 
 
@@ -96,9 +93,12 @@ async def user_create_item(
         csrf_token (str): User's CSRF token.
     """
     new_user_id = admin_retrieve_user_id(session_token, csrf_token)
-    new_category = validate_category("essentials")
     safe_title = validate_string_length(new_title, "Title", 3, 100)
     safe_description = validate_string_length(new_description, "Description", 10, 1000)
+    new_category = await item_categorisation(
+        safe_title, safe_description
+    )  # Assuming this function is defined elsewhere
+    new_category = validate_category(new_category)
     safe_condition = validate_condition(new_condition)
     safe_location = sanitize_input(new_location.lower())
     safe_type = validate_type(new_type)
