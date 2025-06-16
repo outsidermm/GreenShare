@@ -236,11 +236,9 @@ async def get_browse_items():
     Retrieves items from the database with optional filters:
     - category: filter by category
     - condition: filter by condition
-    - location: filter by location
     - type: filter by type
     - title: filter by title
     - id: retrieve a single item by ID
-    - user_id: filter by user ID
 
     Returns:
         Single item (if id provided) or list of filtered items.
@@ -253,7 +251,7 @@ async def get_browse_items():
 
     try:
         filtered_items = await user_get_browse_items(
-            category, condition, location, type, title, item_id
+            category, condition, type, title, item_id
         )
         return jsonify([item.to_dict() for item in filtered_items.values()]), 200
     except Exception as e:

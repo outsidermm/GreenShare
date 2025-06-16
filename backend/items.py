@@ -63,7 +63,7 @@ def validate_string_length(
     return sanitize_input(value.lower())
 
 
-def title_matches(user_input: str, item_title: str, threshold: float = 0.7) -> bool:
+def title_matches(user_input: str, item_title: str, threshold: float = 0.4) -> bool:
     user_input = user_input.lower()
     item_title = item_title.lower()
     return (
@@ -154,11 +154,9 @@ async def user_get_browse_items(
     Args:
         category_filter (str): Filter items by category.
         condition_filter (str): Filter items by condition.
-        location_filter (str): Filter items by location.
         type_filter (str): Filter items by type.
         title_filter (str): Filter items by title.
         item_id (str): Retrieve a single item by ID.
-        user_id (str): Filter items by user ID.
 
     Returns:
         dict[dict]: Dictionary of all item data in dictionary format.
@@ -180,7 +178,7 @@ async def user_get_browse_items(
 
     if title_filter is not None:
         safe_title_filter = validate_string_length(title_filter, "Title filter", 3, 100)
-        for item_key, item in filtered_items.items():
+        for item_key, item in filtered_items_copy.items():
             if not title_matches(safe_title_filter, item.get_title()):
                 del filtered_items[item_key]
 
@@ -203,10 +201,6 @@ async def user_get_browse_items(
         for item_key, item in filtered_items_copy.items():
             if item.get_condition() != safe_condition_filter:
                 del filtered_items[item_key]
-
-    filtered_items_copy = (
-        filtered_items.copy()
-    )  # Create a copy to avoid modifying the original
 
     filtered_items_copy = (
         filtered_items.copy()
