@@ -1,7 +1,8 @@
 from flask import abort
 import requests
 from werkzeug.datastructures import FileStorage
-
+from google import genai
+from google.genai import types
 from backend.classes.user import User
 from backend.classes.item import Item
 from backend.classes.exchange_offer import ExchangeOffer
@@ -18,6 +19,7 @@ exchange_offers: dict[int, ExchangeOffer] = (
     {}
 )  # Dictionary to store exchange offer objects by their unique identifier (e.g., offer ID)
 IMGUR_CLIENT_ID = os.getenv("IMGUR_CLIENT_ID")
+GENAI_API_KEY = os.getenv("GENAI_API_KEY")
 
 
 def admin_retrieve_user_id(session_token: str, csrf_token: str) -> int:
@@ -65,3 +67,23 @@ async def image_upload(image: FileStorage) -> str:
         return upload_response.json()["data"]["link"]
     else:
         abort(500, "Image upload failed. Please try again later.")
+
+async def item_categorisation(title: str, description: str) -> str:
+    """
+    Uses Gemini to classify an item into a predefined category.
+
+    Args:
+        title (str): Title of the item.
+        description (str): Description of the item.
+
+    Returns:
+        str: One of the predefined categories.
+    """
+    client = genai.Client(api_key=GENAI_API_KEY)
+    response = client.models.generate_content(
+        model="gemini-2.0-flash",
+        config= types.GenerateContentConfig(
+            system_instruction="You are a product category classifier. Only respond with one of the following categories: essentials, living, tools-tech, style-expression, leisure-learning."),
+        contents = (f"Classify the following item into one of the categories: essentials, living, tools-tech, style-expression, leisure-learning. Title: {title} Description: {description} Only respond with the category name.")
+    )
+    return response.text.strip().lower()
