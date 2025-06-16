@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import useDebounce from "@/hooks/useDebounce";
 import autocompleteAddress from "@/services/api/autocompleteAddress";
 import DropDown from "./DropDown";
 import { Option } from "@/types/option";
@@ -17,17 +18,18 @@ export default function LocationSelect(input: LocationSelectProps) {
   const [inputValue, setInputValue] = useState("");
   const [options, setOptions] = useState<Option[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const debouncedInputValue = useDebounce(inputValue, 200);
 
   useEffect(() => {
     const fetchOptions = async () => {
-      if (inputValue.length < 3) {
+      if (debouncedInputValue.length < 3) {
         setOptions([]);
         return;
       }
 
       setIsLoading(true);
       try {
-        const predictions = await autocompleteAddress(inputValue);
+        const predictions = await autocompleteAddress(debouncedInputValue);
         const newOptions =
           predictions?.map((prediction) => ({
             value: prediction.place_id,
@@ -42,12 +44,8 @@ export default function LocationSelect(input: LocationSelectProps) {
       }
     };
 
-    const timer = setTimeout(() => {
-      fetchOptions();
-    }, 150); // Debounce to avoid too many API calls
-
-    return () => clearTimeout(timer);
-  }, [inputValue]);
+    fetchOptions();
+  }, [debouncedInputValue]);
 
   return (
     <DropDown

@@ -2,6 +2,7 @@
 import searchItem from "@/services/api/searchItem";
 import { toTitleCase } from "@/utils/titleCase";
 import { useState, useEffect } from "react";
+import useDebounce from "@/hooks/useDebounce";
 import { ImCross } from "react-icons/im";
 import { useRouter } from "next/navigation";
 
@@ -15,17 +16,18 @@ export default function HeaderBar(HeaderBarProps: HeaderBarProps) {
   const { isAuthenticated, handleLogin, handleTitleFilter } = HeaderBarProps;
   const [searchTerm, setSearchTerm] = useState("");
   const [options, setOptions] = useState<string[]>([]);
+  const debouncedSearchTerm = useDebounce(searchTerm, 150);
   const router = useRouter();
 
   useEffect(() => {
     const fetchOptions = async () => {
-      if (searchTerm.length < 3) {
+      if (debouncedSearchTerm.length < 3) {
         setOptions([]);
         return;
       }
 
       try {
-        const predictions = await searchItem(searchTerm);
+        const predictions = await searchItem(debouncedSearchTerm);
         const newOptions = predictions.predictions;
         setOptions(newOptions);
       } catch (error) {
@@ -34,12 +36,8 @@ export default function HeaderBar(HeaderBarProps: HeaderBarProps) {
       }
     };
 
-    const timer = setTimeout(() => {
-      fetchOptions();
-    }, 150); // Debounce to avoid too many API calls
-
-    return () => clearTimeout(timer);
-  }, [searchTerm]);
+    fetchOptions();
+  }, [debouncedSearchTerm]);
 
   return (
     <>
