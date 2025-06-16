@@ -5,6 +5,7 @@ from flask import abort
 from backend.data import items, exchange_offers
 from backend.data import admin_retrieve_user_id
 from backend.classes.exchange_offer import ExchangeOffer
+from backend.utils import sanitize_input
 
 
 def validate_offer_id(offer_id: int) -> None:
@@ -45,7 +46,7 @@ async def user_create_offer(
     if items[requested_item_id].get_type() == "free" and offered_item_ids:
         abort(400, "This item is free, you cannot offer items in exchange.")
 
-    new_message = message.lower()
+    new_message = sanitize_input(message.lower())
     if len(new_message) > 2000 or len(new_message) < 10:
         abort(400, "Message must be between 10 and 1000 characters.")
 
@@ -181,7 +182,7 @@ async def user_cancel_offer(
     offer_id: int,
     message: str = "Offer cancelled by the user.",
 ) -> None:
-    message = message.lower()
+    message = sanitize_input(message.lower())
     new_user_id = admin_retrieve_user_id(session_token, csrf_token)
     validate_offer_id(offer_id)
 

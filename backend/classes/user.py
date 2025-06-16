@@ -4,7 +4,7 @@ import secrets
 from backend.models import UserDB
 from backend.config import db
 import os
-from backend.utils import sanitize_input
+from backend.utils import sanitize_input, unsanitize_output
 
 user_key = os.getenv("USER_FERNET_KEY")
 user_cipher_suite = Fernet(user_key)
@@ -243,13 +243,15 @@ class User:
         """
         Returns the user's first name.
         """
-        return db.session.get(UserDB, self.get_user_pk()).first_name
+        first_name = db.session.get(UserDB, self.get_user_pk()).first_name
+        return unsanitize_output(first_name)
 
     def get_last_name(self) -> str:
         """
         Returns the user's last name.
         """
-        return db.session.get(UserDB, self.get_user_pk()).last_name
+        last_name = db.session.get(UserDB, self.get_user_pk()).last_name
+        return unsanitize_output(last_name)
 
     def get_email(self) -> str:
         """

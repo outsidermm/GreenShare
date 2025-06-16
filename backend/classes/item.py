@@ -1,5 +1,6 @@
 from backend.models import ItemDB, ItemImageDB
 from backend.config import db
+from backend.utils import unsanitize_output
 
 
 class Item:
@@ -76,15 +77,16 @@ class Item:
         self.__item_pk = item_pk
 
     def get_title(self) -> str:
-        return db.session.get(ItemDB, self.get_item_pk()).title
-        return ItemDB.query.filter_by(id=self.get_item_pk()).first().title
+        title = db.session.get(ItemDB, self.get_item_pk()).title
+        return unsanitize_output(title)
 
     def set_title(self, new_title: str) -> None:
         db.session.get(ItemDB, self.get_item_pk()).title = new_title
         db.session.commit()
 
     def get_description(self) -> str:
-        return db.session.get(ItemDB, self.get_item_pk()).description
+        description = db.session.get(ItemDB, self.get_item_pk()).description
+        return unsanitize_output(description)
 
     def set_description(self, new_description: str) -> None:
         db.session.get(ItemDB, self.get_item_pk()).description = new_description
@@ -105,7 +107,8 @@ class Item:
         db.session.commit()
 
     def get_location(self) -> str:
-        return db.session.get(ItemDB, self.get_item_pk()).location
+        location = db.session.get(ItemDB, self.get_item_pk()).location
+        return unsanitize_output(location)
 
     def set_location(self, new_location: str) -> None:
         db.session.get(ItemDB, self.get_item_pk()).location = new_location
