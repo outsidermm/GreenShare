@@ -247,7 +247,6 @@ async def get_browse_items():
     """
     category = request.args.get("category")
     condition = request.args.get("condition")
-    location = request.args.get("location")
     type = request.args.get("type")
     title = request.args.get("title")
     item_id = request.args.get("id")

@@ -144,7 +144,6 @@ async def user_view_item(session_token: str, csrf_token: str) -> list[Item]:
 async def user_get_browse_items(
     category_filter: str = None,
     condition_filter: str = None,
-    location_filter: str = None,
     type_filter: str = None,
     title_filter: str = None,
     item_id: str = None,
@@ -208,13 +207,6 @@ async def user_get_browse_items(
     filtered_items_copy = (
         filtered_items.copy()
     )  # Create a copy to avoid modifying the original
-
-    if location_filter is not None:
-        safe_location_filter = sanitize_input(location_filter.lower())
-
-        for item_key, item in filtered_items_copy.items():
-            if item.get_location() != safe_location_filter:
-                del filtered_items[item_key]
 
     filtered_items_copy = (
         filtered_items.copy()
