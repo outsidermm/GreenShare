@@ -109,12 +109,12 @@ export default function HeaderBar(HeaderBarProps: HeaderBarProps) {
               className="flex-grow px-3 py-2 rounded-xl border border-white focus:border-green-500 outline-none placeholder-white bg-inherit text-sm"
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
-                swal("Redirecting to home page", {
-                  icon: "info",
-                  timer: 750,
-                });
-                setSearchTerm("");
-                router.push("/");
+                  swal("Redirecting to home page", {
+                    icon: "info",
+                    timer: 750,
+                  });
+                  setSearchTerm("");
+                  router.push("/");
                 }
               }}
               value={searchTerm}

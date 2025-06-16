@@ -15,6 +15,7 @@ import { Option } from "@/types/option";
 import { extractErrorMessage } from "@/utils/extractErrorMsg";
 import { Item } from "@/types/item";
 import { toTitleCase } from "@/utils/titleCase";
+import { conditionOptions, typeOptions } from "@/types/itemDropdownOptions";
 
 interface ProductFormProps {
   item?: Item; // Optional item prop for editing
@@ -58,19 +59,6 @@ export default function ProductForm(input: ProductFormProps) {
       setImageURLs(Array.isArray(item.images) ? item.images : []);
     }
   }, [item]);
-
-  const conditionOptions: Array<Option> = [
-    { value: "new", label: "New" },
-    { value: "like-new", label: "Like New" },
-    { value: "used-good", label: "Used - Good" },
-    { value: "used-fair", label: "Used - Fair" },
-    { value: "poor", label: "Poor" },
-  ];
-
-  const typeOptions: Array<Option> = [
-    { value: "Free", label: "Free to Claim" },
-    { value: "Exchange", label: "Exchange via Offer" },
-  ];
 
   const [selectedCondition, setSelectedCondition] = useState<Option | null>(
     null,

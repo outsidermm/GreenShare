@@ -1,7 +1,7 @@
 export interface ItemFilter {
-    category?: string;
-    condition?: string;
-    type?: string;
-    title?: string;
-    item_id?: number;
+  category?: string;
+  condition?: string;
+  type?: string;
+  title?: string;
+  item_id?: number;
 }

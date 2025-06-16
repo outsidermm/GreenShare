@@ -1,6 +1,7 @@
 "use client";
 import DropDown from "./DropDown";
 import { Option } from "@/types/option";
+import { conditionOptions, typeOptions } from "@/types/itemDropdownOptions";
 
 interface FilterBarProps {
   conditionFilter: Option | null;
@@ -16,19 +17,6 @@ export default function HeaderBar(FilterBarProps: FilterBarProps) {
     handleConditionFilter,
     handleTypeFilter,
   } = FilterBarProps;
-
-  const conditionOptions: Array<Option> = [
-    { value: "new", label: "New" },
-    { value: "like-new", label: "Like New" },
-    { value: "used-good", label: "Used - Good" },
-    { value: "used-fair", label: "Used - Fair" },
-    { value: "poor", label: "Poor" },
-  ];
-
-  const typeOptions: Array<Option> = [
-    { value: "Free", label: "Free to Claim" },
-    { value: "Exchange", label: "Exchange via Offer" },
-  ];
 
   return (
     <div className="flex flex-row items-center gap-10 py-8">

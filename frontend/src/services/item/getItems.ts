@@ -1,7 +1,6 @@
 import { Item } from "@/types/item";
 import { ItemFilter } from "@/types/itemFilter";
 
-
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
 export default async function getItems({
