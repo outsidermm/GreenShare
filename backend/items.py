@@ -311,7 +311,7 @@ async def user_delete_item(
 
 
 async def search_item_similarity_pg(
-    search_query: str, threshold: float = 0.2, limit: int = 6
+    search_query: str, threshold: float = 0.4, limit: int = 6
 ) -> list[str]:
     """
     Search items using PostgreSQL trigram similarity.
