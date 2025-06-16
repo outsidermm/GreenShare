@@ -10,16 +10,38 @@ import Link from "next/link";
 import Image from "next/image";
 import { Item } from "@/types/item";
 import { toTitleCase } from "@/utils/titleCase";
+import FilterBar from "@/components/FilterBar";
+import { Option } from "@/types/option";
 
 export default function Home() {
   const { isAuthenticated, refreshAuth } = useAuth();
   const router = useRouter();
   const [items, setItems] = useState<Array<Item>>([]);
+  const [titleFilter, setTitleFilter] = useState<string>("");
+  const [conditionFilter, setConditionFilter] = useState<Option | null>(null);
+  const [typeFilter, setTypeFilter] = useState<Option | null>(null);
 
+  interface getItemsInput {
+    category?: string;
+    condition?: string;
+    type?: string;
+    title?: string;
+    item_id?: number;
+  }
   useEffect(() => {
     const fetchItems = async () => {
       try {
-        const response = await getItems({});
+        const filters: getItemsInput = {}
+        if (titleFilter) {
+          filters.title = titleFilter;
+        }
+        if (conditionFilter) {
+          filters.condition = conditionFilter.value;
+        }
+        if (typeFilter) {
+          filters.type = typeFilter.value;
+        }
+        const response = await getItems(filters);
         setItems(response);
       } catch (error) {
         console.error("Error fetching items:", error);
@@ -27,7 +49,7 @@ export default function Home() {
     };
 
     fetchItems();
-  }, []);
+  }, [titleFilter, conditionFilter, typeFilter]);
 
   const handleLogin = async () => {
     router.push("/login");
@@ -45,6 +67,7 @@ export default function Home() {
         <HeaderBar
           isAuthenticated={isAuthenticated}
           handleLogin={handleLogin}
+          handleTitleFilter={setTitleFilter}
         />
       </div>
 
@@ -76,6 +99,14 @@ export default function Home() {
             </Link>
           )}
         </div>
+
+
+        <FilterBar 
+          conditionFilter={conditionFilter}
+          typeFilter={typeFilter}
+          handleConditionFilter={setConditionFilter}
+          handleTypeFilter={setTypeFilter}
+        />
 
         <h3 className="text-xl text-slate-800 font-semibold mb-4">
           Hot Deals 🔥
