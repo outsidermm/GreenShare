@@ -15,6 +15,7 @@ Classes:
 from typing import Dict
 from backend.models import ItemDB, ItemImageDB
 from backend.config import db
+from backend.utils import unsanitize_output
 
 
 class Item:
@@ -106,7 +107,8 @@ class Item:
         """
         Returns the title of the item.
         """
-        return db.session.get(ItemDB, self.get_item_pk()).title
+        title = db.session.get(ItemDB, self.get_item_pk()).title
+        return unsanitize_output(title)
 
     def set_title(self, new_title: str) -> None:
         """
@@ -120,7 +122,8 @@ class Item:
         """
         Returns the description of the item.
         """
-        return db.session.get(ItemDB, self.get_item_pk()).description
+        description = db.session.get(ItemDB, self.get_item_pk()).description
+        return unsanitize_output(description)
 
     def set_description(self, new_description: str) -> None:
         """
@@ -162,7 +165,8 @@ class Item:
         """
         Returns the location of the item.
         """
-        return db.session.get(ItemDB, self.get_item_pk()).location
+        location = db.session.get(ItemDB, self.get_item_pk()).location
+        return unsanitize_output(location)
 
     def set_location(self, new_location: str) -> None:
         """

@@ -8,6 +8,7 @@ database columns, relationships between entities, and serialization methods for 
 from datetime import datetime
 from typing import List, Dict, Any
 from backend.config import db
+from backend.utils import unsanitize_output
 
 
 # UserDB represents a user in the system with personal and authentication details.
@@ -30,8 +31,8 @@ class UserDB(db.Model):
         """
         return {
             "id": self.id,
-            "first_name": self.first_name,
-            "last_name": self.last_name,
+            "first_name": unsanitize_output(self.first_name),
+            "last_name": unsanitize_output(self.last_name),
             "email": self.email,
             "password": self.password,
         }
@@ -81,11 +82,11 @@ class ItemDB(db.Model):
         return {
             "id": self.id,
             "user_id": self.user_id,
-            "title": self.title,
-            "description": self.description,
+            "title": unsanitize_output(self.title),
+            "description": unsanitize_output(self.description),
             "condition": self.condition,
             "status": self.status,
-            "location": self.location,
+            "location": unsanitize_output(self.location),
             "images": [image.url for image in self.images],
             "updated_at": self.updated_at.isoformat(),
             "category": self.category,
@@ -148,18 +149,18 @@ class ExchangeOfferDB(db.Model):
         return {
             "id": self.id,
             "offered_by_id": self.offered_by_id,
-            "message": self.message,
+            "message": unsanitize_output(self.message),
             "status": self.status,
             "created_at": self.created_at.isoformat(),
             "offered_item_ids": [
                 offered_item.item_id for offered_item in self.offered_items
             ],
             "requested_item_id": self.requested_item_id,
-            "requested_item_name": requested_item.title if requested_item else None,
+            "requested_item_name": unsanitize_output(requested_item.title) if requested_item else None,
             "requested_item_location": (
-                requested_item.location if requested_item else None
+                unsanitize_output(requested_item.location) if requested_item else None
             ),
-            "offered_item_names": [item.title for item in offered_items if item],
+            "offered_item_names": [unsanitize_output(item.title) for item in offered_items if item],
         }
 
 

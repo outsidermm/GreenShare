@@ -7,6 +7,7 @@ with SQLAlchemy models to persist and query data from the backend database.
 from backend.models import ExchangeOfferDB
 from backend.config import db
 from backend.models import OfferedItemDB
+from backend.utils import unsanitize_output
 
 
 class ExchangeOffer:
@@ -114,7 +115,8 @@ class ExchangeOffer:
         """
         Returns the message associated with the exchange offer.
         """
-        return db.session.get(ExchangeOfferDB, self.get_offer_pk()).message
+        message = db.session.get(ExchangeOfferDB, self.get_offer_pk()).message
+        return unsanitize_output(message)
 
     def set_message(self, message: str) -> None:
         """

@@ -12,6 +12,7 @@ from backend.auth import validate_user_id
 from backend.data import items, exchange_offers
 from backend.data import admin_retrieve_user_id
 from backend.classes.exchange_offer import ExchangeOffer
+from backend.utils import sanitize_input
 
 
 def validate_offer_id(offer_id: int) -> None:
