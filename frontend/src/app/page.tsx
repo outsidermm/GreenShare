@@ -12,6 +12,7 @@ import { Item } from "@/types/item";
 import { toTitleCase } from "@/utils/titleCase";
 import FilterBar from "@/components/FilterBar";
 import { Option } from "@/types/option";
+import { ItemFilter } from "@/types/itemFilter";
 
 export default function Home() {
   const { isAuthenticated, refreshAuth } = useAuth();
@@ -21,17 +22,10 @@ export default function Home() {
   const [conditionFilter, setConditionFilter] = useState<Option | null>(null);
   const [typeFilter, setTypeFilter] = useState<Option | null>(null);
 
-  interface getItemsInput {
-    category?: string;
-    condition?: string;
-    type?: string;
-    title?: string;
-    item_id?: number;
-  }
   useEffect(() => {
     const fetchItems = async () => {
       try {
-        const filters: getItemsInput = {};
+        const filters: ItemFilter = {};
         if (titleFilter) {
           filters.title = titleFilter;
         }
