@@ -44,7 +44,7 @@ export default function AddOfferPage() {
         }
       }
     })();
-  }, [pathname,isAuthenticated, router]);
+  }, [pathname, isAuthenticated, router]);
 
   const handleLogin = async () => {
     router.push("/login");
@@ -167,13 +167,11 @@ export default function AddOfferPage() {
               >
                 &times;
               </button>
-              <ProductForm
-                {...(selectedItem ? { item: selectedItem } : {})}
-              />
+              <ProductForm {...(selectedItem ? { item: selectedItem } : {})} />
             </div>
           </div>
         )}
-        <div className = "fixed bottom-4 right-4 z-50">
+        <div className="fixed bottom-4 right-4 z-50">
           <button
             onClick={() => {
               setSelectedItem(undefined);

@@ -11,13 +11,14 @@ from backend.classes.user import User
 from backend.classes.item import Item
 from backend.classes.exchange_offer import ExchangeOffer
 from backend.items import (
+    search_item_similarity_pg,
     user_create_item,
     user_delete_item,
     user_get_browse_items,
     user_modify_item,
     user_view_item,
 )
-from backend.data import users, items, exchange_offers
+from backend.data import image_upload, users, items, exchange_offers
 import os, requests
 from backend.utils import sanitize_input
 
@@ -31,7 +32,6 @@ from backend.offers import (
 )
 
 PLACES_API_KEY = os.getenv("PLACES_API_KEY")
-IMGUR_CLIENT_ID = os.getenv("IMGUR_CLIENT_ID")
 
 
 @app.route("/")
@@ -176,6 +176,8 @@ async def validate_token():
             session_token
         ) and await user_auth_validate_csrf_token(csrf_token):
             return jsonify({"message": "Token is valid and user is in session"}), 200
+        else:
+            return jsonify({"message": "user is not in session"}), 200
     except Exception as e:
         # Return error response if tokens are invalid
         return jsonify({"error": str(e)}), 401
@@ -204,21 +206,12 @@ async def create_item():
         if not all([title, description, condition, location, type]):
             return jsonify({"error": "All fields are required"}), 400
 
-        headers = {"Authorization": f"Client-ID {IMGUR_CLIENT_ID}"}
 
         # Upload each image to Imgur and collect URLs
         image_urls = []
-        for file in images_file:
-            upload_response = requests.post(
-                "https://api.imgur.com/3/image",
-                headers=headers,
-                files={"image": file.read()},
-            )
-            if upload_response.status_code == 200:
-                image_urls.append(upload_response.json()["data"]["link"])
-                print(f"Image uploaded successfully: {image_urls[-1]}")
-            else:
-                return jsonify({"error": "Failed to upload image to Imgur"}), 500
+        for image in images_file:
+            image_url = await image_upload(image)
+            image_urls.append(image_url)
 
         # Create a new item using the provided data
         await user_create_item(
@@ -243,25 +236,22 @@ async def get_browse_items():
     Retrieves items from the database with optional filters:
     - category: filter by category
     - condition: filter by condition
-    - location: filter by location
     - type: filter by type
     - title: filter by title
     - id: retrieve a single item by ID
-    - user_id: filter by user ID
 
     Returns:
         Single item (if id provided) or list of filtered items.
     """
     category = request.args.get("category")
     condition = request.args.get("condition")
-    location = request.args.get("location")
     type = request.args.get("type")
     title = request.args.get("title")
     item_id = request.args.get("id")
 
     try:
         filtered_items = await user_get_browse_items(
-            category, condition, location, type, title, item_id
+            category, condition, type, title, item_id
         )
         return jsonify([item.to_dict() for item in filtered_items.values()]), 200
     except Exception as e:
@@ -309,22 +299,13 @@ async def edit_item():
         location = data["location"]
         type = data["type"]
         images_file = request.files.getlist("images")
-        headers = {"Authorization": f"Client-ID {IMGUR_CLIENT_ID}"}
 
         # Upload each image to Imgur and collect URLs
         image_urls = []
-        for file in images_file:
-            upload_response = requests.post(
-                "https://api.imgur.com/3/image",
-                headers=headers,
-                files={"image": file.read()},
-            )
-            if upload_response.status_code == 200:
-                image_urls.append(upload_response.json()["data"]["link"])
-                print(f"Image uploaded successfully: {image_urls[-1]}")
-            else:
-                return jsonify({"error": "Failed to upload image to Imgur"}), 500
-
+        for image in images_file:
+            image_url = await image_upload(image)
+            image_urls.append(image_url)
+            
         await user_modify_item(
             item_id=item_id,
             new_title=title,
@@ -566,6 +547,20 @@ async def address_autocomplete():
     response = requests.get(google_url, params=params)
     return jsonify(response.json())
 
+@app.route("/api/item_search", methods=["POST"])
+async def search_items():
+    """
+    Searches for items based on the provided search term.
+
+    Expects search term in JSON format and returns a list of matching items.
+    """
+    data = request.json
+    search = sanitize_input(data["input"])
+    try:
+        recommendation_list = await search_item_similarity_pg(search)
+        return jsonify({"predictions": recommendation_list}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 # Entry point to run the Flask app
 if __name__ == "__main__":

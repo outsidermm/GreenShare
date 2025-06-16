@@ -210,7 +210,7 @@ async def user_auth_validate_session_token(session_token: str) -> bool:
         if user.is_valid_session_token(session_token):
             return True
 
-    abort(401, description="Session token does not exist")
+    return False
 
 
 async def user_auth_validate_csrf_token(csrf_token: str) -> bool:
@@ -231,4 +231,4 @@ async def user_auth_validate_csrf_token(csrf_token: str) -> bool:
         if user.is_valid_csrf_token(csrf_token):
             return True
 
-    abort(401, description="CSRF token does not exist")
+    return False

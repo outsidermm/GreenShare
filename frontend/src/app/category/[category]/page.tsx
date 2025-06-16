@@ -10,17 +10,34 @@ import Link from "next/link";
 import Image from "next/image";
 import { Item } from "@/types/item";
 import { toTitleCase } from "@/utils/titleCase";
+import { Option } from "@/types/option";
+import FilterBar from "@/components/FilterBar";
+import { ItemFilter } from "@/types/itemFilter";
 
 export default function Home() {
   const { isAuthenticated, refreshAuth } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
   const [items, setItems] = useState<Array<Item>>([]);
+  const [titleFilter, setTitleFilter] = useState<string>("");
+  const [conditionFilter, setConditionFilter] = useState<Option | null>(null);
+  const [typeFilter, setTypeFilter] = useState<Option | null>(null);
 
   useEffect(() => {
     const fetchItems = async () => {
       try {
+        const filters: ItemFilter = {};
+        if (titleFilter) {
+          filters.title = titleFilter;
+        }
+        if (conditionFilter) {
+          filters.condition = conditionFilter.value;
+        }
+        if (typeFilter) {
+          filters.type = typeFilter.value;
+        }
         const category_filter = pathname.replace("/category/", "");
+        filters.category = category_filter;
         const response = await getItems({ category: category_filter });
         setItems(response);
       } catch (error) {
@@ -29,7 +46,7 @@ export default function Home() {
     };
 
     fetchItems();
-  }, [pathname]);
+  }, [pathname, titleFilter, conditionFilter, typeFilter]);
 
   const handleLogin = async () => {
     router.push("/login");
@@ -47,6 +64,7 @@ export default function Home() {
         <HeaderBar
           isAuthenticated={isAuthenticated}
           handleLogin={handleLogin}
+          handleTitleFilter={setTitleFilter}
         />
       </div>
 
@@ -59,6 +77,12 @@ export default function Home() {
       </div>
 
       <div className="ml-60 p-6">
+        <FilterBar
+          conditionFilter={conditionFilter}
+          typeFilter={typeFilter}
+          handleConditionFilter={setConditionFilter}
+          handleTypeFilter={setTypeFilter}
+        />
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-6">
           {items.length > 0 ? (
             items.map((item) => (

@@ -10,16 +10,32 @@ import Link from "next/link";
 import Image from "next/image";
 import { Item } from "@/types/item";
 import { toTitleCase } from "@/utils/titleCase";
+import FilterBar from "@/components/FilterBar";
+import { Option } from "@/types/option";
+import { ItemFilter } from "@/types/itemFilter";
 
 export default function Home() {
   const { isAuthenticated, refreshAuth } = useAuth();
   const router = useRouter();
   const [items, setItems] = useState<Array<Item>>([]);
+  const [titleFilter, setTitleFilter] = useState<string>("");
+  const [conditionFilter, setConditionFilter] = useState<Option | null>(null);
+  const [typeFilter, setTypeFilter] = useState<Option | null>(null);
 
   useEffect(() => {
     const fetchItems = async () => {
       try {
-        const response = await getItems({});
+        const filters: ItemFilter = {};
+        if (titleFilter) {
+          filters.title = titleFilter;
+        }
+        if (conditionFilter) {
+          filters.condition = conditionFilter.value;
+        }
+        if (typeFilter) {
+          filters.type = typeFilter.value;
+        }
+        const response = await getItems(filters);
         setItems(response);
       } catch (error) {
         console.error("Error fetching items:", error);
@@ -27,7 +43,7 @@ export default function Home() {
     };
 
     fetchItems();
-  }, []);
+  }, [titleFilter, conditionFilter, typeFilter]);
 
   const handleLogin = async () => {
     router.push("/login");
@@ -45,6 +61,7 @@ export default function Home() {
         <HeaderBar
           isAuthenticated={isAuthenticated}
           handleLogin={handleLogin}
+          handleTitleFilter={setTitleFilter}
         />
       </div>
 
@@ -60,9 +77,11 @@ export default function Home() {
         <div className="bg-green-600 text-white rounded-lg p-6 mb-8">
           <h2 className="text-2xl font-bold">Welcome to GreenShare 🌱</h2>
           <p>
-            Where communities thrive by giving goods a second life. Join us in reducing waste, sharing with purpose, and building a more sustainable tomorrow.
+            Where communities thrive by giving goods a second life. Join us in
+            reducing waste, sharing with purpose, and building a more
+            sustainable tomorrow.
           </p>
-          {isAuthenticated?(
+          {isAuthenticated ? (
             <Link href="/manage_products">
               <button className="mt-4 bg-white hover:bg-slate-200 text-green-700 font-semibold px-4 py-2 rounded transition-all">
                 Add a New Item
@@ -76,6 +95,13 @@ export default function Home() {
             </Link>
           )}
         </div>
+
+        <FilterBar
+          conditionFilter={conditionFilter}
+          typeFilter={typeFilter}
+          handleConditionFilter={setConditionFilter}
+          handleTypeFilter={setTypeFilter}
+        />
 
         <h3 className="text-xl text-slate-800 font-semibold mb-4">
           Hot Deals 🔥
