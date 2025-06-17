@@ -2,16 +2,61 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+.light {
+  --color-background: #f1f5f9; /* slate-100 */
+  --color-surface: #ffffff; /* white */
+  --color-text-primary: #1e293b; /* slate-800 */
+  --color-text-secondary: #475569; /* slate-600 */
+  --color-selected-highlight-bg: #bbf7d0; /* green-200 */
+  --color-unselected-highlight-bg: #e2e8f0; /* slate-200 */
+  --color-border: #cbd5e1; /* slate-300 */
+  --color-action-primary: #16a34a; /* green-600 */
+  --color-action-secondary: #22c55e; /* green-500 */
+  --color-action-hover: #bbf7d0; /* green-100 */
+  --color-shadow: rgba(100, 116, 139, 0.4); /* slate-400 */
+  --color-contrast-background: 15, 23, 42; /* slate-900 */
+  --color-hyperlink: #3b82f6; /* blue-500 */
+  --color-hyperlink-hover: #1d4ed8; /* blue-700 */
+  --color-alert: #ef4444; /* red-500 */
+  --color-alert-hover: #dc2626; /* red-600 */
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+.dark {
+  --color-background: #0f172a; /* slate-900 */
+  --color-surface: #1e293b; /* slate-800 */
+  --color-text-primary: #f8fafc; /* slate-100 */
+  --color-text-secondary: #cbd5e1; /* lighter for contrast */
+  --color-selected-highlight-bg: #064e3b; /* green-900 */
+  --color-unselected-highlight-bg: #334155; /* slate-700 */
+  --color-border: #475569; /* slate-600 */
+  --color-action-primary: #16a34a; /* green-600 */
+  --color-action-secondary: #22c55e; /* green-500 */
+  --color-action-hover: #166534; /* green-700 */
+  --color-shadow: rgba(100, 116, 139, 0.4); /* lighter slate */
+  --color-contrast-background: 241, 245, 249; /* slate-100 */
+  --color-hyperlink: #60a5fa; /* blue-400 */
+  --color-hyperlink-hover: #3b82f6; /* blue-500 */
+  --color-alert: #f87171; /* red-400 */
+  --color-alert-hover: #dc2626; /* red-600 */
+}
+
+.color-blind {
+  --color-background: #f5f5f5;
+  --color-surface: #ffffff;
+  --color-text-primary: #1a1a1a;
+  --color-text-secondary: #555555;
+  --color-selected-highlight-bg: #88c0d0; /* accessible blue */
+  --color-unselected-highlight-bg: #dddddd;
+  --color-border: #999999;
+  --color-action-primary: #007acc; /* strong blue */
+  --color-action-secondary: #60a5fa; /* lighter blue */
+  --color-action-hover: #cfe8ff; /* very light blue or hover-friendly */
+  --color-shadow: rgba(0, 0, 0, 0.1);
+  --color-contrast-background: 28, 28, 28; /* dark gray for contrast */
+  --color-hyperlink: #007acc;
+  --color-hyperlink-hover: #005b99;
+  --color-alert: #f6c700; /* yellow as alert substitute */
+  --color-alert-hover: #fde047; /* bright hover yellow */
 }
 
 body {
