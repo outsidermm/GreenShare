@@ -34,8 +34,11 @@ export default function ManageProductsPage() {
               icon: "warning",
               buttons: ["Cancel", "Login"],
             }).then((willLogin) => {
-              if (willLogin === "Login") {
+              if (willLogin) {
                 router.push("/login");
+              }
+              else {
+                router.push("/");
               }
             });
             return;

@@ -48,12 +48,15 @@ export default function AddOfferPage() {
         console.error("Error fetching user offerable item:", error);
         if (error instanceof Error) {
           if (!isAuthenticated) {
-            swal("Please log in to make an offer.", {
+            swal("Please log in to manage your items.", {
               icon: "warning",
               buttons: ["Cancel", "Login"],
             }).then((willLogin) => {
-              if (willLogin === "Login") {
+              if (willLogin) {
                 router.push("/login");
+              }
+              else {
+                router.push("/");
               }
             });
             return;
