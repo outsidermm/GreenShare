@@ -1,5 +1,9 @@
 "use client";
 
+/**
+ * Login page for the GreenShare platform.
+ */
+
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import loginUser from "@/services/user/loginUser";
@@ -18,11 +22,16 @@ export default function LoginPage() {
 
   const [showSuccess, setShowSuccess] = useState(false);
 
+  // Prefetch post-login pages for improved responsiveness
   useEffect(() => {
     router.prefetch("/manage_offers");
     router.prefetch("/manage_products");
   }, [router]);
 
+  /**
+   * Handles the login submission process, including authentication,
+   * error handling, and redirecting on success.
+   */
   const handleSubmit = async () => {
     try {
       const csrf_token = await loginUser(email, password);
@@ -52,21 +61,23 @@ export default function LoginPage() {
     }
   };
 
+  // Main render structure of the login UI
   return (
-    <div className="bg-background w-screen h-screen flex items-center justify-center align-middle">
+    <main role="main" aria-label="Login Page" className="bg-background w-screen h-screen flex items-center justify-center align-middle">
       <div className="sm:max-w-xl shadow-grey-shadow shadow-xl rounded-2xl p-6 px-10 sm:min-w-md w-11/12 bg-surface">
         <h1 className="text-4xl text-center text-content font-bold">Login</h1>
         {showSuccess && (
-          <div className="text-surface text-center mb-2 bg-action-secondary rounded-lg py-2 px-4 mt-5 transition-all">
+          <div aria-live="polite" className="text-surface text-center mb-2 bg-action-secondary rounded-lg py-2 px-4 mt-5 transition-all">
             Login successful! Redirecting to homepage...
           </div>
         )}
         {!["", "email", "password"].includes(errorType) && (
-          <div className="text-surface text-center mb-2 bg-alert rounded-lg py-2 px-4 mt-5 transition-all">
+          <div aria-live="polite" className="text-surface text-center mb-2 bg-alert rounded-lg py-2 px-4 mt-5 transition-all">
             {errorType}
           </div>
         )}
         <form
+          aria-label="Login Form"
           onSubmit={(e) => {
             e.preventDefault();
             handleSubmit();
@@ -98,6 +109,7 @@ export default function LoginPage() {
           <div className="pt-10">
             <button
               type="submit"
+              aria-label="Submit Login"
               className="w-full rounded bg-hyperlink hover:bg-blue-400 text-surface font-bold py-2 px-4 border-solid border-2 border-hyperlink transition-all"
             >
               Login
@@ -117,6 +129,6 @@ export default function LoginPage() {
           </div>
         </form>
       </div>
-    </div>
+    </main>
   );
 }
