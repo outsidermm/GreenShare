@@ -13,7 +13,7 @@ import deleteItem from "@/services/item/deleteItem";
 import { Item } from "@/types/item";
 import ProductForm from "@/components/ProductForm";
 
-export default function AddOfferPage() {
+export default function ManageProductsPage() {
   const router = useRouter();
   const pathname = usePathname();
   const { isAuthenticated, refreshAuth } = useAuth();
@@ -34,8 +34,10 @@ export default function AddOfferPage() {
               icon: "warning",
               buttons: ["Cancel", "Login"],
             }).then((willLogin) => {
-              if (willLogin === "Login") {
+              if (willLogin) {
                 router.push("/login");
+              } else {
+                router.push("/");
               }
             });
             return;
@@ -45,6 +47,18 @@ export default function AddOfferPage() {
       }
     })();
   }, [pathname, isAuthenticated, router]);
+
+  useEffect(() => {
+    if (isEditOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [isEditOpen]);
 
   const handleLogin = async () => {
     router.push("/login");
@@ -74,15 +88,15 @@ export default function AddOfferPage() {
   };
 
   return (
-    <div className="bg-slate-100 w-screen h-screen pt-16">
-      <div className="fixed top-0 left-0 w-full bg-slate-900 shadow z-50 px-6 py-4 flex items-center justify-between gap-4 sm:gap-10">
+    <div className="bg-background w-screen h-screen pt-16">
+      <div className="fixed top-0 left-0 w-full bg-contrast shadow z-50 px-6 py-4 flex items-center justify-between gap-4 sm:gap-10">
         <HeaderBar
           isAuthenticated={isAuthenticated}
           handleLogin={handleLogin}
         />
       </div>
 
-      <div className="fixed top-16 left-0 w-60 h-[calc(100vh-4rem)] bg-slate-900 text-white px-6 py-6 shadow-slate-400 shadow-xl flex flex-col justify-between">
+      <div className="z-49 fixed top-16 left-0 sm:w-60 w-full sm:h-[calc(100vh-4rem)] bg-contrast text-surface px-6 py-6 shadow-grey-shadow shadow-xl flex flex-col items-center sm:items-start sm:justify-between">
         <NavBar
           handleLogout={handleLogout}
           pathname={pathname}
@@ -90,8 +104,10 @@ export default function AddOfferPage() {
         />
       </div>
 
-      <div className="ml-60 p-6 relative h-[calc(100vh-4rem)] overflow-hidden">
-        <h1 className="text-2xl font-bold mb-4 text-slate-800 px-4">
+      <div
+        className={`relative sm:ml-60 sm:mt-0 p-6 ${isAuthenticated ? "mt-96 pt-20" : "mt-64"}`}
+      >
+        <h1 className="text-2xl font-bold mb-4 text-content px-4">
           View Your Items
         </h1>
 
@@ -100,37 +116,25 @@ export default function AddOfferPage() {
             ownedItems.map((item) => (
               <div
                 key={item.id}
-                className="bg-white p-4 mb-4 rounded-lg shadow flex justify-between gap-8 flex-col sm:flex-row"
+                className="bg-surface p-4 mb-4 rounded-lg shadow flex justify-between gap-8 flex-col sm:flex-row"
               >
-                <div className="flex-2">
-                  <p className="text-slate-800">
-                    <strong>Title:</strong> {toTitleCase(item.title)}
-                  </p>
-                  <p className="text-slate-800">
-                    <strong>Description</strong> {toTitleCase(item.description)}
-                  </p>
-                  <p className="text-slate-800">
-                    <strong>Condition:</strong> {toTitleCase(item.condition)}
-                  </p>
-                  <p className="text-slate-800">
-                    <strong>Status:</strong> {toTitleCase(item.status)}
-                  </p>
-                  <p className="text-slate-800">
-                    <strong>Location:</strong> {toTitleCase(item.location)}
-                  </p>
-                  <p className="text-slate-800">
-                    <strong>Category:</strong> {toTitleCase(item.category)}
-                  </p>
-                  <p className="text-slate-800">
-                    <strong>Type:</strong> {toTitleCase(item.type)}
-                  </p>
-                  <p className="text-slate-800">
+                <div className="flex-2 text-content">
+                  <h1 className="text-xl font-bold mb-2">
+                    {toTitleCase(item.title)}
+                  </h1>
+                  <p>
+                    <strong>Description</strong> {toTitleCase(item.description)}{" "}
+                    <br />
+                    <strong>Condition:</strong> {toTitleCase(item.condition)}{" "}
+                    <br />
+                    <strong>Status:</strong> {toTitleCase(item.status)} <br />
+                    <strong>Location:</strong> {toTitleCase(item.location)}{" "}
+                    <br />
+                    <strong>Category:</strong> {toTitleCase(item.category)}{" "}
+                    <br />
+                    <strong>Type:</strong> {toTitleCase(item.type)} <br />
                     <strong>Last Updated:</strong>{" "}
-                    {new Date(item.updated_at).toLocaleDateString("en-US", {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })}
+                    {new Date(item.updated_at).toLocaleDateString()}
                   </p>
                 </div>
                 <div className="flex-2">
@@ -140,13 +144,13 @@ export default function AddOfferPage() {
                       setIsEditOpen(true);
                     }}
                     className={
-                      "w-full rounded bg-green-600 hover:bg-green-500 text-slate-900 border-green-600 font-bold py-2 px-4 border-solid border-2 transition-all mt-4"
+                      "w-full rounded bg-action-primary hover:bg-action-secondary text-contrast border-action-primary font-bold py-2 px-4 border-solid border-2 transition-all mt-4"
                     }
                   >
                     Edit
                   </button>
                   <button
-                    className="w-full rounded bg-red-600 hover:bg-red-500 text-white font-bold py-2 px-2 border-solid border-2 border-red-600 transition-all mt-4"
+                    className="w-full rounded bg-alert hover:bg-alert-hover text-contrast font-bold py-2 px-2 border-solid border-2 border-alert transition-all mt-4"
                     onClick={() => handleDeleteItem(item.id)}
                   >
                     Delete
@@ -155,15 +159,15 @@ export default function AddOfferPage() {
               </div>
             ))
           ) : (
-            <p className="text-slate-800">You do not own any items.</p>
+            <p className="text-content">You do not own any items.</p>
           )}
         </div>
         {isEditOpen && (
-          <div className="fixed top-16 left-60 w-full h-full z-50 flex items-center justify-center backdrop-blur-sm bg-black bg-opacity-40 transition-all">
-            <div className="bg-white p-12 rounded-xl shadow-xl w-full max-w-3xl relative">
+          <div className="fixed top-0 left-0 w-full h-full z-50 flex items-center justify-center backdrop-blur-sm bg-contrast/40 transition-all">
+            <div className="bg-surface p-12 rounded-xl shadow-xl w-full max-w-3xl relative">
               <button
                 onClick={() => setIsEditOpen(false)}
-                className="absolute top-4 right-4 text-slate-700 hover:text-slate-800 text-4xl font-bold"
+                className="absolute top-4 right-4 text-content hover:text-content text-4xl font-bold"
               >
                 &times;
               </button>
@@ -177,7 +181,7 @@ export default function AddOfferPage() {
               setSelectedItem(undefined);
               setIsEditOpen(true);
             }}
-            className="bg-green-600 text-slate-800 px-4 py-2 rounded-full hover:bg-green-500 flex items-center gap-2 transition-all border-2 border-green-600 font-bold shadow-xl"
+            className="bg-action-primary text-content px-4 py-2 rounded-full hover:bg-action-secondary flex items-center gap-2 transition-all border-2 border-action-primary font-bold shadow-xl"
           >
             Add New Item
           </button>

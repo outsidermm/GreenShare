@@ -1,3 +1,4 @@
+from backend.auth import validate_user_id
 from backend.data import admin_retrieve_user_id, item_categorisation, items
 from backend.models import ItemDB
 from sqlalchemy import select, func, desc
@@ -93,6 +94,7 @@ async def user_create_item(
         csrf_token (str): User's CSRF token.
     """
     new_user_id = admin_retrieve_user_id(session_token, csrf_token)
+    validate_user_id(new_user_id)  # Ensure the user ID is valid
     safe_title = validate_string_length(new_title, "Title", 3, 100)
     safe_description = validate_string_length(new_description, "Description", 10, 1000)
     new_category = await item_categorisation(
@@ -244,6 +246,7 @@ async def user_modify_item(
         Item: The modified item object.
     """
     user_id = admin_retrieve_user_id(session_token, csrf_token)
+    validate_user_id(user_id)  # Ensure the user ID is valid
     item_id = validate_item_id(item_id)
     if items[item_id].get_user_id() != user_id:
         abort(403, "You do not have permission to modify this item.")
@@ -298,6 +301,7 @@ async def user_delete_item(
 
     if session_token and csrf_token:
         user_id = admin_retrieve_user_id(session_token, csrf_token)
+        validate_user_id(user_id)  # Ensure the user ID is valid
         if items[item_id].get_user_id() != user_id:
             abort(403, "You do not have permission to delete this item.")
 

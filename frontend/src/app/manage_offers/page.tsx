@@ -15,7 +15,7 @@ import confirmOfferComplete from "@/services/offer/confirmOfferComplete";
 import swal from "sweetalert";
 import { extractErrorMessage } from "@/utils/extractErrorMsg";
 
-export default function AddOfferPage() {
+export default function ManageOffersPage() {
   const router = useRouter();
   const pathname = usePathname();
   const { isAuthenticated, refreshAuth } = useAuth();
@@ -36,8 +36,10 @@ export default function AddOfferPage() {
               icon: "warning",
               buttons: ["Cancel", "Login"],
             }).then((willLogin) => {
-              if (willLogin === "Login") {
+              if (willLogin) {
                 router.push("/login");
+              } else {
+                router.push("/");
               }
             });
             return;
@@ -121,7 +123,7 @@ export default function AddOfferPage() {
             placeholder: "Reason for cancelling...",
             type: "text",
             className:
-              "border-slate-500 rounded-lg py-2 px-3 w-full border-2 text-slate-500 focus:outline-green-500",
+              "border-slate-500 rounded-lg py-2 px-3 w-full border-2 text-slate-500 focus:outline-action-secondary",
           },
         },
         buttons: ["No", "Yes"],
@@ -142,15 +144,15 @@ export default function AddOfferPage() {
   };
 
   return (
-    <div className="bg-slate-100 w-screen min-h-screen pt-16">
-      <div className="fixed top-0 left-0 w-full bg-slate-900 shadow z-50 px-6 py-4 flex items-center justify-between gap-4 sm:gap-10">
+    <div className="bg-background w-screen min-h-screen pt-16">
+      <div className="fixed top-0 left-0 w-full bg-contrast shadow z-50 px-6 py-4 flex items-center justify-between gap-4 sm:gap-10">
         <HeaderBar
           isAuthenticated={isAuthenticated}
           handleLogin={handleLogin}
         />
       </div>
 
-      <div className="fixed top-16 left-0 w-60 h-[calc(100vh-4rem)] bg-slate-900 text-white px-6 py-6 shadow-slate-400 shadow-xl flex flex-col justify-between">
+      <div className="z-49 fixed top-16 left-0 sm:w-60 w-full sm:h-[calc(100vh-4rem)] bg-contrast text-surface px-6 py-6 shadow-grey-shadow shadow-xl flex flex-col items-center sm:items-start sm:justify-between">
         <NavBar
           handleLogout={handleLogout}
           pathname={pathname}
@@ -158,20 +160,22 @@ export default function AddOfferPage() {
         />
       </div>
 
-      <div className="ml-60 p-6">
-        <h1 className="text-2xl font-bold mb-4 text-slate-800 px-4">
+      <div
+        className={`sm:ml-60 sm:mt-0 p-6 ${isAuthenticated ? "mt-96 pt-20" : "mt-64"}`}
+      >
+        <h1 className="text-2xl font-bold mb-4 text-content px-4">
           View Offers
         </h1>
 
         <div className="p-4 flex flex-col sm:flex-row">
           <button
-            className={`flex-1 px-4 py-2 mb-4 sm:mb-0 rounded-xl sm:rounded-none sm:rounded-l-xl text-slate-800 border-2 border-slate-400 transition-all ${!toggleOffer ? "bg-slate-400" : "bg-slate-100"}`}
+            className={`flex-1 px-4 py-2 mb-4 sm:mb-0 rounded-xl sm:rounded-none sm:rounded-l-xl text-content border-2 border-grey-shadow transition-all ${!toggleOffer ? "bg-grey-shadow" : "bg-background"}`}
             onClick={() => setToggleOffer(false)}
           >
             Outgoing Offers
           </button>
           <button
-            className={`flex-1 px-4 py-2 rounded-xl sm:rounded-none sm:rounded-r-xl text-slate-800 border-2 border-slate-400 transition-all ${toggleOffer ? "bg-slate-400" : "bg-slate-100"}`}
+            className={`flex-1 px-4 py-2 rounded-xl sm:rounded-none sm:rounded-r-xl text-content border-2 border-grey-shadow transition-all ${toggleOffer ? "bg-grey-shadow" : "bg-background"}`}
             onClick={() => setToggleOffer(true)}
           >
             Incoming Offers
@@ -182,31 +186,31 @@ export default function AddOfferPage() {
             (toggleOffer ? incomingOffers : outgoingOffers).map((offer) => (
               <div
                 key={offer.id}
-                className="bg-white p-4 mb-4 rounded-lg shadow flex justify-between gap-8 flex-col sm:flex-row"
+                className="bg-surface p-4 mb-4 rounded-lg shadow flex justify-between gap-8 flex-col sm:flex-row"
               >
-                <div className="flex-2">
-                  <p className="text-slate-800">
+                <div className="flex-2 text-content">
+                  <p>
                     <strong>Offered To:</strong>{" "}
                     {toTitleCase(offer.requested_item_name)}
                   </p>
-                  <p className="text-slate-800">
+                  <p>
                     <strong>Offered Items:</strong>{" "}
                     {toTitleCase(offer.offered_item_names.join(", "))}
                   </p>
-                  <p className="text-slate-800">
+                  <p>
                     <strong>Message:</strong> {toTitleCase(offer.message)}
                   </p>
-                  <p className="text-slate-800">
+                  <p>
                     <strong>Status:</strong> {toTitleCase(offer.status)}
                   </p>
                   {offer.status !== "pending" &&
                     offer.status !== "cancelled" && (
-                      <p className="text-slate-800">
+                      <p>
                         <strong>Requested Item Location:</strong>{" "}
                         {toTitleCase(offer.requested_item_location)}
                       </p>
                     )}
-                  <p className="text-slate-800">
+                  <p>
                     <strong>Created At:</strong>{" "}
                     {new Date(offer.created_at).toLocaleDateString()}
                   </p>
@@ -217,13 +221,13 @@ export default function AddOfferPage() {
                     onClick={() =>
                       handleCurrentUserOfferAction(offer, toggleOffer)
                     }
-                    className={`w-full rounded ${offer.status === "cancelled" ? "bg-red-600 text-white border-red-600" : "bg-green-600 hover:bg-green-500 text-slate-900 border-green-600"} font-bold py-2 px-4 border-solid border-2 transition-all mt-4`}
+                    className={`w-full rounded  text-contrast ${offer.status === "cancelled" ? "bg-alert-hover border-alert-hover" : "bg-action-primary hover:bg-action-secondary border-action-primary"} font-bold py-2 px-4 border-solid border-2 transition-all mt-4`}
                   >
                     {getOfferActionLabel(toggleOffer, offer.status)}
                   </button>
                   {offer.status === "pending" && (
                     <button
-                      className="w-full rounded bg-red-600 hover:bg-red-500 text-white font-bold py-2 px-2 border-solid border-2 border-red-600 transition-all mt-4"
+                      className="w-full rounded bg-alert-hover hover:bg-alert text-contrast font-bold py-2 px-2 border-solid border-2 border-alert-hover transition-all mt-4"
                       onClick={() => handleCancel(offer.id)}
                     >
                       Cancel
@@ -233,7 +237,7 @@ export default function AddOfferPage() {
               </div>
             ))
           ) : (
-            <p className="text-slate-800">
+            <p className="text-content">
               No {toggleOffer ? "incoming" : "outgoing"} offers found.
             </p>
           )}

@@ -42,9 +42,7 @@ def admin_retrieve_user_id(session_token: str, csrf_token: str) -> int:
             # Return the user's full name if tokens match
             return user_obj.get_user_pk()
     # Return None if no valid tokens are found
-    abort(
-        403, "Invalid credentials. Please log in again."
-    )  # Raise an error if no valid user is found
+    return None
 
 
 async def image_upload(image: FileStorage) -> str:
