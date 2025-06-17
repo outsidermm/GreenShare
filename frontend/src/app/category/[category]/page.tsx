@@ -83,7 +83,7 @@ export default function CategoryPage() {
       </div>
 
       <div
-        className={`sm:ml-60 sm:mt-0 p-6 ${isAuthenticated ? "mt-96 pt-20" : "mt-64"}`}
+        className={`sm:ml-60 sm:mt-0 sm:pt-0 p-6 ${isAuthenticated ? "mt-96 pt-20" : "mt-64"}`}
       >
         {/* UI component for applying filter options to the item list */}
         <FilterBar
