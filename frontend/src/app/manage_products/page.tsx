@@ -90,7 +90,7 @@ export default function ManageProductsPage() {
         />
       </div>
 
-      <div className="ml-60 p-6 relative h-[calc(100vh-4rem)] overflow-hidden">
+      <div className="ml-60 p-6 relative h-[calc(100vh-4rem)]">
         <h1 className="text-2xl font-bold mb-4 text-content px-4">
           View Your Items
         </h1>
@@ -159,7 +159,7 @@ export default function ManageProductsPage() {
           )}
         </div>
         {isEditOpen && (
-          <div className="fixed top-16 left-60 w-full h-full z-50 flex items-center justify-center backdrop-blur-sm bg-contrast/40 transition-all">
+          <div className="fixed top-0 left-0 w-full h-full z-50 flex items-center justify-center backdrop-blur-sm bg-contrast/40 transition-all">
             <div className="bg-surface p-12 rounded-xl shadow-xl w-full max-w-3xl relative">
               <button
                 onClick={() => setIsEditOpen(false)}
