@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import useDebounce from "@/hooks/useDebounce";
 import { ImCross } from "react-icons/im";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 interface HeaderBarProps {
   isAuthenticated: boolean;
@@ -41,7 +42,11 @@ export default function HeaderBar(HeaderBarProps: HeaderBarProps) {
 
   return (
     <>
-      <div className="text-lg font-bold text-action-primary">GreenShare</div>
+      <div className="text-lg font-bold text-action-primary"> 
+        <Link href="/">
+          GreenShare
+        </Link>
+      </div>
       <div className="flex items-center gap-4 flex-grow px-4 pr-10 relative">
         {handleTitleFilter ? (
           <>
