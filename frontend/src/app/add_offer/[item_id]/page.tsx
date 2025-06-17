@@ -54,8 +54,7 @@ export default function AddOfferPage() {
             }).then((willLogin) => {
               if (willLogin) {
                 router.push("/login");
-              }
-              else {
+              } else {
                 router.push("/");
               }
             });
@@ -147,7 +146,9 @@ export default function AddOfferPage() {
         />
       </div>
 
-      <div className={`sm:ml-60 sm:mt-0 p-6 ${isAuthenticated ? "mt-96 pt-20" : "mt-64"}`}>
+      <div
+        className={`sm:ml-60 sm:mt-0 p-6 ${isAuthenticated ? "mt-96 pt-20" : "mt-64"}`}
+      >
         <div className="flex flex-col sm:flex-row gap-6 items-start">
           <div className="flex-1">
             <div className="shadow-lg p-4 mb-4">
@@ -210,10 +211,25 @@ export default function AddOfferPage() {
                     {toTitleCase(requestedItem.title)}
                   </p>
                   <div className="leading-relaxed space-y-1 mb-4 text-content">
-                    <p><strong>Description:</strong> {toTitleCase(requestedItem.description)}</p>
-                    <p><strong>Condition:</strong> {toTitleCase(requestedItem.condition)}</p>
-                    <p><strong>Type:</strong> {toTitleCase(requestedItem.type)}</p>
-                    <p><strong>Approximate Location:</strong> {toTitleCase(requestedItem.location).split(", ").slice(1).join(", ").trim()}</p>
+                    <p>
+                      <strong>Description:</strong>{" "}
+                      {toTitleCase(requestedItem.description)}
+                    </p>
+                    <p>
+                      <strong>Condition:</strong>{" "}
+                      {toTitleCase(requestedItem.condition)}
+                    </p>
+                    <p>
+                      <strong>Type:</strong> {toTitleCase(requestedItem.type)}
+                    </p>
+                    <p>
+                      <strong>Approximate Location:</strong>{" "}
+                      {toTitleCase(requestedItem.location)
+                        .split(", ")
+                        .slice(1)
+                        .join(", ")
+                        .trim()}
+                    </p>
                   </div>
                 </>
               )}

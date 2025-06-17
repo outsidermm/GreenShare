@@ -79,7 +79,9 @@ export default function ViewProductPage() {
         />
       </div>
 
-      <div className={`sm:ml-60 sm:mt-0 p-6 ${isAuthenticated ? "mt-96 pt-20" : "mt-64"}`}>
+      <div
+        className={`sm:ml-60 sm:mt-0 p-6 ${isAuthenticated ? "mt-96 pt-20" : "mt-64"}`}
+      >
         <div className="p-2 mb-4">
           <div
             onClick={() => router.back()}
@@ -121,11 +123,28 @@ export default function ViewProductPage() {
                   {toTitleCase(item.title)}
                 </h1>
                 <div className="text-lg leading-relaxed space-y-2 text-content">
-                  <p><strong>Description:</strong> {toTitleCase(item.description)}</p>
-                  <p><strong>Condition:</strong> {toTitleCase(item.condition)}</p>
-                  <p><strong>Type:</strong> {toTitleCase(item.type)}</p>
-                  <p><strong>Approximate Location:</strong> {toTitleCase(item.location).split(", ").slice(1).join(", ").trim()}</p>
-                  <p><strong>Last Updated:</strong> {new Date(item.updated_at).toLocaleDateString()}</p>
+                  <p>
+                    <strong>Description:</strong>{" "}
+                    {toTitleCase(item.description)}
+                  </p>
+                  <p>
+                    <strong>Condition:</strong> {toTitleCase(item.condition)}
+                  </p>
+                  <p>
+                    <strong>Type:</strong> {toTitleCase(item.type)}
+                  </p>
+                  <p>
+                    <strong>Approximate Location:</strong>{" "}
+                    {toTitleCase(item.location)
+                      .split(", ")
+                      .slice(1)
+                      .join(", ")
+                      .trim()}
+                  </p>
+                  <p>
+                    <strong>Last Updated:</strong>{" "}
+                    {new Date(item.updated_at).toLocaleDateString()}
+                  </p>
                 </div>
               </>
             ) : (

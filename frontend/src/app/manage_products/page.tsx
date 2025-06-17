@@ -36,8 +36,7 @@ export default function ManageProductsPage() {
             }).then((willLogin) => {
               if (willLogin) {
                 router.push("/login");
-              }
-              else {
+              } else {
                 router.push("/");
               }
             });
@@ -105,7 +104,9 @@ export default function ManageProductsPage() {
         />
       </div>
 
-      <div className={`relative sm:ml-60 sm:mt-0 p-6 ${isAuthenticated ? "mt-96 pt-20" : "mt-64"}`}>
+      <div
+        className={`relative sm:ml-60 sm:mt-0 p-6 ${isAuthenticated ? "mt-96 pt-20" : "mt-64"}`}
+      >
         <h1 className="text-2xl font-bold mb-4 text-content px-4">
           View Your Items
         </h1>
@@ -122,13 +123,18 @@ export default function ManageProductsPage() {
                     {toTitleCase(item.title)}
                   </h1>
                   <p>
-                    <strong>Description</strong> {toTitleCase(item.description)} <br />
-                    <strong>Condition:</strong> {toTitleCase(item.condition)} <br />
+                    <strong>Description</strong> {toTitleCase(item.description)}{" "}
+                    <br />
+                    <strong>Condition:</strong> {toTitleCase(item.condition)}{" "}
+                    <br />
                     <strong>Status:</strong> {toTitleCase(item.status)} <br />
-                    <strong>Location:</strong> {toTitleCase(item.location)} <br />
-                    <strong>Category:</strong> {toTitleCase(item.category)} <br />
+                    <strong>Location:</strong> {toTitleCase(item.location)}{" "}
+                    <br />
+                    <strong>Category:</strong> {toTitleCase(item.category)}{" "}
+                    <br />
                     <strong>Type:</strong> {toTitleCase(item.type)} <br />
-                    <strong>Last Updated:</strong> {new Date(item.updated_at).toLocaleDateString()}
+                    <strong>Last Updated:</strong>{" "}
+                    {new Date(item.updated_at).toLocaleDateString()}
                   </p>
                 </div>
                 <div className="flex-2">

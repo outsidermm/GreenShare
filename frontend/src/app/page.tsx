@@ -73,7 +73,9 @@ export default function Home() {
         />
       </div>
 
-      <div className={`sm:ml-60 sm:mt-0 p-6 ${isAuthenticated ? "mt-96 pt-20" : "mt-64"}`}>
+      <div
+        className={`sm:ml-60 sm:mt-0 p-6 ${isAuthenticated ? "mt-96 pt-20" : "mt-64"}`}
+      >
         <div className="bg-action-primary text-white rounded-lg p-6 mb-8">
           <h2 className="text-2xl font-bold">Welcome to GreenShare 🌱</h2>
           <p>

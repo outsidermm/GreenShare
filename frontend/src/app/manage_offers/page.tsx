@@ -38,8 +38,7 @@ export default function ManageOffersPage() {
             }).then((willLogin) => {
               if (willLogin) {
                 router.push("/login");
-              }
-              else {
+              } else {
                 router.push("/");
               }
             });
@@ -161,7 +160,9 @@ export default function ManageOffersPage() {
         />
       </div>
 
-      <div className={`sm:ml-60 sm:mt-0 p-6 ${isAuthenticated ? "mt-96 pt-20" : "mt-64"}`}>
+      <div
+        className={`sm:ml-60 sm:mt-0 p-6 ${isAuthenticated ? "mt-96 pt-20" : "mt-64"}`}
+      >
         <h1 className="text-2xl font-bold mb-4 text-content px-4">
           View Offers
         </h1>

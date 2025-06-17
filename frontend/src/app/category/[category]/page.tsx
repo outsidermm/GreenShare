@@ -76,7 +76,9 @@ export default function CategoryPage() {
         />
       </div>
 
-      <div className={`sm:ml-60 sm:mt-0 p-6 ${isAuthenticated ? "mt-96 pt-20" : "mt-64"}`}>
+      <div
+        className={`sm:ml-60 sm:mt-0 p-6 ${isAuthenticated ? "mt-96 pt-20" : "mt-64"}`}
+      >
         <FilterBar
           conditionFilter={conditionFilter}
           typeFilter={typeFilter}
