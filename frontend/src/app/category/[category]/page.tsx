@@ -59,8 +59,8 @@ export default function Home() {
   };
 
   return (
-    <div className="bg-slate-100 w-screen min-h-screen pt-16">
-      <div className="fixed top-0 left-0 w-full bg-slate-900 shadow z-50 px-6 py-4 flex items-center justify-between gap-4 sm:gap-10">
+    <div className="bg-background w-screen min-h-screen pt-16">
+      <div className="fixed top-0 left-0 w-full bg-contrast shadow z-50 px-6 py-4 flex items-center justify-between gap-4 sm:gap-10">
         <HeaderBar
           isAuthenticated={isAuthenticated}
           handleLogin={handleLogin}
@@ -68,7 +68,7 @@ export default function Home() {
         />
       </div>
 
-      <div className="fixed top-16 left-0 w-60 h-[calc(100vh-4rem)] bg-slate-900 text-white px-6 py-6 shadow-slate-400 shadow-xl flex flex-col justify-between">
+      <div className="fixed top-16 left-0 w-60 h-[calc(100vh-4rem)] bg-contrast text-surface px-6 py-6 shadow-grey-shadow shadow-xl flex flex-col justify-between">
         <NavBar
           handleLogout={handleLogout}
           pathname={pathname}
@@ -87,7 +87,7 @@ export default function Home() {
           {items.length > 0 ? (
             items.map((item) => (
               <Link key={item.id} href={`/view_product/${item.id}`}>
-                <div className="bg-white rounded shadow p-4 cursor-pointer hover:shadow-lg transition-all h-full">
+                <div className="bg-surface rounded shadow p-4 cursor-pointer hover:shadow-lg transition-all h-full">
                   <Image
                     src={item.images[0]}
                     alt={item.title}
@@ -95,18 +95,18 @@ export default function Home() {
                     height={200}
                     className="w-full h-32 object-cover mb-3 rounded"
                   />
-                  <h4 className="text-slate-800 font-bold">
+                  <h4 className="text-content font-bold">
                     {toTitleCase(item.title)}
                   </h4>
-                  <p className="text-blue-600">{toTitleCase(item.condition)}</p>
-                  <p className="text-slate-600 text-sm">
-                    {toTitleCase(item.type)}
+                  <p className="text-hyperlink">
+                    {toTitleCase(item.condition)}
                   </p>
+                  <p className="text-muted">{toTitleCase(item.type)}</p>
                 </div>
               </Link>
             ))
           ) : (
-            <div className="col-span-4 text-center text-slate-600">
+            <div className="col-span-4 text-center text-muted">
               <p>No items available at the moment.</p>
             </div>
           )}
