@@ -15,7 +15,7 @@ import swal from "sweetalert";
 import { Item } from "@/types/item";
 import { toTitleCase } from "@/utils/titleCase";
 
-export default function Home() {
+export default function ViewProductPage() {
   const { isAuthenticated, refreshAuth } = useAuth();
   const router = useRouter();
   const pathname = usePathname();

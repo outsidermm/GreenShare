@@ -15,7 +15,7 @@ import confirmOfferComplete from "@/services/offer/confirmOfferComplete";
 import swal from "sweetalert";
 import { extractErrorMessage } from "@/utils/extractErrorMsg";
 
-export default function AddOfferPage() {
+export default function ManageOffersPage() {
   const router = useRouter();
   const pathname = usePathname();
   const { isAuthenticated, refreshAuth } = useAuth();

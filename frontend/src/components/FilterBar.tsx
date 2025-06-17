@@ -10,7 +10,7 @@ interface FilterBarProps {
   handleTypeFilter: (value: Option | null) => void;
 }
 
-export default function HeaderBar(FilterBarProps: FilterBarProps) {
+export default function FilterBar(FilterBarProps: FilterBarProps) {
   const {
     conditionFilter,
     typeFilter,

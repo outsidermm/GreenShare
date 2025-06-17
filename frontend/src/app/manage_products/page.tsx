@@ -13,7 +13,7 @@ import deleteItem from "@/services/item/deleteItem";
 import { Item } from "@/types/item";
 import ProductForm from "@/components/ProductForm";
 
-export default function AddOfferPage() {
+export default function ManageProductsPage() {
   const router = useRouter();
   const pathname = usePathname();
   const { isAuthenticated, refreshAuth } = useAuth();

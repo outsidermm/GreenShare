@@ -14,7 +14,7 @@ import { Option } from "@/types/option";
 import FilterBar from "@/components/FilterBar";
 import { ItemFilter } from "@/types/itemFilter";
 
-export default function Home() {
+export default function CategoryPage() {
   const { isAuthenticated, refreshAuth } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
