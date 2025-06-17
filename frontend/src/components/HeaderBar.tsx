@@ -20,14 +20,16 @@ export default function HeaderBar(HeaderBarProps: HeaderBarProps) {
   const [options, setOptions] = useState<string[]>([]);
   const debouncedSearchTerm = useDebounce(searchTerm, 150);
   const router = useRouter();
+  const [theme, setTheme] = useState<"light" | "dark" | "color-blind">("light");
 
-  const [theme, setTheme] = useState<"light" | "dark" | "color-blind">(
-    document.body.classList.contains("color-blind")
+  useEffect(() => {
+    const currentTheme = document.body.classList.contains("color-blind")
       ? "color-blind"
       : document.body.classList.contains("dark")
         ? "dark"
-        : "light",
-  );
+        : "light";
+    setTheme(currentTheme);
+  }, []);
 
   const toggleTheme = () => {
     const next =
