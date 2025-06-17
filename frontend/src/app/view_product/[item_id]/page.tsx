@@ -63,15 +63,15 @@ export default function Home() {
   };
 
   return (
-    <div className="bg-slate-100 w-screen min-h-screen pt-16">
-      <div className="fixed top-0 left-0 w-full bg-slate-900 shadow z-50 px-6 py-4 flex items-center justify-between gap-4 sm:gap-10">
+    <div className="bg-background w-screen min-h-screen pt-16">
+      <div className="fixed top-0 left-0 w-full bg-contrast shadow z-50 px-6 py-4 flex items-center justify-between gap-4 sm:gap-10">
         <HeaderBar
           isAuthenticated={isAuthenticated}
           handleLogin={handleLogin}
         />
       </div>
 
-      <div className="fixed top-16 left-0 w-60 h-[calc(100vh-4rem)] bg-slate-900 text-white px-6 py-6 shadow-slate-400 shadow-xl flex flex-col justify-between">
+      <div className="fixed top-16 left-0 w-60 h-[calc(100vh-4rem)] bg-contrast text-surface px-6 py-6 shadow-grey-shadow shadow-xl flex flex-col justify-between">
         <NavBar
           handleLogout={handleLogout}
           pathname={pathname}
@@ -83,9 +83,9 @@ export default function Home() {
         <div className="p-2 mb-4">
           <div
             onClick={() => router.back()}
-            className="cursor-pointer w-fit p-1 hover:bg-slate-300 rounded"
+            className="cursor-pointer w-fit p-1 hover:bg-border rounded"
           >
-            <FaChevronLeft color="black" size={16} />
+            <FaChevronLeft color="contrast" size={16} />
           </div>
         </div>
         <div className="flex flex-col sm:flex-row gap-6">
@@ -102,7 +102,7 @@ export default function Home() {
                 item.images.map((image, index) => (
                   <div
                     key={index}
-                    className="relative w-full aspect-[4/3] bg-white overflow-hidden rounded"
+                    className="relative w-full aspect-[4/3] bg-surface overflow-hidden rounded"
                   >
                     <Image
                       src={image}
@@ -117,51 +117,47 @@ export default function Home() {
           <div className="flex-1">
             {item ? (
               <>
-                <h1 className="text-2xl font-bold text-slate-800 mb-4">
+                <h1 className="text-2xl font-bold text-contrast mb-4">
                   {toTitleCase(item.title)}
                 </h1>
-                <h3 className="text-lg font-medium text-slate-700 mb-2">
+                <h3 className="text-lg font-medium text-content mb-2">
                   Description:
                 </h3>
-                <p className="text-slate-600 mb-4">
+                <p className="text-muted mb-4">
                   {toTitleCase(item.description)}
                 </p>
 
-                <h3 className="text-lg font-medium text-slate-700 mb-2">
+                <h3 className="text-lg font-medium text-content mb-2">
                   Condition:
                 </h3>
-                <p className="text-blue-600 mb-2">
+                <p className="text-hyperlink mb-2">
                   {toTitleCase(item.condition)}
                 </p>
 
-                <h3 className="text-lg font-medium text-slate-700 mb-2">
-                  Type:
-                </h3>
-                <p className="text-slate-600 mb-2">{toTitleCase(item.type)}</p>
+                <h3 className="text-lg font-medium text-content mb-2">Type:</h3>
+                <p className="text-muted mb-2">{toTitleCase(item.type)}</p>
 
-                <h3 className="text-lg font-medium text-slate-700 mb-2">
+                <h3 className="text-lg font-medium text-content mb-2">
                   Location:
                 </h3>
-                <p className="text-slate-600 mb-2">
-                  {toTitleCase(item.location)}
-                </p>
+                <p className="text-muted mb-2">{toTitleCase(item.location)}</p>
 
-                <h3 className="text-lg font-medium text-slate-700 mb-2">
+                <h3 className="text-lg font-medium text-content mb-2">
                   Last Updated:
                 </h3>
-                <p className="text-slate-600 mb-2">
+                <p className="text-muted mb-2">
                   {new Date(item.updated_at).toLocaleDateString()}
                 </p>
               </>
             ) : (
-              <div className="text-center text-slate-600">
+              <div className="text-center text-muted">
                 <p>Item not found.</p>
               </div>
             )}
             <div className="pt-10 p-6">
               <button
                 onClick={handleOffer}
-                className="w-full rounded bg-green-600 hover:bg-green-500 text-slate-900 font-bold py-2 px-4 border-solid border-2 border-green-600 transition-all"
+                className="w-full rounded bg-action-primary hover:bg-action-secondary text-contrast font-bold py-2 px-4 border-solid border-2 border-action-primary transition-all"
               >
                 Make an Offer
               </button>
