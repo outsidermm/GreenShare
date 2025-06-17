@@ -1,4 +1,5 @@
 "use client";
+// This page allows authenticated users to manage (view, edit, delete) their posted items.
 import { useRouter, usePathname } from "next/navigation";
 import logoutUser from "@/services/user/logoutUser";
 import NavBar from "@/components/NavBar";
@@ -21,6 +22,7 @@ export default function ManageProductsPage() {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<Item>();
 
+  // Fetches the authenticated user's items on page load. If unauthenticated, prompts for login or redirects.
   useEffect(() => {
     (async () => {
       try {
@@ -48,6 +50,7 @@ export default function ManageProductsPage() {
     })();
   }, [pathname, isAuthenticated, router]);
 
+  // Disables background scrolling when the edit modal is open.
   useEffect(() => {
     if (isEditOpen) {
       document.body.style.overflow = "hidden";
@@ -88,7 +91,7 @@ export default function ManageProductsPage() {
   };
 
   return (
-    <div className="bg-background w-screen h-screen pt-16">
+    <main role="main" aria-label="Manage Products Page" className="bg-background w-screen h-screen pt-16">
       <div className="fixed top-0 left-0 w-full bg-contrast shadow z-50 px-6 py-4 flex items-center justify-between gap-4 sm:gap-10">
         <HeaderBar
           isAuthenticated={isAuthenticated}
@@ -107,16 +110,19 @@ export default function ManageProductsPage() {
       <div
         className={`relative sm:ml-60 sm:mt-0 p-6 ${isAuthenticated ? "mt-96 pt-20" : "mt-64"}`}
       >
-        <h1 className="text-2xl font-bold mb-4 text-content px-4">
-          View Your Items
-        </h1>
+        <header>
+          <h1 className="text-2xl font-bold mb-4 text-content px-4">
+            View Your Items
+          </h1>
+        </header>
 
-        <div className="p-4">
+        <div className="p-4" aria-live="polite">
           {ownedItems.length > 0 ? (
             ownedItems.map((item) => (
               <div
                 key={item.id}
                 className="bg-surface p-4 mb-4 rounded-lg shadow flex justify-between gap-8 flex-col sm:flex-row"
+                aria-label="User Item Card"
               >
                 <div className="flex-2 text-content">
                   <h1 className="text-xl font-bold mb-2">
@@ -168,6 +174,7 @@ export default function ManageProductsPage() {
               <button
                 onClick={() => setIsEditOpen(false)}
                 className="absolute top-4 right-4 text-content hover:text-content text-4xl font-bold"
+                aria-label="Close edit modal"
               >
                 &times;
               </button>
@@ -182,11 +189,12 @@ export default function ManageProductsPage() {
               setIsEditOpen(true);
             }}
             className="bg-action-primary text-content px-4 py-2 rounded-full hover:bg-action-secondary flex items-center gap-2 transition-all border-2 border-action-primary font-bold shadow-xl"
+            aria-label="Add New Item"
           >
             Add New Item
           </button>
         </div>
       </div>
-    </div>
+    </main>
   );
 }
