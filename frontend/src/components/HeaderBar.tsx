@@ -139,17 +139,17 @@ export default function HeaderBar(HeaderBarProps: HeaderBarProps) {
           </>
         )}
       </div>
-
-      <div className="flex items-center gap-2 sm:gap-6 pr-4">
-        {!isAuthenticated && (
-          <button
-            onClick={handleLogin}
-            className="text-action-primary border border-surface px-3 py-1 rounded hover:bg-action-hover"
-          >
-            Login
-          </button>
-        )}
-      </div>
+      {!isAuthenticated && (
+        <div className="flex items-center gap-2 sm:gap-6 pr-4">
+            <button
+              onClick={handleLogin}
+              className="text-action-primary border border-surface px-3 py-1 rounded hover:bg-action-hover"
+            >
+              Login
+            </button>
+        </div>
+      )}
+     
     </>
   );
 }
