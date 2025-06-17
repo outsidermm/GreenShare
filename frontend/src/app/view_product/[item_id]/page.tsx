@@ -71,15 +71,15 @@ export default function ViewProductPage() {
         />
       </div>
 
-      <div className="fixed top-16 left-0 w-60 h-[calc(100vh-4rem)] bg-contrast text-surface px-6 py-6 shadow-grey-shadow shadow-xl flex flex-col justify-between">
+      <div className="z-50 fixed top-16 left-0 sm:w-60 w-full sm:h-[calc(100vh-4rem)] bg-contrast text-surface px-6 py-6 shadow-grey-shadow shadow-xl flex flex-col items-center sm:items-start sm:justify-between">
         <NavBar
           handleLogout={handleLogout}
-          pathname={pathname}
+          pathname="/"
           isAuthenticated={isAuthenticated}
         />
       </div>
 
-      <div className="ml-60 p-6 h-[calc(100vh-4rem)]">
+      <div className={`sm:ml-60 sm:mt-0 p-6 ${isAuthenticated ? "mt-96 pt-20" : "mt-64"}`}>
         <div className="p-2 mb-4">
           <div
             onClick={() => router.back()}
@@ -120,34 +120,13 @@ export default function ViewProductPage() {
                 <h1 className="text-2xl font-bold text-contrast mb-4">
                   {toTitleCase(item.title)}
                 </h1>
-                <h3 className="text-lg font-medium text-content mb-2">
-                  Description:
-                </h3>
-                <p className="text-muted mb-4">
-                  {toTitleCase(item.description)}
-                </p>
-
-                <h3 className="text-lg font-medium text-content mb-2">
-                  Condition:
-                </h3>
-                <p className="text-hyperlink mb-2">
-                  {toTitleCase(item.condition)}
-                </p>
-
-                <h3 className="text-lg font-medium text-content mb-2">Type:</h3>
-                <p className="text-muted mb-2">{toTitleCase(item.type)}</p>
-
-                <h3 className="text-lg font-medium text-content mb-2">
-                  Location:
-                </h3>
-                <p className="text-muted mb-2">{toTitleCase(item.location)}</p>
-
-                <h3 className="text-lg font-medium text-content mb-2">
-                  Last Updated:
-                </h3>
-                <p className="text-muted mb-2">
-                  {new Date(item.updated_at).toLocaleDateString()}
-                </p>
+                <div className="text-lg leading-relaxed space-y-2 text-content">
+                  <p><strong>Description:</strong> {toTitleCase(item.description)}</p>
+                  <p><strong>Condition:</strong> {toTitleCase(item.condition)}</p>
+                  <p><strong>Type:</strong> {toTitleCase(item.type)}</p>
+                  <p><strong>Approximate Location:</strong> {toTitleCase(item.location).split(", ").slice(1).join(", ").trim()}</p>
+                  <p><strong>Last Updated:</strong> {new Date(item.updated_at).toLocaleDateString()}</p>
+                </div>
               </>
             ) : (
               <div className="text-center text-muted">

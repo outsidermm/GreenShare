@@ -19,7 +19,7 @@ export default function FilterBar(FilterBarProps: FilterBarProps) {
   } = FilterBarProps;
 
   return (
-    <div className="flex flex-row items-center gap-10 py-8">
+    <div className="flex flex-col items-center gap-4 py-8 lg:flex-row lg:gap-10">
       <DropDown
         label_text="Filtered Condition:"
         placeholder="Select Condition"

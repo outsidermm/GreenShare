@@ -23,7 +23,7 @@ interface ProductFormProps {
 
 export default function ProductForm(input: ProductFormProps) {
   const { item } = input;
-  const { isAuthenticated, refreshAuth } = useAuth();
+  const { isAuthenticated } = useAuth();
   const router = useRouter();
 
   const [title, setTitle] = useState("");
@@ -163,7 +163,7 @@ export default function ProductForm(input: ProductFormProps) {
       }}
     >
       <div className="p-4">
-        <div className="flex justify-between">
+        <div className="flex justify-between flex-col sm:flex-row gap-4">
           <div className="flex items-center gap-2">
             <AiOutlineShop
               style={{ color: "var(--color-contrast-background)" }}

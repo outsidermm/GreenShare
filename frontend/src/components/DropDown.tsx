@@ -53,6 +53,7 @@ export default function DropDown(props: DropDownProps) {
     <>
       <label className="block mb-2 text-content">{label_text}</label>
       <Select
+        className="z-40"
         options={options}
         value={selectedOption}
         onChange={(option: OnChangeValue<unknown, false>) =>

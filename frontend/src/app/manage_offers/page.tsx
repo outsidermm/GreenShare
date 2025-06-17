@@ -150,7 +150,7 @@ export default function ManageOffersPage() {
         />
       </div>
 
-      <div className="fixed top-16 left-0 w-60 h-[calc(100vh-4rem)] bg-contrast text-surface px-6 py-6 shadow-grey-shadow shadow-xl flex flex-col justify-between">
+      <div className="z-50 fixed top-16 left-0 sm:w-60 w-full sm:h-[calc(100vh-4rem)] bg-contrast text-surface px-6 py-6 shadow-grey-shadow shadow-xl flex flex-col items-center sm:items-start sm:justify-between">
         <NavBar
           handleLogout={handleLogout}
           pathname={pathname}
@@ -158,7 +158,7 @@ export default function ManageOffersPage() {
         />
       </div>
 
-      <div className="ml-60 p-6">
+      <div className={`sm:ml-60 sm:mt-0 p-6 ${isAuthenticated ? "mt-96 pt-20" : "mt-64"}`}>
         <h1 className="text-2xl font-bold mb-4 text-content px-4">
           View Offers
         </h1>

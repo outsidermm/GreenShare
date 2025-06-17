@@ -136,7 +136,7 @@ export default function AddOfferPage() {
         />
       </div>
 
-      <div className="fixed top-16 left-0 w-60 h-[calc(100vh-4rem)] bg-contrast text-surface px-6 py-6 shadow-grey-shadow shadow-xl flex flex-col justify-between">
+      <div className="z-50 fixed top-16 left-0 sm:w-60 w-full sm:h-[calc(100vh-4rem)] bg-contrast text-surface px-6 py-6 shadow-grey-shadow shadow-xl flex flex-col items-center sm:items-start sm:justify-between">
         <NavBar
           handleLogout={handleLogout}
           pathname={pathname}
@@ -144,7 +144,7 @@ export default function AddOfferPage() {
         />
       </div>
 
-      <div className="ml-60 p-6">
+      <div className={`sm:ml-60 sm:mt-0 p-6 ${isAuthenticated ? "mt-96 pt-20" : "mt-64"}`}>
         <div className="flex flex-col sm:flex-row gap-6 items-start">
           <div className="flex-1">
             <div className="shadow-lg p-4 mb-4">
@@ -196,23 +196,22 @@ export default function AddOfferPage() {
               ></textarea>
             </div>
           </div>
-          <div className="flex-1 shadow-lg text-content">
+          <div className="flex-1 shadow-lg text-content w-full">
             <div className="p-4">
               <h1 className="text-content font-bold">
                 Requested Item Information:
               </h1>
               {requestedItem && (
                 <>
-                  <p className="font-bold mb-4">
+                  <p className="font-bold mb-2">
                     {toTitleCase(requestedItem.title)}
                   </p>
-                  <p className="mb-4">
-                    Description: {toTitleCase(requestedItem.description)}
-                    <br />
-                    Condition: {toTitleCase(requestedItem.condition)}
-                    <br />
-                    Type: {toTitleCase(requestedItem.type)}
-                  </p>
+                  <div className="leading-relaxed space-y-1 mb-4 text-content">
+                    <p><strong>Description:</strong> {toTitleCase(requestedItem.description)}</p>
+                    <p><strong>Condition:</strong> {toTitleCase(requestedItem.condition)}</p>
+                    <p><strong>Type:</strong> {toTitleCase(requestedItem.type)}</p>
+                    <p><strong>Approximate Location:</strong> {toTitleCase(requestedItem.location).split(", ").slice(1).join(", ").trim()}</p>
+                  </div>
                 </>
               )}
               <h1 className="text-content font-bold">Offered Item:</h1>

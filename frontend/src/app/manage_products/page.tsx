@@ -46,6 +46,18 @@ export default function ManageProductsPage() {
     })();
   }, [pathname, isAuthenticated, router]);
 
+  useEffect(() => {
+    if (isEditOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [isEditOpen]);
+
   const handleLogin = async () => {
     router.push("/login");
   };
@@ -82,7 +94,7 @@ export default function ManageProductsPage() {
         />
       </div>
 
-      <div className="fixed top-16 left-0 w-60 h-[calc(100vh-4rem)] bg-contrast text-surface px-6 py-6 shadow-grey-shadow shadow-xl flex flex-col justify-between">
+      <div className="z-50 fixed top-16 left-0 sm:w-60 w-full sm:h-[calc(100vh-4rem)] bg-contrast text-surface px-6 py-6 shadow-grey-shadow shadow-xl flex flex-col items-center sm:items-start sm:justify-between">
         <NavBar
           handleLogout={handleLogout}
           pathname={pathname}
@@ -90,7 +102,7 @@ export default function ManageProductsPage() {
         />
       </div>
 
-      <div className="ml-60 p-6 relative h-[calc(100vh-4rem)]">
+      <div className={`relative sm:ml-60 sm:mt-0 p-6 ${isAuthenticated ? "mt-96 pt-20" : "mt-64"}`}>
         <h1 className="text-2xl font-bold mb-4 text-content px-4">
           View Your Items
         </h1>
@@ -103,34 +115,17 @@ export default function ManageProductsPage() {
                 className="bg-surface p-4 mb-4 rounded-lg shadow flex justify-between gap-8 flex-col sm:flex-row"
               >
                 <div className="flex-2 text-content">
+                  <h1 className="text-xl font-bold mb-2">
+                    {toTitleCase(item.title)}
+                  </h1>
                   <p>
-                    <strong>Title:</strong> {toTitleCase(item.title)}
-                  </p>
-                  <p>
-                    <strong>Description</strong> {toTitleCase(item.description)}
-                  </p>
-                  <p>
-                    <strong>Condition:</strong> {toTitleCase(item.condition)}
-                  </p>
-                  <p>
-                    <strong>Status:</strong> {toTitleCase(item.status)}
-                  </p>
-                  <p>
-                    <strong>Location:</strong> {toTitleCase(item.location)}
-                  </p>
-                  <p>
-                    <strong>Category:</strong> {toTitleCase(item.category)}
-                  </p>
-                  <p>
-                    <strong>Type:</strong> {toTitleCase(item.type)}
-                  </p>
-                  <p>
-                    <strong>Last Updated:</strong>{" "}
-                    {new Date(item.updated_at).toLocaleDateString("en-US", {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })}
+                    <strong>Description</strong> {toTitleCase(item.description)} <br />
+                    <strong>Condition:</strong> {toTitleCase(item.condition)} <br />
+                    <strong>Status:</strong> {toTitleCase(item.status)} <br />
+                    <strong>Location:</strong> {toTitleCase(item.location)} <br />
+                    <strong>Category:</strong> {toTitleCase(item.category)} <br />
+                    <strong>Type:</strong> {toTitleCase(item.type)} <br />
+                    <strong>Last Updated:</strong> {new Date(item.updated_at).toLocaleDateString()}
                   </p>
                 </div>
                 <div className="flex-2">

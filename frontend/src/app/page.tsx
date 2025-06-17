@@ -65,7 +65,7 @@ export default function Home() {
         />
       </div>
 
-      <div className="fixed top-16 left-0 w-60 h-[calc(100vh-4rem)] bg-contrast text-surface px-6 py-6 shadow-grey-shadow shadow-xl flex flex-col justify-between">
+      <div className="z-50 fixed top-16 left-0 sm:w-60 w-full sm:h-[calc(100vh-4rem)] bg-contrast text-surface px-6 py-6 shadow-grey-shadow shadow-xl flex flex-col items-center sm:items-start sm:justify-between">
         <NavBar
           handleLogout={handleLogout}
           pathname="/"
@@ -73,7 +73,7 @@ export default function Home() {
         />
       </div>
 
-      <div className="ml-60 p-6">
+      <div className={`sm:ml-60 sm:mt-0 p-6 ${isAuthenticated ? "mt-96 pt-20" : "mt-64"}`}>
         <div className="bg-action-primary text-white rounded-lg p-6 mb-8">
           <h2 className="text-2xl font-bold">Welcome to GreenShare 🌱</h2>
           <p>
@@ -106,7 +106,7 @@ export default function Home() {
         <h3 className="text-xl text-content font-semibold mb-4">
           Hot Deals 🔥
         </h3>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-6">
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-6">
           {items.length > 0 ? (
             items.map((item) => (
               <Link key={item.id} href={`/view_product/${item.id}`}>
