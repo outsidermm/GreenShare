@@ -217,13 +217,13 @@ export default function ManageOffersPage() {
                     onClick={() =>
                       handleCurrentUserOfferAction(offer, toggleOffer)
                     }
-                    className={`w-full rounded ${offer.status === "cancelled" ? "bg-alert-hover text-surface border-alert-hover" : "bg-action-primary hover:bg-action-secondary text-contrast border-action-primary"} font-bold py-2 px-4 border-solid border-2 transition-all mt-4`}
+                    className={`w-full rounded  text-contrast ${offer.status === "cancelled" ? "bg-alert-hover border-alert-hover" : "bg-action-primary hover:bg-action-secondary border-action-primary"} font-bold py-2 px-4 border-solid border-2 transition-all mt-4`}
                   >
                     {getOfferActionLabel(toggleOffer, offer.status)}
                   </button>
                   {offer.status === "pending" && (
                     <button
-                      className="w-full rounded bg-alert-hover hover:bg-alert text-surface font-bold py-2 px-2 border-solid border-2 border-alert-hover transition-all mt-4"
+                      className="w-full rounded bg-alert-hover hover:bg-alert text-contrast font-bold py-2 px-2 border-solid border-2 border-alert-hover transition-all mt-4"
                       onClick={() => handleCancel(offer.id)}
                     >
                       Cancel
