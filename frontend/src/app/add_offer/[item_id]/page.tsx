@@ -128,15 +128,15 @@ export default function AddOfferPage() {
   };
 
   return (
-    <div className="bg-slate-100 w-screen min-h-screen pt-16">
-      <div className="fixed top-0 left-0 w-full bg-slate-900 shadow z-50 px-6 py-4 flex items-center justify-between gap-4 sm:gap-10">
+    <div className="bg-background w-screen min-h-screen pt-16">
+      <div className="fixed top-0 left-0 w-full bg-contrast shadow z-50 px-6 py-4 flex items-center justify-between gap-4 sm:gap-10">
         <HeaderBar
           isAuthenticated={isAuthenticated}
           handleLogin={handleLogin}
         />
       </div>
 
-      <div className="fixed top-16 left-0 w-60 h-[calc(100vh-4rem)] bg-slate-900 text-white px-6 py-6 shadow-slate-400 shadow-xl flex flex-col justify-between">
+      <div className="fixed top-16 left-0 w-60 h-[calc(100vh-4rem)] bg-contrast text-surface px-6 py-6 shadow-grey-shadow shadow-xl flex flex-col justify-between">
         <NavBar
           handleLogout={handleLogout}
           pathname={pathname}
@@ -148,7 +148,7 @@ export default function AddOfferPage() {
         <div className="flex flex-col sm:flex-row gap-6 items-start">
           <div className="flex-1">
             <div className="shadow-lg p-4 mb-4">
-              <h1 className="text-slate-800 font-bold">Your inventory</h1>
+              <h1 className="text-content font-bold">Your inventory</h1>
               {offerableItems.length > 0 ? (
                 <ul className="list-disc pl-5">
                   {offerableItems.map((item) => {
@@ -158,10 +158,10 @@ export default function AddOfferPage() {
                     return (
                       <li
                         key={item.id}
-                        className={`mb-2 p-2 rounded ${
+                        className={`mb-2 p-2 text-content cursor-pointer rounded ${
                           isSelected
-                            ? "bg-green-200 text-slate-800 cursor-pointer"
-                            : "text-slate-800 cursor-pointer hover:bg-slate-200"
+                            ? "bg-selected-highlight"
+                            : "hover:bg-unselected-highlight"
                         }`}
                         onClick={() => {
                           if (!isSelected)
@@ -179,15 +179,15 @@ export default function AddOfferPage() {
                   })}
                 </ul>
               ) : (
-                <p className="text-slate-600">You have no items to offer.</p>
+                <p className="text-muted">You have no items to offer.</p>
               )}
             </div>
             <div className="shadow-lg p-4 mb-4">
-              <h1 className="text-slate-800 font-bold">
+              <h1 className="text-content font-bold">
                 Enter a message with your offer:
               </h1>
               <textarea
-                className="w-full h-32 p-2 border border-slate-300 rounded text-slate-800"
+                className="w-full h-32 p-2 border border-border rounded text-slate-600"
                 placeholder="Type your message here..."
                 minLength={10}
                 maxLength={2000}
@@ -196,17 +196,17 @@ export default function AddOfferPage() {
               ></textarea>
             </div>
           </div>
-          <div className="flex-1 shadow-lg">
+          <div className="flex-1 shadow-lg text-content">
             <div className="p-4">
-              <h1 className="text-slate-800 font-bold">
+              <h1 className="text-content font-bold">
                 Requested Item Information:
               </h1>
               {requestedItem && (
                 <>
-                  <p className="font-bold text-slate-800 mb-4">
+                  <p className="font-bold mb-4">
                     {toTitleCase(requestedItem.title)}
                   </p>
-                  <p className="text-slate-800 mb-4">
+                  <p className="mb-4">
                     Description: {toTitleCase(requestedItem.description)}
                     <br />
                     Condition: {toTitleCase(requestedItem.condition)}
@@ -215,13 +215,13 @@ export default function AddOfferPage() {
                   </p>
                 </>
               )}
-              <h1 className="text-slate-800 font-bold">Offered Item:</h1>
+              <h1 className="text-content font-bold">Offered Item:</h1>
               {outgoingItems.length > 0 ? (
                 <ul className="list-disc pl-5">
                   {outgoingItems.map((item) => (
                     <li
                       key={item.id}
-                      className="mb-2 p-2 rounded text-slate-800 cursor-pointer hover:bg-slate-200"
+                      className="mb-2 p-2 rounded text-content cursor-pointer hover:bg-unselected-highlight"
                       onClick={() => {
                         setOutgoingItems((prev) =>
                           prev.filter((outItem) => outItem.id !== item.id),
@@ -234,11 +234,11 @@ export default function AddOfferPage() {
                   ))}
                 </ul>
               ) : (
-                <p className="text-slate-800">You offered no items.</p>
+                <p className="text-content">You offered no items.</p>
               )}
               <button
                 onClick={() => handleOfferSubmit()}
-                className="w-full rounded bg-green-600 hover:bg-green-500 text-slate-900 font-bold py-2 px-4 border-solid border-2 border-green-600 transition-all mt-4"
+                className="w-full rounded bg-action-primary hover:bg-action-secondary text-contrast font-bold py-2 px-4 border-solid border-2 border-action-primary transition-all mt-4"
               >
                 Make an Offer
               </button>
