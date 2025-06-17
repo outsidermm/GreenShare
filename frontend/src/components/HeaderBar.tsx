@@ -4,6 +4,7 @@ import { toTitleCase } from "@/utils/titleCase";
 import { useState, useEffect } from "react";
 import useDebounce from "@/hooks/useDebounce";
 import { ImCross } from "react-icons/im";
+import { FaSun, FaMoon, FaEyeDropper } from "react-icons/fa6";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
@@ -19,6 +20,14 @@ export default function HeaderBar(HeaderBarProps: HeaderBarProps) {
   const [options, setOptions] = useState<string[]>([]);
   const debouncedSearchTerm = useDebounce(searchTerm, 150);
   const router = useRouter();
+
+  const [theme, setTheme] = useState<"light" | "dark" | "color-blind">("light");
+
+  const toggleTheme = () => {
+    const next = theme === "light" ? "dark" : theme === "dark" ? "color-blind" : "light";
+    setTheme(next);
+    document.documentElement.dataset.theme = next;
+  };
 
   useEffect(() => {
     const fetchOptions = async () => {
@@ -47,40 +56,63 @@ export default function HeaderBar(HeaderBarProps: HeaderBarProps) {
           GreenShare
         </Link>
       </div>
-      <div className="flex items-center gap-4 flex-grow px-4 pr-10 relative">
-        {handleTitleFilter ? (
-          <>
+      <div className="flex items-center gap-4 flex-grow px-4 relative">
             <input
               type="text"
               placeholder="Search for items"
-              className="flex-grow px-3 py-2 rounded-xl border border-surface focus:border-action-secondary outline-none placeholder-surface bg-inherit"
+              className="flex-grow px-3 py-2 rounded-xl border border-surface focus:border-action-secondary outline-none placeholder-surface bg-inherit text-surface"
               onChange={(e) => {
                 setSearchTerm(e.target.value);
-                if (e.target.value.length === 0) {
+                if (e.target.value.length === 0 && handleTitleFilter) {
                   handleTitleFilter("");
                 }
               }}
               onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  handleTitleFilter(searchTerm);
+                  if (e.key === "Enter") {
+                    if(handleTitleFilter) {
+                      handleTitleFilter(searchTerm);
+                    }
+                    else {
+                      swal("Redirecting to home page", {
+                        icon: "info",
+                        timer: 750,
+                      });
+                      setSearchTerm("");
+                      router.push("/");
+                    }
+                  }
                 }
-              }}
+              }
               value={searchTerm}
             />
             {searchTerm && (
               <button
                 onClick={() => {
                   setSearchTerm("");
-                  handleTitleFilter("");
+                  if (handleTitleFilter) {
+                    handleTitleFilter("");
+                  }
                 }}
-                className="absolute right-28 px-3 text-xs"
+                className="absolute right-24 px-3 text-xs"
               >
                 <ImCross className="text-surface" />
               </button>
             )}
             <button
-              onClick={() => handleTitleFilter(searchTerm)}
-              className="absolute right-10 text-surface bg-action-primary hover:bg-action-secondary px-3 py-2 rounded-r-xl"
+              onClick={() => {
+                if (handleTitleFilter) {
+                handleTitleFilter(searchTerm)
+                }
+                else {
+                  swal("Redirecting to home page", {
+                    icon: "info",
+                    timer: 750,
+                  });
+                  setSearchTerm("");
+                  router.push("/");
+                }
+            }}
+              className="absolute right-4 text-surface bg-action-primary hover:bg-action-secondary px-3 py-2 rounded-r-xl"
             >
               Enter
             </button>
@@ -103,44 +135,22 @@ export default function HeaderBar(HeaderBarProps: HeaderBarProps) {
                 ))}
               </div>
             )}
-          </>
-        ) : (
-          <>
-            <input
-              type="text"
-              placeholder="Search for items"
-              className="flex-grow px-3 py-2 rounded-xl border border-surface focus:border-action-secondary outline-none placeholder-surface bg-inherit"
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  swal("Redirecting to home page", {
-                    icon: "info",
-                    timer: 750,
-                  });
-                  setSearchTerm("");
-                  router.push("/");
-                }
-              }}
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-            <button
-              onClick={() => {
-                swal("Redirecting to home page", {
-                  icon: "info",
-                  timer: 750,
-                });
-                setSearchTerm("");
-                router.push("/");
-              }}
-              className="absolute right-10 text-surface text-sm bg-action-primary hover:bg-action-secondary px-3 py-2 rounded-r-xl"
-            >
-              Enter
-            </button>
-          </>
-        )}
+          
       </div>
+      <div>
+        <button
+            onClick={toggleTheme}
+            className="p-2 rounded-full text-xl bg-surface hover:bg-muted transition-all"
+            title={`Current theme: ${theme}`}
+          >
+            {theme === "light" && <FaSun />}
+            {theme === "dark" && <FaMoon />}
+            {theme === "color-blind" && <FaEyeDropper />}
+          </button>
+      </div>
+
       {!isAuthenticated && (
-        <div className="flex items-center gap-2 sm:gap-6 pr-4">
+        <div className="px-4">
             <button
               onClick={handleLogin}
               className="text-action-primary border border-surface px-3 py-1 rounded hover:bg-action-hover"
