@@ -45,6 +45,14 @@ export default function Home() {
     fetchItems();
   }, [titleFilter, conditionFilter, typeFilter]);
 
+  useEffect(() => {
+    router.prefetch("/category/essentials");
+    router.prefetch("/category/living");
+    router.prefetch("/category/tools-tech");
+    router.prefetch("/category/style-expression");
+    router.prefetch("/category/leisure-learning");
+  }, [router]);
+
   const handleLogin = async () => {
     router.push("/login");
   };
@@ -84,13 +92,13 @@ export default function Home() {
             sustainable tomorrow.
           </p>
           {isAuthenticated ? (
-            <Link href="/manage_products">
+            <Link href="/manage_products" prefetch={true}>
               <button className="mt-4 bg-surface hover:bg-unselected-highlight text-action-primary font-semibold px-4 py-2 rounded transition-all">
                 Add a New Item
               </button>
             </Link>
           ) : (
-            <Link href="/login">
+            <Link href="/login" prefetch={true}>
               <button className="mt-4 bg-surface hover:bg-unselected-highlight text-action-primary font-semibold px-4 py-2 rounded transition-all">
                 Login to Add a New Item
               </button>
@@ -111,7 +119,11 @@ export default function Home() {
         <div className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-6">
           {items.length > 0 ? (
             items.map((item) => (
-              <Link key={item.id} href={`/view_product/${item.id}`}>
+              <Link
+                key={item.id}
+                href={`/view_product/${item.id}`}
+                prefetch={true}
+              >
                 <div className="bg-surface rounded shadow p-4 cursor-pointer hover:shadow-lg transition-all h-full">
                   <Image
                     src={item.images[0]}

@@ -29,13 +29,14 @@ export default function ViewProductPage() {
         if (response.length === 1) {
           setItem(response[0]);
         }
+        router.prefetch(`/add_offer/${item_id_filter}`);
       } catch (error) {
         console.error("Error fetching items:", error);
       }
     };
 
     fetchItems();
-  }, [pathname, item_id_filter]);
+  }, [pathname, item_id_filter, router]);
 
   const handleLogin = async () => {
     router.push("/login");
@@ -110,7 +111,9 @@ export default function ViewProductPage() {
                       src={image}
                       alt={item.title}
                       fill
+                      sizes="(min-width: 1024px) 50vw, 100vw"
                       className="object-contain"
+                      priority={true}
                     />
                   </div>
                 ))}

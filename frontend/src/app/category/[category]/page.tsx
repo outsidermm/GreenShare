@@ -88,7 +88,11 @@ export default function CategoryPage() {
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-6">
           {items.length > 0 ? (
             items.map((item) => (
-              <Link key={item.id} href={`/view_product/${item.id}`}>
+              <Link
+                key={item.id}
+                href={`/view_product/${item.id}`}
+                prefetch={true}
+              >
                 <div className="bg-surface rounded shadow p-4 cursor-pointer hover:shadow-lg transition-all h-full">
                   <Image
                     src={item.images[0]}

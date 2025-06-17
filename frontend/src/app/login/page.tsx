@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import loginUser from "@/services/user/loginUser";
 import PasswordInput from "@/components/PasswordInput";
@@ -17,6 +17,11 @@ export default function LoginPage() {
   const [pwdChanged, setPwdChanged] = useState(false);
 
   const [showSuccess, setShowSuccess] = useState(false);
+
+  useEffect(() => {
+    router.prefetch("/manage_offers");
+    router.prefetch("/manage_products");
+  }, [router]);
 
   const handleSubmit = async () => {
     try {
@@ -104,6 +109,7 @@ export default function LoginPage() {
               <Link
                 href="/register"
                 className="text-hyperlink hover:text-hyperlink-hover"
+                prefetch={true}
               >
                 Sign Up
               </Link>
