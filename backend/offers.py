@@ -2,6 +2,7 @@ from typing import Tuple
 
 from flask import abort
 
+from backend.auth import validate_user_id
 from backend.data import items, exchange_offers
 from backend.data import admin_retrieve_user_id
 from backend.classes.exchange_offer import ExchangeOffer
@@ -21,6 +22,7 @@ async def user_create_offer(
 ) -> ExchangeOffer:
 
     new_offered_by_id = admin_retrieve_user_id(session_token, csrf_token)
+    validate_user_id(new_offered_by_id)
 
     requested_item_id = int(requested_item_id)
     if requested_item_id not in items:
@@ -66,6 +68,7 @@ async def user_get_offers(
     session_token: str, csrf_token: str
 ) -> Tuple[list[ExchangeOffer], list[ExchangeOffer]]:
     new_user_id = admin_retrieve_user_id(session_token, csrf_token)
+    validate_user_id(new_user_id)
     outgoing_offers: list[ExchangeOffer] = []
     incoming_offers: list[ExchangeOffer] = []
     for offer in exchange_offers.values():
@@ -81,6 +84,7 @@ async def user_get_offers(
 
 async def user_accept_offer(session_token: str, csrf_token: str, offer_id: int) -> None:
     new_user_id = admin_retrieve_user_id(session_token, csrf_token)
+    validate_user_id(new_user_id)
     validate_offer_id(offer_id)
 
     offer = exchange_offers[offer_id]
@@ -118,6 +122,7 @@ async def user_complete_offer(
     session_token: str, csrf_token: str, offer_id: int
 ) -> None:
     new_user_id = admin_retrieve_user_id(session_token, csrf_token)
+    validate_user_id(new_user_id)
     validate_offer_id(offer_id)
 
     offer = exchange_offers[offer_id]
@@ -139,6 +144,7 @@ async def user_confirm_offer(
     session_token: str, csrf_token: str, offer_id: int
 ) -> None:
     new_user_id = admin_retrieve_user_id(session_token, csrf_token)
+    validate_user_id(new_user_id)
     validate_offer_id(offer_id)
 
     offer = exchange_offers[offer_id]
@@ -163,6 +169,7 @@ async def user_confirm_offer(
 
 async def user_get_offer_details(session_token: str, csrf_token: str, offer_id: int):
     new_user_id = admin_retrieve_user_id(session_token, csrf_token)
+    validate_user_id(new_user_id)
     validate_offer_id(offer_id)
 
     offer = exchange_offers[offer_id]
@@ -183,6 +190,7 @@ async def user_cancel_offer(
 ) -> None:
     message = message.lower()
     new_user_id = admin_retrieve_user_id(session_token, csrf_token)
+    validate_user_id(new_user_id)
     validate_offer_id(offer_id)
 
     offer = exchange_offers[offer_id]
