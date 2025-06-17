@@ -51,7 +51,7 @@ export default function DropDown(props: DropDownProps) {
   } = props;
   return (
     <>
-      <label className="block mb-2 text-slate-800">{label_text}</label>
+      <label className="block mb-2 text-content">{label_text}</label>
       <Select
         options={options}
         value={selectedOption}
