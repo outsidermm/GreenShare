@@ -7,12 +7,11 @@ and access control for user-submitted exchange offers.
 from typing import Tuple
 
 from flask import abort
-
+from backend.utils import validate_string_length
 from backend.auth import validate_user_id
 from backend.data import items, exchange_offers
 from backend.data import admin_retrieve_user_id
 from backend.classes.exchange_offer import ExchangeOffer
-from backend.utils import sanitize_input
 
 
 def validate_offer_id(offer_id: int) -> None:
@@ -88,9 +87,7 @@ async def user_create_offer(
         abort(400, "This item is free, you cannot offer items in exchange.")
 
     # Validate message length and format
-    new_message: str = message.lower()
-    if len(new_message) > 2000 or len(new_message) < 10:
-        abort(400, "Message must be between 10 and 1000 characters.")
+    new_message: str = validate_string_length(message, "Message", 10, 1000)
 
     # Create and store new offer
     try:
@@ -352,7 +349,9 @@ async def user_cancel_offer(
         404 Error: If the offer does not exist.
         500 Error: If there is an internal server error while cancelling the offer.
     """
-    message = message.lower()
+    message = validate_string_length(
+        message, "Cancellation Message", 10, 1000
+    )
 
     # Authenticate and validate user
     new_user_id: int = admin_retrieve_user_id(session_token, csrf_token)
