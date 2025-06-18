@@ -1,3 +1,9 @@
+"""
+This module defines the ExchangeOffer class, which manages the creation, retrieval,
+update, and deletion of exchange offers in the GreenShare platform. It interfaces
+with SQLAlchemy models to persist and query data from the backend database.
+"""
+
 from backend.models import ExchangeOfferDB
 from backend.config import db
 from backend.models import OfferedItemDB
@@ -8,8 +14,10 @@ class ExchangeOffer:
     Represents an exchange offer with encapsulated access and database interaction.
     """
 
+    # Internal storage for the primary key of the exchange offer instance
     __offer_pk: int = None
 
+    # Initialise a new ExchangeOffer instance and persist it with its offered items
     def __init__(
         self,
         offered_by_id: int,
@@ -49,7 +57,7 @@ class ExchangeOffer:
 
         return offer_dict
 
-    def set_offer_pk(self, offer_pk: int):
+    def set_offer_pk(self, offer_pk: int) -> None:
         """
         Sets the primary key for the exchange offer.
         """
@@ -73,7 +81,7 @@ class ExchangeOffer:
         """
         return db.session.get(ExchangeOfferDB, self.get_offer_pk()).status
 
-    def set_status(self, status: str):
+    def set_status(self, status: str) -> None:
         """
         Sets the status of the exchange offer.
         """
@@ -108,14 +116,15 @@ class ExchangeOffer:
         """
         return db.session.get(ExchangeOfferDB, self.get_offer_pk()).message
 
-    def set_message(self, message: str):
+    def set_message(self, message: str) -> None:
         """
         Sets the message for the exchange offer.
         """
         db.session.get(ExchangeOfferDB, self.get_offer_pk()).message = message
         db.session.commit()
 
-    def delete(self):
+    # Remove the current exchange offer from the database using its primary key
+    def delete(self) -> None:
         """
         Deletes the exchange offer from the database.
         """
