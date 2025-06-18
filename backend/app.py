@@ -1,5 +1,19 @@
-from flask import request, jsonify, make_response
+"""
+GreenShare Backend Application
+
+This module defines the Flask application routes for the GreenShare platform.
+It includes endpoints for user authentication, item management, exchange offers,
+and auxiliary services such as autocomplete and item search.
+"""
+
+import os
+import requests
+from flask import request, jsonify, make_response, Response
+
+# Application config and database
 from backend.config import app, db
+
+# Auth-related imports
 from backend.auth import (
     user_auth_register,
     user_auth_login,
@@ -7,9 +21,16 @@ from backend.auth import (
     user_auth_validate_session_token,
     user_auth_validate_csrf_token,
 )
+
+# Classes
 from backend.classes.user import User
 from backend.classes.item import Item
 from backend.classes.exchange_offer import ExchangeOffer
+
+# Data management
+from backend.data import image_upload, users, items, exchange_offers
+
+# Items
 from backend.items import (
     search_item_similarity_pg,
     user_create_item,
@@ -18,10 +39,8 @@ from backend.items import (
     user_modify_item,
     user_view_item,
 )
-from backend.data import image_upload, users, items, exchange_offers
-import os, requests
-from backend.utils import sanitize_input
 
+# Offers
 from backend.offers import (
     user_accept_offer,
     user_cancel_offer,
@@ -31,38 +50,51 @@ from backend.offers import (
     user_get_offers,
 )
 
+# Utils
+from backend.utils import sanitize_input
+
 PLACES_API_KEY = os.getenv("PLACES_API_KEY")
 
 
 @app.route("/")
-def index():
-    """Simple index route to verify the server is running."""
+def index() -> str:
+    """
+    Simple index route to verify the server is running.
+
+    Returns:
+        str: A string indicating the index route.
+    """
     return "Index route"
 
 
 # POST API for user registration
 @app.route("/auth/register", methods=["POST"])
-async def register_user():
+async def register_user() -> Response:
     """
     Registers a new user with email, password, first name, and last name.
 
+    Extracts user data from request JSON, registers the user, and returns a CSRF token.
     On success, sets a secure session cookie and returns a CSRF token for future requests.
+
+    Returns:
+        Response: Flask response with success or error message.
     """
-    # Extract user data from request JSON
-    data = request.json
-    email = data["email"]
-    pwd = data["password"]
-    first_name = data["firstName"]
-    last_name = data["lastName"]
+    # Extract user data from request JSON and annotate types
+    data: dict = request.json
+    email: str = data["email"]
+    pwd: str = data["password"]
+    first_name: str = data["firstName"]
+    last_name: str = data["lastName"]
 
     try:
         # Register user and retrieve session and CSRF tokens
+        session_token: str
+        csrf_token: str
         session_token, csrf_token = await user_auth_register(
             email, pwd, first_name, last_name
         )
-
         # Create a response with CSRF token and set the secure session cookie
-        response = make_response(
+        response: Response = make_response(
             jsonify(
                 {
                     "message": "User registered successfully",
@@ -88,23 +120,28 @@ async def register_user():
 
 # POST API for user login
 @app.route("/auth/login", methods=["POST"])
-async def login_user():
+async def login_user() -> Response:
     """
     Authenticates an existing user with email and password.
 
+    Extracts login credentials from request JSON, authenticates user, and returns a CSRF token.
     On success, issues a session cookie and returns a CSRF token.
+
+    Returns:
+        Response: Flask response with success or error message.
     """
-    # Extract login credentials from request JSON
-    data = request.json
-    email = data["email"]
-    pwd = data["password"]
+    # Extract login credentials from request JSON and annotate types
+    data: dict = request.json
+    email: str = data["email"]
+    pwd: str = data["password"]
 
     try:
         # Authenticate user and obtain session and CSRF tokens
+        session_token: str
+        csrf_token: str
         session_token, csrf_token = await user_auth_login(email, pwd)
-
         # Prepare response with CSRF token in JSON and session token as a secure cookie
-        response = make_response(
+        response: Response = make_response(
             jsonify(
                 {
                     "message": "User logged in successfully",
@@ -130,23 +167,25 @@ async def login_user():
 
 # DELETE API for user logout
 @app.route("/auth/logout", methods=["DELETE"])
-async def logout_user():
+async def logout_user() -> Response:
     """
     Logs out the user by invalidating session and CSRF tokens.
 
     Requires session token from cookies and CSRF token from headers.
+
+    Returns:
+        Response: Flask response with success or error message.
     """
     # Retrieve session and CSRF tokens from request
     # Tokens don't need HTML escaping as they're not displayed
-    session_token = request.cookies.get("session_token")
-    csrf_token = request.headers.get("X-CSRF-TOKEN")
+    session_token: str = request.cookies.get("session_token")
+    csrf_token: str = request.headers.get("X-CSRF-TOKEN")
 
     try:
         # Invalidate user session and CSRF tokens
         await user_auth_logout(session_token, csrf_token)
-
         # Clear session cookie and return logout success response
-        response = make_response(
+        response: Response = make_response(
             jsonify({"message": "User logged out successfully"}),
             200,
         )
@@ -160,57 +199,62 @@ async def logout_user():
 
 # POST API to validate tokens for active session verification
 @app.route("/auth/validate", methods=["POST"])
-async def validate_token():
+async def validate_token() -> Response:
     """
     Validates both session and CSRF tokens to verify if a user session is active.
 
     Requires session token from cookies and CSRF token from headers.
+
+    Returns:
+        Response: Flask response indicating session validity.
     """
     # Retrieve session and CSRF tokens
     try:
         # Tokens don't need HTML escaping as they're not displayed
-        session_token = request.cookies.get("session_token")
-        csrf_token = request.headers.get("X-CSRF-TOKEN")
+        session_token: str = request.cookies.get("session_token")
+        csrf_token: str = request.headers.get("X-CSRF-TOKEN")
         # Check the validity of session and CSRF tokens
         if await user_auth_validate_session_token(
             session_token
         ) and await user_auth_validate_csrf_token(csrf_token):
             return jsonify({"message": "Token is valid and user is in session"}), 200
-        else:
-            return jsonify({"message": "user is not in session"}), 200
+        return jsonify({"message": "user is not in session"}), 200
     except Exception as e:
         # Return error response if tokens are invalid
         return jsonify({"error": str(e)}), 401
 
 
 @app.route("/item/create", methods=["POST"])
-async def create_item():
+async def create_item() -> Response:
     """
     Creates a new item with the provided details.
 
-    Expects item data in JSON format and returns the created item ID.
+    Expects item data in form-data format and returns a success message.
+
+    Returns:
+        Response: Flask response with success or error message.
     """
     try:
-        data = request.form
+        # Extract form data and annotate types
+        data: dict = request.form
         # Tokens don't need HTML escaping as they're not displayed
-        session_token = request.cookies.get("session_token")
-        csrf_token = request.headers.get("X-CSRF-TOKEN")
+        session_token: str = request.cookies.get("session_token")
+        csrf_token: str = request.headers.get("X-CSRF-TOKEN")
         # Get raw input data - sanitization happens in user_create_item
-        title = data["title"]
-        description = data["description"]
-        condition = data["condition"]
-        location = data["location"]
-        type = data["type"]
+        title: str = data["title"]
+        description: str = data["description"]
+        condition: str = data["condition"]
+        location: str = data["location"]
+        type_: str = data["type"]
         images_file = request.files.getlist("images")
 
-        if not all([title, description, condition, location, type]):
+        if not all([title, description, condition, location, type_]):
             return jsonify({"error": "All fields are required"}), 400
 
-
         # Upload each image to Imgur and collect URLs
-        image_urls = []
+        image_urls: list = []
         for image in images_file:
-            image_url = await image_upload(image)
+            image_url: str = await image_upload(image)
             image_urls.append(image_url)
 
         # Create a new item using the provided data
@@ -219,7 +263,7 @@ async def create_item():
             new_description=description,
             new_condition=condition,
             new_location=location,
-            new_type=type,
+            new_type=type_,
             new_images=image_urls,
             session_token=session_token,
             csrf_token=csrf_token,
@@ -231,7 +275,7 @@ async def create_item():
 
 # Unified GET /item route with optional filters
 @app.route("/item", methods=["GET"])
-async def get_browse_items():
+async def get_browse_items() -> Response:
     """
     Retrieves items from the database with optional filters:
     - category: filter by category
@@ -241,17 +285,18 @@ async def get_browse_items():
     - id: retrieve a single item by ID
 
     Returns:
-        Single item (if id provided) or list of filtered items.
+        Response: Single item (if id provided) or list of filtered items.
     """
-    category = request.args.get("category")
-    condition = request.args.get("condition")
-    type = request.args.get("type")
-    title = request.args.get("title")
-    item_id = request.args.get("id")
+    # Get filter parameters from query string and annotate types
+    category: str = request.args.get("category")
+    condition: str = request.args.get("condition")
+    type_: str = request.args.get("type")
+    title: str = request.args.get("title")
+    item_id: str = request.args.get("id")
 
     try:
-        filtered_items = await user_get_browse_items(
-            category, condition, type, title, item_id
+        filtered_items: dict = await user_get_browse_items(
+            category, condition, type_, title, item_id
         )
         return jsonify([item.to_dict() for item in filtered_items.values()]), 200
     except Exception as e:
@@ -259,18 +304,19 @@ async def get_browse_items():
 
 
 @app.route("/item/userview", methods=["GET"])
-async def get_user_items():
+async def get_user_items() -> Response:
     """
     Retrieves all items created by the user.
 
     Returns:
-        List of items created by the user.
+        Response: List of items created by the user.
     """
-    session_token = sanitize_input(request.cookies.get("session_token"))
-    csrf_token = sanitize_input(request.headers.get("X-CSRF-TOKEN"))
+    # Retrieve session and CSRF tokens and sanitize
+    session_token: str = sanitize_input(request.cookies.get("session_token"))
+    csrf_token: str = sanitize_input(request.headers.get("X-CSRF-TOKEN"))
 
     try:
-        user_items = await user_view_item(
+        user_items: list = await user_view_item(
             session_token=session_token, csrf_token=csrf_token
         )
         return jsonify([item.to_dict() for item in user_items]), 200
@@ -279,62 +325,65 @@ async def get_user_items():
 
 
 @app.route("/item/edit", methods=["POST"])
-async def edit_item():
+async def edit_item() -> Response:
     """
     Edits an existing item with the provided details.
 
-    Expects item data in JSON format and returns a success message.
+    Expects item data in form-data format and returns a success message.
+
+    Returns:
+        Response: Flask response with success or error message.
     """
     try:
-        data = request.form
-        
-        session_token = request.cookies.get("session_token")
-        csrf_token = request.headers.get("X-CSRF-TOKEN")
-    
-        # Get raw input data - sanitization happens in user_create_item    
-        item_id = data["id"]
-        title = data["title"]
-        description = data["description"]
-        condition = data["condition"]
-        location = data["location"]
-        type = data["type"]
+        data: dict = request.form
+        session_token: str = request.cookies.get("session_token")
+        csrf_token: str = request.headers.get("X-CSRF-TOKEN")
+        # Get raw input data - sanitization happens in user_create_item
+        item_id: str = data["id"]
+        title: str = data["title"]
+        description: str = data["description"]
+        condition: str = data["condition"]
+        location: str = data["location"]
+        type_: str = data["type"]
         images_file = request.files.getlist("images")
 
         # Upload each image to Imgur and collect URLs
-        image_urls = []
+        image_urls: list = []
         for image in images_file:
-            image_url = await image_upload(image)
+            image_url: str = await image_upload(image)
             image_urls.append(image_url)
-            
+
         await user_modify_item(
             item_id=item_id,
             new_title=title,
             new_description=description,
             new_condition=condition,
             new_location=location,
-            new_type=type,
+            new_type=type_,
             session_token=session_token,
             csrf_token=csrf_token,
             new_images=image_urls,
         )
-        
         return jsonify({"message": "Item has been successfully edited."}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
 
 @app.route("/item/delete", methods=["DELETE"])
-async def delete_item():
+async def delete_item() -> Response:
     """
     Deletes an existing item based on the provided item ID.
 
     Expects item ID in JSON format and returns a success message.
+
+    Returns:
+        Response: Flask response with success or error message.
     """
     try:
-        data = request.json
-        session_token = sanitize_input(request.cookies.get("session_token"))
-        csrf_token = sanitize_input(request.headers.get("X-CSRF-TOKEN"))
-        item_id = data["id"]
+        data: dict = request.json
+        session_token: str = sanitize_input(request.cookies.get("session_token"))
+        csrf_token: str = sanitize_input(request.headers.get("X-CSRF-TOKEN"))
+        item_id: str = data["id"]
 
         if not item_id:
             return jsonify({"error": "Item ID is required"}), 400
@@ -350,19 +399,22 @@ async def delete_item():
 
 
 @app.route("/offer/create", methods=["POST"])
-async def create_exchange_offer():
+async def create_exchange_offer() -> Response:
     """
     Creates a new exchange offer with the provided details.
 
-    Expects offer data in JSON format and returns the created offer ID.
+    Expects offer data in JSON format and returns a success message.
+
+    Returns:
+        Response: Flask response with success or error message.
     """
     try:
-        data = request.json
-        session_token = sanitize_input(request.cookies.get("session_token"))
-        csrf_token = sanitize_input(request.headers.get("X-CSRF-TOKEN"))
-        offered_item_ids = data["offeredItemIds"]
-        requested_item_id = data["requestedItemId"]
-        message = sanitize_input(data["message"])
+        data: dict = request.json
+        session_token: str = sanitize_input(request.cookies.get("session_token"))
+        csrf_token: str = sanitize_input(request.headers.get("X-CSRF-TOKEN"))
+        offered_item_ids: list = data["offeredItemIds"]
+        requested_item_id: str = data["requestedItemId"]
+        message: str = sanitize_input(data["message"])
 
         await user_create_offer(
             session_token=session_token,
@@ -371,7 +423,6 @@ async def create_exchange_offer():
             requested_item_id=requested_item_id,
             message=message,
         )
-
         return (
             jsonify({"message": "Exchange offer has been successfully created."}),
             201,
@@ -381,22 +432,22 @@ async def create_exchange_offer():
 
 
 @app.route("/offer/userview", methods=["GET"])
-async def view_exchange_offers():
+async def view_exchange_offers() -> Response:
     """
-    Retrieves all exchange offers from the database.
+    Retrieves all exchange offers from the database for the user.
 
     Returns:
-        List of exchange offers.
+        Response: List of exchange offers.
     """
-    session_token = sanitize_input(request.cookies.get("session_token"))
-    csrf_token = sanitize_input(request.headers.get("X-CSRF-TOKEN"))
+    session_token: str = sanitize_input(request.cookies.get("session_token"))
+    csrf_token: str = sanitize_input(request.headers.get("X-CSRF-TOKEN"))
 
     try:
         outgoing_offers, incoming_offers = await user_get_offers(
             session_token=session_token, csrf_token=csrf_token
         )
-        outgoing_offers_dict = [offer.to_json() for offer in outgoing_offers]
-        incoming_offers_dict = [offer.to_json() for offer in incoming_offers]
+        outgoing_offers_dict: list = [offer.to_json() for offer in outgoing_offers]
+        incoming_offers_dict: list = [offer.to_json() for offer in incoming_offers]
         return (
             jsonify(
                 {
@@ -411,16 +462,19 @@ async def view_exchange_offers():
 
 
 @app.route("/offer/accept", methods=["POST"])
-async def accept_exchange_offer():
+async def accept_exchange_offer() -> Response:
     """
     Accepts an exchange offer based on the provided offer ID.
 
     Expects offer ID in JSON format and returns a success message.
+
+    Returns:
+        Response: Flask response with success or error message.
     """
-    data = request.json
-    offer_id = data["offerId"]
-    session_token = sanitize_input(request.cookies.get("session_token"))
-    csrf_token = sanitize_input(request.headers.get("X-CSRF-TOKEN"))
+    data: dict = request.json
+    offer_id: str = data["offerId"]
+    session_token: str = sanitize_input(request.cookies.get("session_token"))
+    csrf_token: str = sanitize_input(request.headers.get("X-CSRF-TOKEN"))
 
     try:
         await user_accept_offer(
@@ -434,16 +488,19 @@ async def accept_exchange_offer():
 
 
 @app.route("/offer/exchange_complete", methods=["POST"])
-async def complete_exchange_offer():
+async def complete_exchange_offer() -> Response:
     """
     Completes an exchange offer based on the provided offer ID.
 
     Expects offer ID in JSON format and returns a success message.
+
+    Returns:
+        Response: Flask response with success or error message.
     """
-    data = request.json
-    offer_id = data["offerId"]
-    session_token = sanitize_input(request.cookies.get("session_token"))
-    csrf_token = sanitize_input(request.headers.get("X-CSRF-TOKEN"))
+    data: dict = request.json
+    offer_id: str = data["offerId"]
+    session_token: str = sanitize_input(request.cookies.get("session_token"))
+    csrf_token: str = sanitize_input(request.headers.get("X-CSRF-TOKEN"))
 
     try:
         await user_complete_offer(
@@ -457,16 +514,19 @@ async def complete_exchange_offer():
 
 
 @app.route("/offer/exchange_confirmed", methods=["POST"])
-async def confirm_exchange_offer():
+async def confirm_exchange_offer() -> Response:
     """
     Confirms an exchange offer based on the provided offer ID.
 
     Expects offer ID in JSON format and returns a success message.
+
+    Returns:
+        Response: Flask response with success or error message.
     """
-    data = request.json
-    offer_id = data["offerId"]
-    session_token = sanitize_input(request.cookies.get("session_token"))
-    csrf_token = sanitize_input(request.headers.get("X-CSRF-TOKEN"))
+    data: dict = request.json
+    offer_id: str = data["offerId"]
+    session_token: str = sanitize_input(request.cookies.get("session_token"))
+    csrf_token: str = sanitize_input(request.headers.get("X-CSRF-TOKEN"))
 
     try:
         await user_confirm_offer(
@@ -480,13 +540,16 @@ async def confirm_exchange_offer():
 
 
 @app.route("/offer/details", methods=["GET"])
-async def get_offer_details():
+async def get_offer_details() -> Response:
     """
     Retrieves details of a specific exchange offer based on the provided offer ID.
 
     Expects offer ID as a query parameter and returns the offer details.
+
+    Returns:
+        Response: Flask response with offer details or error message.
     """
-    offer_id = request.args.get("offerId")
+    offer_id: str = request.args.get("offerId")
 
     if not offer_id:
         return jsonify({"error": "Offer ID is required"}), 400
@@ -494,30 +557,35 @@ async def get_offer_details():
     try:
         if not offer_id.isdigit():
             raise ValueError("Offer ID must be an integer.")
-        else:
-            offer_id = int(offer_id)
+        offer_id_int: int = int(offer_id)
 
-        if offer_id not in exchange_offers:
-            return jsonify({"error": f"Offer with ID {offer_id} does not exist."}), 404
+        if offer_id_int not in exchange_offers:
+            return (
+                jsonify({"error": f"Offer with ID {offer_id_int} does not exist."}),
+                404,
+            )
 
-        offer = exchange_offers[offer_id]
+        offer = exchange_offers[offer_id_int]
         return jsonify(offer.to_json()), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
 
 @app.route("/offer/cancel", methods=["POST"])
-async def cancel_exchange_offer():
+async def cancel_exchange_offer() -> Response:
     """
     Cancels an exchange offer based on the provided offer ID.
 
     Expects offer ID in JSON format and returns a success message.
+
+    Returns:
+        Response: Flask response with success or error message.
     """
-    data = request.json
-    session_token = sanitize_input(request.cookies.get("session_token"))
-    csrf_token = sanitize_input(request.headers.get("X-CSRF-TOKEN"))
-    message = sanitize_input(data["message"])
-    offer_id = data["offerId"]
+    data: dict = request.json
+    session_token: str = sanitize_input(request.cookies.get("session_token"))
+    csrf_token: str = sanitize_input(request.headers.get("X-CSRF-TOKEN"))
+    message: str = sanitize_input(data["message"])
+    offer_id: str = data["offerId"]
 
     try:
         await user_cancel_offer(
@@ -532,35 +600,53 @@ async def cancel_exchange_offer():
 
 
 @app.route("/api/autocomplete", methods=["POST"])
-async def address_autocomplete():
-    data = request.json
-    # Sanitize input for API request
-    input = sanitize_input(data["input"])
+async def address_autocomplete() -> Response:
+    """
+    Provides address autocomplete suggestions using Google Places API.
 
-    google_url = "https://maps.googleapis.com/maps/api/place/autocomplete/json"
-    params = {
-        "input": input,
+    Expects input in JSON format and returns autocomplete predictions.
+
+    Returns:
+        Response: Flask response with autocomplete predictions.
+    """
+    data: dict = request.json
+    # Sanitize input for API request
+    user_input: str = sanitize_input(data["input"])
+
+    google_url: str = "https://maps.googleapis.com/maps/api/place/autocomplete/json"
+    params: dict = {
+        "input": user_input,
         "types": "address",
         "key": PLACES_API_KEY,
     }
 
-    response = requests.get(google_url, params=params)
+    response = requests.get(google_url, params=params, timeout=10)
     return jsonify(response.json())
 
+
 @app.route("/api/item_search", methods=["POST"])
-async def search_items():
+async def search_items() -> Response:
     """
     Searches for items based on the provided search term.
 
     Expects search term in JSON format and returns a list of matching items.
+
+    Returns:
+        Response: Flask response with matching item predictions.
     """
-    data = request.json
-    search = sanitize_input(data["input"])
+    data: dict = request.json
+    search: str = sanitize_input(data["input"])
     try:
-        recommendation_list = await search_item_similarity_pg(search)
+        recommendation_list: list = await search_item_similarity_pg(search)
         return jsonify({"predictions": recommendation_list}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+# Entry point to run the Flask app
+#
+# The following block creates all database tables and loads users/items/offers
+# from backup, then runs the Flask development server.
 
 # Entry point to run the Flask app
 if __name__ == "__main__":
