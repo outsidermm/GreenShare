@@ -63,7 +63,6 @@ export default function DropDown(props: DropDownProps) {
       </label>
       <Select
         inputId={inputId}
-        className="z-40"
         options={options}
         value={selectedOption}
         onChange={(option: OnChangeValue<unknown, false>) =>
