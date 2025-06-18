@@ -6,12 +6,15 @@ including item validation, creation, viewing, filtering, modification, and delet
 from difflib import SequenceMatcher
 from sqlalchemy import select, func, desc
 from flask import abort
+from backend.utils import (
+    validate_string_length,
+    sanitize_input,
+)
 from backend.auth import validate_user_id
 from backend.data import admin_retrieve_user_id, item_categorisation, items
 from backend.models import ItemDB
 from backend.config import db
 from backend.classes.item import Item
-from backend.utils import sanitize_input
 
 
 def validate_item_id(item_id: str) -> int:
@@ -99,32 +102,6 @@ def validate_category(category: str) -> str:
     if category_lc not in valid_categories:
         category_lc = "essentials"  # Default category if invalid
     return sanitize_input(category_lc)
-
-
-def validate_string_length(
-    value: str, field_name: str, min_length: int, max_length: int
-) -> str:
-    """
-    Validates the length of a string field.
-
-    Args:
-        value (str): The string to validate.
-        field_name (str): The name of the field (for error messages).
-        min_length (int): Minimum allowed length.
-        max_length (int): Maximum allowed length.
-
-    Returns:
-        str: Sanitized, validated string.
-
-    Raises:
-        400: If the string length is out of bounds.
-    """
-    if not min_length <= len(value) <= max_length:
-        abort(
-            400,
-            f"{field_name} must be between {min_length} and {max_length} characters.",
-        )
-    return sanitize_input(value.lower())
 
 
 def title_matches(user_input: str, item_title: str, threshold: float = 0.4) -> bool:
