@@ -224,7 +224,7 @@ async def user_view_item(session_token: str, csrf_token: str) -> list[Item]:
     owned_items: list[Item] = []
     # Iterate through all items and collect those that are available and owned by the user
     for item in items.values():
-        if item.get_user_id() == user_id and item.get_status() == "available":
+        if item.get_user_id() == user_id:
             owned_items.append(item)
     return owned_items
 
@@ -256,10 +256,12 @@ async def user_get_browse_items(
         if item.get_status() == "available":
             return {item_id_int: item}
     # Otherwise, build a filtered dictionary of available items
+    
     filtered_items: dict[int, Item] = {}
     for item_key, item in items.items():
         if item.get_status() == "available":
             filtered_items[item_key] = item
+            
     # Filter by title if provided
     filtered_items_copy = filtered_items.copy()
     if title_filter is not None:
@@ -269,6 +271,7 @@ async def user_get_browse_items(
         for item_key, item in filtered_items_copy.items():
             if not title_matches(safe_title_filter, item.get_title()):
                 del filtered_items[item_key]
+                
     # Filter by category if provided
     filtered_items_copy = filtered_items.copy()
     if category_filter is not None:
@@ -276,6 +279,7 @@ async def user_get_browse_items(
         for item_key, item in filtered_items_copy.items():
             if item.get_category() != safe_category_filter:
                 del filtered_items[item_key]
+                
     # Filter by condition if provided
     filtered_items_copy = filtered_items.copy()
     if condition_filter is not None:
@@ -283,6 +287,7 @@ async def user_get_browse_items(
         for item_key, item in filtered_items_copy.items():
             if item.get_condition() != safe_condition_filter:
                 del filtered_items[item_key]
+            
     # Filter by type if provided
     filtered_items_copy = filtered_items.copy()
     if type_filter is not None:
@@ -335,19 +340,24 @@ async def user_modify_item(
     if new_title is not None:
         safe_title: str = validate_string_length(new_title, "Title", 3, 100)
         items[item_id_int].set_title(sanitize_input(safe_title.lower()))
+    
     if new_description is not None:
         safe_description: str = validate_string_length(
             new_description, "Description", 10, 1000
         )
         items[item_id_int].set_description(sanitize_input(safe_description.lower()))
+    
     if new_condition is not None:
         safe_condition: str = validate_condition(new_condition)
         items[item_id_int].set_condition(sanitize_input(safe_condition.lower()))
+    
     if new_location is not None:
         items[item_id_int].set_location(sanitize_input(new_location.lower()))
+    
     if new_type is not None:
         safe_type: str = validate_type(new_type)
         items[item_id_int].set_type(sanitize_input(safe_type.lower()))
+    
     if new_images is not None:
         if not isinstance(new_images, list):
             abort(400, "Images must be a list of URLs.")
