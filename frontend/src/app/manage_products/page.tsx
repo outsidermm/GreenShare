@@ -147,25 +147,27 @@ export default function ManageProductsPage() {
                     {new Date(item.updated_at).toLocaleDateString()}
                   </p>
                 </div>
-                <div className="flex-2">
-                  <button
-                    onClick={() => {
-                      setSelectedItem(item);
-                      setIsEditOpen(true);
-                    }}
-                    className={
-                      "w-full rounded bg-action-primary hover:bg-action-secondary text-contrast border-action-primary font-bold py-2 px-4 border-solid border-2 transition-all mt-4"
-                    }
-                  >
-                    Edit
-                  </button>
-                  <button
-                    className="w-full rounded bg-alert hover:bg-alert-hover text-contrast font-bold py-2 px-2 border-solid border-2 border-alert transition-all mt-4"
-                    onClick={() => handleDeleteItem(item.id)}
-                  >
-                    Delete
-                  </button>
-                </div>
+                {item.status === "available" && (
+                  <div className="flex-2">
+                    <button
+                      onClick={() => {
+                        setSelectedItem(item);
+                        setIsEditOpen(true);
+                      }}
+                      className={
+                        "w-full rounded bg-action-primary hover:bg-action-secondary text-contrast border-action-primary font-bold py-2 px-4 border-solid border-2 transition-all mt-4"
+                      }
+                    >
+                      Edit
+                    </button>
+                    <button
+                      className="w-full rounded bg-alert hover:bg-alert-hover text-contrast font-bold py-2 px-2 border-solid border-2 border-alert transition-all mt-4"
+                      onClick={() => handleDeleteItem(item.id)}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                )}
               </div>
             ))
           ) : (
