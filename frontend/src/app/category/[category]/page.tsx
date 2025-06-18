@@ -32,15 +32,9 @@ export default function CategoryPage() {
     const fetchItems = async () => {
       try {
         const filters: ItemFilter = {};
-        if (titleFilter) {
-          filters.title = titleFilter;
-        }
-        if (conditionFilter) {
-          filters.condition = conditionFilter.value;
-        }
-        if (typeFilter) {
-          filters.type = typeFilter.value;
-        }
+        if (titleFilter) filters.title = titleFilter;
+        if (conditionFilter) filters.condition = conditionFilter.value;
+        if (typeFilter) filters.type = typeFilter.value;
         const category_filter = pathname.replace("/category/", "");
         filters.category = category_filter;
         const response = await getItems({ category: category_filter });
@@ -50,7 +44,14 @@ export default function CategoryPage() {
       }
     };
 
+    // Initial fetch
     fetchItems();
+
+    // Set up polling every 30 seconds
+    const intervalId = setInterval(fetchItems, 30000);
+
+    // Clean up interval on component unmount
+    return () => clearInterval(intervalId);
   }, [pathname, titleFilter, conditionFilter, typeFilter]);
 
   // Handlers for redirecting user to login and logging out

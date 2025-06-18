@@ -41,8 +41,14 @@ export default function Home() {
         console.error("Error fetching items:", error);
       }
     };
-
+    // Initial fetch
     fetchItems();
+
+    // Set up polling every 30 seconds
+    const intervalId = setInterval(fetchItems, 30000);
+
+    // Clean up interval on component unmount
+    return () => clearInterval(intervalId);
   }, [titleFilter, conditionFilter, typeFilter]);
 
   useEffect(() => {
