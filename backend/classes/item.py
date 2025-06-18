@@ -12,7 +12,7 @@ Classes:
     Item: Represents an item with various accessors, mutators, and persistence logic.
 """
 
-from typing import Dict, List
+from typing import Dict
 from backend.models import ItemDB, ItemImageDB
 from backend.config import db
 
@@ -35,12 +35,11 @@ class Item:
         new_user_id: int,
         new_type: str,
         new_category: str,
-        new_images: List[str] = [],
+        new_images: list[str] = [],
     ) -> None:
         """
         Creates a new item in the database and sets internal state.
         """
-        new_images = []
 
         # Create main item first
         new_item = ItemDB(
@@ -180,13 +179,13 @@ class Item:
         return db.session.get(ItemDB, self.get_item_pk()).category
 
     # Accessor/Mutator for images
-    def get_images(self) -> List[str]:
+    def get_images(self) -> list[str]:
         """
         Returns the list of image URLs associated with the item.
         """
         return db.session.get(ItemDB, self.get_item_pk()).images
 
-    def set_images(self, new_images: List[str]) -> None:
+    def set_images(self, new_images: list[str]) -> None:
         """
         Replaces existing images with new ones and commits the changes.
         """
