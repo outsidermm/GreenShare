@@ -168,7 +168,7 @@ async def user_accept_offer(session_token: str, csrf_token: str, offer_id: int) 
     for existing_offer in exchange_offers.values():
         if (
             existing_offer.get_requested_item_id() == offer.get_requested_item_id()
-            and existing_offer.get_status() in ["accepted", "confirmed"]
+            and existing_offer.get_status() in ["accepted", "confirmed", "completed"]
             and existing_offer.get_offer_pk() != offer.get_offer_pk()
         ):
             abort(
