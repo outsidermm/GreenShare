@@ -37,7 +37,7 @@ export default function ProductForm(input: ProductFormProps) {
   // Store URLs of existing images (for edit mode)
   const [imageURLs, setImageURLs] = useState<string[]>([]);
 
-  // Pre-fill form fields if editing an item
+  // useEffect to populate form fields in edit mode
   useEffect(() => {
     if (item) {
       setTitle(item.title || "");
@@ -67,6 +67,7 @@ export default function ProductForm(input: ProductFormProps) {
 
   const [selectedLocation, setSelectedLocation] = useState<Option | null>(null);
 
+  // handleSubmit handles form validation and submission logic, supporting both create and edit modes
   const handleSubmit = async () => {
     try {
       if (!isAuthenticated) {
@@ -155,6 +156,7 @@ export default function ProductForm(input: ProductFormProps) {
     }
   };
 
+  // UI rendering of the product form
   return (
     <form
       onSubmit={(e) => {
@@ -174,16 +176,17 @@ export default function ProductForm(input: ProductFormProps) {
           </div>
           <button
             type="submit"
+            aria-label={item ? "Update Product" : "Add Product"}
             className="bg-action-primary text-content px-4 py-2 rounded-full hover:bg-action-secondary flex items-center gap-2 transition-all border-2 border-action-primary font-bold"
           >
             <IoMdCheckmark />
             <p>{item ? "Update Product" : "Add Product"}</p>
           </button>
         </div>
-        <div className="pt-6">
-          <label className="block mb-2 text-content">
-            Name Product (3-100 characters)
-          </label>
+        <fieldset>
+          <legend className="block pt-6 mb-2 text-content font-medium">
+            Product Title
+          </legend>
           <input
             type="text"
             placeholder={item ? item.title : "Enter product name"}
@@ -195,12 +198,12 @@ export default function ProductForm(input: ProductFormProps) {
             onFocus={() => setIsTitleChanged(true)}
             className={`border-muted text-slate-600 rounded-lg py-2 px-3 w-full border-2 focus:outline-action-secondary ${isTitleChanged ? "invalid:border-alert" : ""}`}
           />
-        </div>
+        </fieldset>
 
-        <div className="pt-6">
-          <label className="block mb-2 text-content">
-            Product Description (10-1000 characters)
-          </label>
+        <fieldset>
+          <legend className="pt-6 block mb-2 text-content font-medium">
+            Product Description
+          </legend>
           <input
             type="text"
             placeholder={item ? item.description : "Enter product description"}
@@ -212,7 +215,7 @@ export default function ProductForm(input: ProductFormProps) {
             onFocus={() => setIsDescriptionChanged(true)}
             className={`border-muted rounded-lg py-2 px-3 w-full border-2 text-slate-600 focus:outline-action-secondary ${isDescriptionChanged ? "invalid:border-alert" : ""}`}
           />
-        </div>
+        </fieldset>
 
         <div className="pt-6">
           <LocationSelect
@@ -245,10 +248,10 @@ export default function ProductForm(input: ProductFormProps) {
           />
         </div>
 
-        <div className="pt-6">
-          <label className="block mb-2 text-content font-medium">
+        <fieldset>
+          <legend className="pt-6 block mb-2 text-content font-medium">
             Product Images
-          </label>
+          </legend>
           <div className="border-2 border-dashed border-grey-shadow rounded-lg p-4 bg-background/50">
             <input
               type="file"
@@ -262,6 +265,7 @@ export default function ProductForm(input: ProductFormProps) {
               }}
               className="block w-full text-sm text-muted mb-4 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-400 file:text-content hover:file:bg-action-secondary"
             />
+            {/* Conditional rendering of image previews (existing and newly selected) */}
             {imageURLs.length > 0 || selectedFiles.length > 0 ? (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                 {imageURLs.map((url, index) => (
@@ -271,7 +275,8 @@ export default function ProductForm(input: ProductFormProps) {
                   >
                     <Image
                       src={url}
-                      alt={`Existing Preview ${index + 1}`}
+                      alt={`Uploaded image preview ${index + 1}`}
+                      role="img"
                       width={300}
                       height={300}
                       className="w-full h-full object-cover"
@@ -285,7 +290,8 @@ export default function ProductForm(input: ProductFormProps) {
                   >
                     <Image
                       src={URL.createObjectURL(file)}
-                      alt={`New Preview ${index + 1}`}
+                      alt={`Uploaded image preview ${index + 1}`}
+                      role="img"
                       width={300}
                       height={300}
                       className="w-full h-full object-cover"
@@ -299,7 +305,7 @@ export default function ProductForm(input: ProductFormProps) {
               </div>
             )}
           </div>
-        </div>
+        </fieldset>
       </div>
     </form>
   );

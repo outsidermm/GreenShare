@@ -76,7 +76,11 @@ export default function RegisterPage() {
   };
 
   return (
-    <main className="bg-background w-screen h-screen flex items-center justify-center align-middle" role="main" aria-label="Registration Page">
+    <main
+      className="bg-background w-screen h-screen flex items-center justify-center align-middle"
+      role="main"
+      aria-label="Registration Page"
+    >
       <div className="sm:max-w-xl shadow-grey-shadow shadow-xl rounded-2xl p-6 px-10 sm:min-w-md w-11/12 bg-surface">
         <header>
           <h1 className="text-4xl text-center text-content font-bold">
@@ -84,7 +88,10 @@ export default function RegisterPage() {
           </h1>
         </header>
         {showSuccess && (
-          <div aria-live="polite" className="text-surface text-center mb-2 bg-action-primary rounded-lg py-2 px-4 mt-5 transition-all">
+          <div
+            aria-live="polite"
+            className="text-surface text-center mb-2 bg-action-primary rounded-lg py-2 px-4 mt-5 transition-all"
+          >
             Registration successful! Redirecting to homepage...
           </div>
         )}
@@ -96,7 +103,10 @@ export default function RegisterPage() {
           "last name",
           "email-exists",
         ].includes(errorType) && (
-          <div aria-live="polite" className="text-surface text-center mb-2 bg-alert rounded-lg py-2 px-4 mt-5 transition-all">
+          <div
+            aria-live="polite"
+            className="text-surface text-center mb-2 bg-alert rounded-lg py-2 px-4 mt-5 transition-all"
+          >
             {errorType}
           </div>
         )}

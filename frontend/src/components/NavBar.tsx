@@ -9,9 +9,11 @@ interface NavBarProps {
   isAuthenticated: boolean;
 }
 
+// NavBar component displays category links and user-specific navigation options with logout functionality
 export default function NavBar(props: NavBarProps) {
   const { handleLogout, pathname, isAuthenticated } = props;
 
+  // Array of categories to be rendered in the navigation list
   const categories = [
     { label: "Essentials", path: "/category/essentials" },
     { label: "Living", path: "/category/living" },
@@ -22,7 +24,7 @@ export default function NavBar(props: NavBarProps) {
 
   return (
     <>
-      <div>
+      <nav aria-label="Primary site navigation">
         <h2 className="font-bold mb-2">
           <Link
             href="/"
@@ -35,7 +37,7 @@ export default function NavBar(props: NavBarProps) {
             Categories
           </Link>
         </h2>
-        <ul className="space-y-1">
+        <ul className="space-y-1" role="list">
           {categories.map(({ label, path }) => {
             const isActive = pathname === path;
             return (
@@ -82,11 +84,16 @@ export default function NavBar(props: NavBarProps) {
             </Link>
           </h2>
         )}
-      </div>
+      </nav>
+      {/* Render logout button and icon for authenticated users */}
       {isAuthenticated && (
         <div className="flex flex-row transition-all cursor-pointer py-4">
           <MdLogout onClick={handleLogout} className="mr-2" />
-          <button className="font-bold text-surface" onClick={handleLogout}>
+          <button
+            className="font-bold text-surface"
+            onClick={handleLogout}
+            aria-label="Log out of GreenShare"
+          >
             Log Out
           </button>
         </div>

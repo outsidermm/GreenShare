@@ -91,7 +91,11 @@ export default function ManageProductsPage() {
   };
 
   return (
-    <main role="main" aria-label="Manage Products Page" className="bg-background w-screen h-screen pt-16">
+    <main
+      role="main"
+      aria-label="Manage Products Page"
+      className="bg-background w-screen h-screen pt-16"
+    >
       <div className="fixed top-0 left-0 w-full bg-contrast shadow z-50 px-6 py-4 flex items-center justify-between gap-4 sm:gap-10">
         <HeaderBar
           isAuthenticated={isAuthenticated}
