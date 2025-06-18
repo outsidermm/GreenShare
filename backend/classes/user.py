@@ -1,13 +1,21 @@
+"""
+This module defines the User class responsible for managing user-related operations
+such as registration, authentication, session handling, CSRF protection, and
+encrypted password management. It interfaces with the UserDB SQLAlchemy model
+to persist user information and provides methods for secure user interaction.
+"""
+
 import hashlib
-from cryptography.fernet import Fernet
+import os
 import secrets
+from cryptography.fernet import Fernet
 from backend.models import UserDB
 from backend.config import db
-import os
 from backend.utils import sanitize_input
 
-user_key = os.getenv("USER_FERNET_KEY")
-user_cipher_suite = Fernet(user_key)
+# Initialize Fernet encryption suite with user key from environment variables
+user_key: str = os.getenv("USER_FERNET_KEY")
+user_cipher_suite: Fernet = Fernet(user_key)
 
 
 class User:
@@ -17,6 +25,7 @@ class User:
     Attributes:
         __session_token (str): Token to manage user's session.
         __csrf_token (str): Token to prevent cross-site request forgery.
+        __user_pk (int): Primary key of the user in the database.
     """
 
     __session_token: str = None
@@ -39,7 +48,8 @@ class User:
             new_last_name (str): User's last name.
             new_pwd_input (str): Plaintext password to be hashed and encrypted.
         """
-        new_user = UserDB(
+        # Create a new user database entry with encrypted password
+        new_user: UserDB = UserDB(
             email=new_email,
             first_name=new_first_name,
             last_name=new_last_name,
@@ -49,6 +59,7 @@ class User:
         db.session.add(new_user)
         db.session.commit()
 
+        # Set internal user primary key and generate tokens
         self.set_user_pk(new_user.id)
         self.set_session_token(self.generate_session_token())
         self.set_csrf_token(self.generate_csrf_token())
@@ -56,15 +67,19 @@ class User:
     @classmethod
     def backup(cls) -> dict[str, "User"]:
         """
-        Return a dictionary of existing user from UserDB.
+        Return a dictionary of existing users from UserDB.
+
+        Returns:
+            dict[str, User]: Dictionary mapping user emails to User instances.
         """
-        user_record = UserDB.query.all()
+        user_record: list[UserDB] = UserDB.query.all()
         if not user_record:
             return {}
 
-        user_dict = {}
+        user_dict: dict[str, User] = {}
+        # Recreate User instances for each user record without re-adding to DB
         for user in user_record:
-            user_obj = cls.__new__(cls)
+            user_obj: User = cls.__new__(cls)
             user_obj.set_user_pk(user.id)
             user_obj.set_session_token(user_obj.generate_session_token())
             user_obj.set_csrf_token(user_obj.generate_csrf_token())
@@ -79,6 +94,7 @@ class User:
         Returns:
             str: A URL-safe session token.
         """
+        # Generate a random URL-safe token of 32 bytes
         return secrets.token_urlsafe(32)
 
     def generate_csrf_token(self) -> str:
@@ -88,6 +104,7 @@ class User:
         Returns:
             str: A URL-safe CSRF token.
         """
+        # Combine session token with a new random token for CSRF protection
         return self.get_session_token() + secrets.token_urlsafe(32)
 
     def is_valid_session_token(self, session_token: str) -> bool:
@@ -100,6 +117,7 @@ class User:
         Returns:
             bool: True if valid, False otherwise.
         """
+        # Check if current session token matches sanitized input token
         return (
             self.get_session_token() is not None
             and sanitize_input(self.get_session_token()) == session_token
@@ -115,17 +133,22 @@ class User:
         Returns:
             bool: True if valid, False otherwise.
         """
+        # Check if current CSRF token matches sanitized input token
         return (
             self.get_csrf_token() is not None
             and sanitize_input(self.get_csrf_token()) == csrf_token
         )
 
     def revoke_session_token(self) -> None:
-        """Revokes the user's session token by setting it to None."""
+        """
+        Revokes the user's session token by setting it to None.
+        """
         self.set_session_token(None)
 
     def revoke_csrf_token(self) -> None:
-        """Revokes the user's CSRF token by setting it to None."""
+        """
+        Revokes the user's CSRF token by setting it to None.
+        """
         self.set_csrf_token(None)
 
     def hash_pwd(self, unhashed_pwd: str) -> str:
@@ -138,6 +161,7 @@ class User:
         Returns:
             str: SHA-256 hash of the password.
         """
+        # Return SHA-256 hash hex digest of password string
         return hashlib.sha256(unhashed_pwd.encode()).hexdigest()
 
     def encrypt_pwd(self, pwd: str) -> str:
@@ -150,6 +174,7 @@ class User:
         Returns:
             str: Encrypted password.
         """
+        # Encrypt password bytes and return as bytes
         return user_cipher_suite.encrypt(pwd.encode())
 
     def decrypt_pwd(self, encrypted_pwd: str) -> str:
@@ -162,6 +187,7 @@ class User:
         Returns:
             str: Decrypted password.
         """
+        # Decrypt encrypted password bytes and decode to string
         return user_cipher_suite.decrypt(encrypted_pwd).decode()
 
     def verify_pwd(self, pwd_input: str) -> bool:
@@ -174,7 +200,10 @@ class User:
         Returns:
             bool: True if passwords match, False otherwise.
         """
-        encrypted_pwd = UserDB.query.filter_by(id=self.get_user_pk()).first().password
+        # Retrieve encrypted password from DB and compare after decryption and hashing
+        encrypted_pwd: str = (
+            UserDB.query.filter_by(id=self.get_user_pk()).first().password
+        )
         return self.decrypt_pwd(encrypted_pwd) == self.hash_pwd(pwd_input)
 
     def user_data(self) -> dict:
@@ -184,6 +213,7 @@ class User:
         Returns:
             dict: User data including email, first name, last name, and encrypted password.
         """
+        # Return JSON representation of user from DB
         return UserDB.query.filter_by(id=self.get_user_pk()).first().to_json()
 
     # Getters and Setters for encapsulated fields
@@ -229,43 +259,61 @@ class User:
         Sets the user's primary key.
 
         Args:
-            user_pk (str): User's primary key.
+            user_pk (int): User's primary key.
         """
         self.__user_pk = user_pk
 
     def get_user_pk(self) -> int:
         """
         Returns the user's primary key.
+
+        Returns:
+            int: User's primary key.
         """
         return self.__user_pk
 
     def get_first_name(self) -> str:
         """
         Returns the user's first name.
+
+        Returns:
+            str: User's first name.
         """
         return db.session.get(UserDB, self.get_user_pk()).first_name
 
     def get_last_name(self) -> str:
         """
         Returns the user's last name.
+
+        Returns:
+            str: User's last name.
         """
         return db.session.get(UserDB, self.get_user_pk()).last_name
 
     def get_email(self) -> str:
         """
         Returns the user's email.
+
+        Returns:
+            str: User's email.
         """
         return db.session.get(UserDB, self.get_user_pk()).email
 
     def get_password(self) -> str:
         """
         Returns the user's password.
+
+        Returns:
+            str: User's encrypted password.
         """
         return db.session.get(UserDB, self.get_user_pk()).password
 
     def set_password(self, new_pwd: str) -> None:
         """
         Sets the user's password.
+
+        Args:
+            new_pwd (str): New encrypted password to set.
         """
         db.session.get(UserDB, self.get_user_pk()).password = new_pwd
         db.session.commit()
@@ -273,6 +321,9 @@ class User:
     def set_first_name(self, new_first_name: str) -> None:
         """
         Sets the user's first name.
+
+        Args:
+            new_first_name (str): New first name to set.
         """
         db.session.get(UserDB, self.get_user_pk()).first_name = new_first_name
         db.session.commit()
@@ -280,6 +331,9 @@ class User:
     def set_last_name(self, new_last_name: str) -> None:
         """
         Sets the user's last name.
+
+        Args:
+            new_last_name (str): New last name to set.
         """
         db.session.get(UserDB, self.get_user_pk()).last_name = new_last_name
         db.session.commit()
@@ -287,6 +341,9 @@ class User:
     def set_email(self, new_email: str) -> None:
         """
         Sets the user's email.
+
+        Args:
+            new_email (str): New email to set.
         """
         db.session.get(UserDB, self.get_user_pk()).email = new_email
         db.session.commit()
