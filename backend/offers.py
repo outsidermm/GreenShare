@@ -285,12 +285,12 @@ async def user_confirm_offer(
     offer.set_status("confirmed")
 
     # Update status of requested item to 'offer_complete'
-    items[offer.get_requested_item_id()].set_status("offer_complete")
+    items[offer.get_requested_item_id()].set_status("exchanged")
 
     # Update status of all offered items to 'offer_complete'
     for offered_item_id in offer.get_offered_items():
         if offered_item_id in items:
-            items[offered_item_id].set_status("offer_complete")
+            items[offered_item_id].set_status("exchanged")
 
 
 async def user_get_offer_details(
