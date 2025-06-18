@@ -103,7 +103,7 @@ export default function ManageProductsPage() {
         />
       </div>
 
-      <div className="z-49 fixed top-16 left-0 sm:w-60 w-full sm:h-[calc(100vh-4rem)] bg-contrast text-surface px-6 py-6 shadow-grey-shadow shadow-xl flex flex-col items-center sm:items-start sm:justify-between">
+      <div className="z-40 fixed top-16 left-0 sm:w-60 w-full sm:h-[calc(100vh-4rem)] bg-contrast text-surface px-6 py-6 shadow-grey-shadow shadow-xl flex flex-col items-center sm:items-start sm:justify-between">
         <NavBar
           handleLogout={handleLogout}
           pathname={pathname}
@@ -176,7 +176,7 @@ export default function ManageProductsPage() {
         </div>
         {isEditOpen && (
           <div className="fixed top-0 left-0 w-full h-full z-50 flex items-center justify-center backdrop-blur-sm bg-contrast/40 transition-all">
-            <div className="bg-surface p-12 rounded-xl shadow-xl w-full max-w-3xl relative">
+            <div className="bg-surface p-12 rounded-xl shadow-xl w-full max-w-3xl relative max-h-[80vh] overflow-y-auto">
               <button
                 onClick={() => setIsEditOpen(false)}
                 className="absolute top-4 right-4 text-content hover:text-content text-4xl font-bold"

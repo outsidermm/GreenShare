@@ -106,7 +106,6 @@ export default function ManageOffersPage() {
             "You have accepted the offer. Please wait for the other party to complete the exchange.",
             "success",
           );
-          router.refresh();
         } else if (offer.status === "completed") {
           await confirmOfferComplete(offer.id);
           swal(
@@ -114,7 +113,6 @@ export default function ManageOffersPage() {
             "You have confirmed the completion of the offer. Thank you for using GreenShare!",
             "success",
           );
-          router.refresh();
         }
       } else {
         if (offer.status === "accepted") {
@@ -124,9 +122,9 @@ export default function ManageOffersPage() {
             "You have completed the offer. Please wait for the other party to confirm completion.",
             "success",
           );
-          router.refresh();
         }
       }
+      router.push("/manage_offers");
     } catch (error) {
       console.error("Error performing actions on your offer:", error);
       if (error instanceof Error) {
@@ -182,7 +180,7 @@ export default function ManageOffersPage() {
         />
       </div>
 
-      <div className="z-49 fixed top-16 left-0 sm:w-60 w-full sm:h-[calc(100vh-4rem)] bg-contrast text-surface px-6 py-6 shadow-grey-shadow shadow-xl flex flex-col items-center sm:items-start sm:justify-between">
+      <div className="z-40 fixed top-16 left-0 sm:w-60 w-full sm:h-[calc(100vh-4rem)] bg-contrast text-surface px-6 py-6 shadow-grey-shadow shadow-xl flex flex-col items-center sm:items-start sm:justify-between">
         <NavBar
           handleLogout={handleLogout}
           pathname={pathname}
