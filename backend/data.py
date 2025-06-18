@@ -1,3 +1,10 @@
+"""
+This module provides data handling functionality for the GreenShare backend.
+It manages in-memory data storage for users, items, and exchange offers, and includes
+utilities for image uploading and item categorisation using external APIs.
+"""
+
+import os
 from flask import abort
 import requests
 from werkzeug.datastructures import FileStorage
@@ -6,7 +13,6 @@ from google.genai import types
 from backend.classes.user import User
 from backend.classes.item import Item
 from backend.classes.exchange_offer import ExchangeOffer
-import os
 
 # In-memory storage for users
 users: dict[str, User] = (
@@ -18,20 +24,22 @@ items: dict[int, Item] = (
 exchange_offers: dict[int, ExchangeOffer] = (
     {}
 )  # Dictionary to store exchange offer objects by their unique identifier (e.g., offer ID)
-IMGUR_CLIENT_ID = os.getenv("IMGUR_CLIENT_ID")
-GENAI_API_KEY = os.getenv("GENAI_API_KEY")
+
+# Load environment variables for external service credentials
+IMGUR_CLIENT_ID: str | None = os.getenv("IMGUR_CLIENT_ID")
+GENAI_API_KEY: str | None = os.getenv("GENAI_API_KEY")
 
 
-def admin_retrieve_user_id(session_token: str, csrf_token: str) -> int:
+def admin_retrieve_user_id(session_token: str, csrf_token: str) -> int | None:
     """
-    Retrieves the full name of a user based on valid session and CSRF tokens.
+    Retrieves the user ID of a user based on valid session and CSRF tokens.
 
     Args:
         session_token (str): Session token of the user.
         csrf_token (str): CSRF token of the user.
 
     Returns:
-        str: user ID if both tokens are valid, otherwise None.
+        int | None: User ID if both tokens are valid, otherwise None.
     """
     # Iterate through each user object in the users dictionary
     for _, user_obj in users.items():
@@ -39,7 +47,7 @@ def admin_retrieve_user_id(session_token: str, csrf_token: str) -> int:
         if user_obj.is_valid_session_token(
             session_token
         ) and user_obj.is_valid_csrf_token(csrf_token):
-            # Return the user's full name if tokens match
+            # Return the user's primary key (user ID) if tokens match
             return user_obj.get_user_pk()
     # Return None if no valid tokens are found
     return None
@@ -47,41 +55,63 @@ def admin_retrieve_user_id(session_token: str, csrf_token: str) -> int:
 
 async def image_upload(image: FileStorage) -> str:
     """
-    Uploads an image file and returns its URL.
+    Uploads an image file to Imgur and returns its URL.
 
     Args:
         image (FileStorage): The image file to be uploaded.
 
     Returns:
         str: URL of the uploaded image.
+
+    Raises:
+        werkzeug.exceptions.InternalServerError: If image upload fails.
     """
-    headers = {"Authorization": f"Client-ID {IMGUR_CLIENT_ID}"}
-    upload_response = requests.post(
+    # Prepare authorization header with Imgur client ID
+    headers: dict[str, str] = {"Authorization": f"Client-ID {IMGUR_CLIENT_ID}"}
+    # Make POST request to Imgur API to upload the image
+    upload_response: requests.Response = requests.post(
         "https://api.imgur.com/3/image",
         headers=headers,
         files={"image": image.read()},
+        timeout=10,
     )
+    # Check if the upload was successful
     if upload_response.status_code == 200:
+        # Return the direct link to the uploaded image
         return upload_response.json()["data"]["link"]
-    else:
-        abort(500, "Image upload failed. Please try again later.")
+    abort(500, "Image upload failed. Please try again later.")
+
 
 async def item_categorisation(title: str, description: str) -> str:
     """
-    Uses Gemini to classify an item into a predefined category.
+    Classifies an item into a predefined category using Gemini model.
 
     Args:
         title (str): Title of the item.
         description (str): Description of the item.
 
     Returns:
-        str: One of the predefined categories.
+        str: One of the predefined categories in lowercase:
+             'essentials', 'living', 'tools-tech', 'style-expression', or 'leisure-learning'.
+
+    Raises:
+        Exception: If the Gemini API call fails or returns an unexpected result.
     """
-    client = genai.Client(api_key=GENAI_API_KEY)
+    # Initialize Gemini client with API key
+    client: genai.Client = genai.Client(api_key=GENAI_API_KEY)
+    # Generate content classification using Gemini model
     response = client.models.generate_content(
         model="gemini-2.0-flash",
-        config= types.GenerateContentConfig(
-            system_instruction="You are a product category classifier. Only respond with one of the following categories: essentials, living, tools-tech, style-expression, leisure-learning."),
-        contents = (f"Classify the following item into one of the categories: essentials, living, tools-tech, style-expression, leisure-learning. Title: {title} Description: {description} Only respond with the category name.")
+        config=types.GenerateContentConfig(
+            system_instruction=(
+                "You are a product category classifier. "
+                "Only respond with one of the following categories: essentials, living, tools-tech, style-expression, leisure-learning."
+            )
+        ),
+        contents=(
+            f"Classify the following item into one of the categories: essentials, living, tools-tech, style-expression, leisure-learning. "
+            f"Title: {title} Description: {description} Only respond with the category name."
+        ),
     )
+    # Return the category name in lowercase without extra whitespace
     return response.text.strip().lower()
