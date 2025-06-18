@@ -1,3 +1,5 @@
+// Offer interface defines the structure of a user-generated offer on the GreenShare platform,
+// representing a proposal to exchange specific items for another listed item.
 export interface Offer {
   id: number;
   offered_by_id: number;
