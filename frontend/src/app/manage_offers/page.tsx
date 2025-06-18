@@ -154,6 +154,14 @@ export default function ManageOffersPage() {
       });
 
       if (typeof message === "string") {
+        if (message.length < 10 || message.length > 1000) {
+          swal(
+            "Invalid Reason",
+            "Please provide a reason between 10 and 1000 characters.",
+            "warning",
+          );
+          return;
+        }
         await cancelOffer({ offerId, message });
         router.refresh();
       }
