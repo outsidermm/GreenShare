@@ -101,14 +101,29 @@ export default function ManageOffersPage() {
       if (toggleOffer) {
         if (offer.status === "pending") {
           await acceptOffer(offer.id);
+          swal(
+            "Offer Accepted",
+            "You have accepted the offer. Please wait for the other party to complete the exchange.",
+            "success",
+          );
           router.refresh();
         } else if (offer.status === "completed") {
           await confirmOfferComplete(offer.id);
+          swal(
+            "Offer Completed",
+            "You have confirmed the completion of the offer. Thank you for using GreenShare!",
+            "success",
+          );
           router.refresh();
         }
       } else {
         if (offer.status === "accepted") {
           await completeOffer(offer.id);
+          swal(
+            "Offer Completed",
+            "You have completed the offer. Please wait for the other party to confirm completion.",
+            "success",
+          );
           router.refresh();
         }
       }
