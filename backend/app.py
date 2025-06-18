@@ -656,5 +656,5 @@ if __name__ == "__main__":
         items.update(Item.backup())
         exchange_offers.update(ExchangeOffer.backup())
 
-    # Run Flask server in debug mode on port 4000 for local testing
-    app.run(host="0.0.0.0", port=4000, debug=True)
+    # Run Flask server in production mode on port 4000 for local testing
+    app.run(host="0.0.0.0", port=4000)
