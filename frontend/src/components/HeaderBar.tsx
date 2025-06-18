@@ -14,6 +14,7 @@ interface HeaderBarProps {
   handleTitleFilter?: (title: string) => void;
 }
 
+// HeaderBar component displays the main navigation area, including site title, search input, theme toggle, and login button
 export default function HeaderBar(HeaderBarProps: HeaderBarProps) {
   const { isAuthenticated, handleLogin, handleTitleFilter } = HeaderBarProps;
   const [searchTerm, setSearchTerm] = useState("");
@@ -22,6 +23,7 @@ export default function HeaderBar(HeaderBarProps: HeaderBarProps) {
   const router = useRouter();
   const [theme, setTheme] = useState<"light" | "dark" | "color-blind">("light");
 
+  // Detect and set current theme on component mount by checking body class
   useEffect(() => {
     const currentTheme = document.body.classList.contains("color-blind")
       ? "color-blind"
@@ -31,6 +33,7 @@ export default function HeaderBar(HeaderBarProps: HeaderBarProps) {
     setTheme(currentTheme);
   }, []);
 
+  // Cycle through light, dark, and color-blind themes and update the body class
   const toggleTheme = () => {
     const next =
       theme === "light" ? "dark" : theme === "dark" ? "color-blind" : "light";
@@ -39,6 +42,7 @@ export default function HeaderBar(HeaderBarProps: HeaderBarProps) {
     document.body.classList.add(next);
   };
 
+  // Fetch search suggestions when the debounced search term changes
   useEffect(() => {
     const fetchOptions = async () => {
       if (debouncedSearchTerm.length < 3) {
@@ -61,10 +65,19 @@ export default function HeaderBar(HeaderBarProps: HeaderBarProps) {
 
   return (
     <>
-      <div className="text-lg font-bold text-action-primary">
+      <div
+        role="heading"
+        aria-level={1}
+        className="text-lg font-bold text-action-primary"
+      >
         <Link href="/">GreenShare</Link>
       </div>
-      <div className="flex items-center gap-4 flex-grow px-4 relative">
+      <nav
+        role="navigation"
+        aria-label="Site-wide navigation"
+        className="flex items-center gap-4 flex-grow px-4 relative"
+      >
+        {/* Text input for searching item titles */}
         <input
           type="text"
           placeholder="Search for items"
@@ -90,6 +103,7 @@ export default function HeaderBar(HeaderBarProps: HeaderBarProps) {
             }
           }}
           value={searchTerm}
+          aria-label="Search for items"
         />
         {searchTerm && (
           <button
@@ -122,6 +136,7 @@ export default function HeaderBar(HeaderBarProps: HeaderBarProps) {
           Enter
         </button>
 
+        {/* Render list of search suggestions below input if available */}
         {options && options.length > 0 && (
           <div
             className="absolute top-10 flex-grow left-4 bg-surface border shadow-xl rounded-xl"
@@ -140,12 +155,14 @@ export default function HeaderBar(HeaderBarProps: HeaderBarProps) {
             ))}
           </div>
         )}
-      </div>
+      </nav>
       <div>
+        {/* Button to toggle between visual themes with accessible icon and label */}
         <button
           onClick={toggleTheme}
           className="p-2 rounded-full text-xl bg-action-primary hover:bg-action-secondary transition-all"
           title={`Current theme: ${theme}`}
+          aria-label="Toggle visual theme"
         >
           {theme === "light" && <FaSun />}
           {theme === "dark" && <FaMoon />}
@@ -153,11 +170,13 @@ export default function HeaderBar(HeaderBarProps: HeaderBarProps) {
         </button>
       </div>
 
+      {/* Show login button only if user is not authenticated */}
       {!isAuthenticated && (
         <div className="px-4">
           <button
             onClick={handleLogin}
             className="text-action-primary border border-surface px-3 py-1 rounded hover:bg-action-hover"
+            aria-label="Login to GreenShare"
           >
             Login
           </button>

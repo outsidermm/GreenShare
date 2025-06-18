@@ -14,6 +14,7 @@ interface CredentialsInputProps {
   label: string;
 }
 
+// CredentialsInput is a reusable controlled input component for user credentials (e.g. email, password)
 export default function CredentialsInput(props: CredentialsInputProps) {
   const {
     type,
@@ -29,11 +30,19 @@ export default function CredentialsInput(props: CredentialsInputProps) {
     label,
   } = props;
 
+  const inputId = label.toLowerCase().replace(/\s+/g, "-");
+
   return (
     <>
       <div className="pt-5">
-        <label className="block mb-2 text-content">{label}</label>
+        {/* Label for the input field, improves accessibility and usability */}
+        <label htmlFor={inputId} className="block mb-2 text-content">
+          {label}
+        </label>
+        {/* Input field bound to parent component's state with dynamic validation styling */}
         <input
+          id={inputId}
+          aria-describedby={inputId + "-error"}
           type={type}
           placeholder={placeholder}
           minLength={minLength}
@@ -45,7 +54,9 @@ export default function CredentialsInput(props: CredentialsInputProps) {
           className={`border-muted text-slate-800 rounded py-2 px-3 w-full ${credentialChanged ? "invalid:border-alert" : ""} border-2`}
         />
         {credentialError != "" && (
-          <div className="text-alert text-center pt-2">{credentialError}</div>
+          <div id={inputId + "-error"} className="text-alert text-center pt-2">
+            {credentialError}
+          </div>
         )}
       </div>
     </>
