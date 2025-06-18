@@ -1,21 +1,26 @@
 # syntax=docker/dockerfile:1
+FROM node:24-alpine AS builder
 
-FROM node:24-alpine
-
-# Set the working directory
 WORKDIR /app/frontend
-
-# Copy only package.json and lock file(s) first to leverage Docker layer caching
 COPY package*.json ./
-
-# Install dependencies
 RUN npm install
-
-# Copy the rest of your source code
 COPY . .
 
-# Expose port 3000 (Next.js default dev port)
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+
+RUN npm run build
+
+FROM node:24-alpine AS runner
+WORKDIR /app
+
+# Copy standalone server files
+COPY --from=builder /app/frontend/.next/standalone ./
+COPY --from=builder /app/frontend/.next/static ./.next/static
+COPY --from=builder /app/frontend/public ./public
+
+ENV NODE_ENV=production
+ENV PORT=3000
 EXPOSE 3000
 
-# By default, run Next.js in development mode
-CMD ["npm", "run", "dev"]
+CMD ["node", "server.js"]

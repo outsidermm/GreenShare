@@ -2,13 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   output: "standalone",
-  webpackDevMiddleware: (config: any) => {
-    config.watchOptions = {
-      poll: 1000,
-      aggregateTimeout: 300,
-    };
-    return config;
-  },
+  poweredByHeader: false,
   images: {
     remotePatterns: [
       {
@@ -32,8 +26,19 @@ const nextConfig: NextConfig = {
           },
           {
             key: "Content-Security-Policy",
-            value:
-              "default-src * 'unsafe-inline' 'unsafe-eval' data: blob:;",
+            value: `
+              default-src 'self';
+              script-src 'self' 'unsafe-inline' 'unsafe-eval' https:;
+              style-src 'self' 'unsafe-inline';
+              img-src 'self' https://i.imgur.com data: blob:;
+              font-src 'self' data:;
+              connect-src 'self' https: http://localhost:4000;
+              media-src 'self' https:;
+              object-src 'none';
+              base-uri 'self';
+              form-action 'self';
+              frame-ancestors 'none';
+            `.replace(/\n\s+/g, " ").trim(),
           },
           {
             key: "X-XSS-Protection",
@@ -41,7 +46,7 @@ const nextConfig: NextConfig = {
           },
           {
             key: "Referrer-Policy",
-            value: "no-referrer",
+            value: "strict-origin-when-cross-origin",
           },
           {
             key: "Permissions-Policy",

@@ -1,28 +1,35 @@
+version: '3.8'
+
+volumes:
+  pgdata:
+
+networks:
+  app-network:
+    driver: bridge
+
 services:
-  #nextjs service
   nextapp:
-    container_name: nextapp
-    image: nextapp:1.0.0
+    networks:
+      - app-network
+    ports:
+      - "3000:3000"
     build:
       context: ./frontend
       dockerfile: next.dockerfile
-    ports:
-      - 3000:3000
+      args:
+        NEXT_PUBLIC_API_URL: "http://localhost:4000"
     environment:
-      - NEXT_PUBLIC_API_URL=http://localhost:4000/
-      - CHOKIDAR_USEPOLLING=true
-      - WATCHPACK_POLLING=true
+      - NEXT_PUBLIC_API_URL=http://localhost:4000
     volumes:
       - ./frontend:/app/frontend
       - /app/node_modules
     restart: unless-stopped
     depends_on:
       - flaskapp
-  
-  # flask service
+
   flaskapp:
-    container_name: flaskapp
-    image: flaskapp:1.0.0
+    networks:
+      - app-network
     build:
       context: ./backend
       dockerfile: flask.dockerfile
@@ -30,7 +37,7 @@ services:
       - 4000:4000
     environment:
       - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
-      - FLASK_ENV=development
+      - FLASK_ENV=production
       - USER_FERNET_KEY=${USER_FERNET_KEY}
       - SECRET_KEY=${SECRET_KEY}
       - PLACES_API_KEY=${PLACES_API_KEY}
@@ -42,9 +49,9 @@ services:
     depends_on:
       - db
 
-  # db service
   db:
-    container_name: db
+    networks:
+      - app-network
     image: postgres:17
     environment:
       - POSTGRES_USER=${DB_USER}
@@ -54,10 +61,9 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
 
-  # Test service to run pytest in the full environment
   tests:
-    container_name: tests
     build:
       context: ./tests
       dockerfile: tests.dockerfile
@@ -77,6 +83,3 @@ services:
       - flaskapp
     profiles:
       - tests
-
-volumes:
-  pgdata: {}
