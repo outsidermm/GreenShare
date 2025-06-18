@@ -9,10 +9,12 @@ interface UseAuthResult {
   refreshAuth: () => Promise<void>;
 }
 
+// Custom React hook to manage and track user authentication status
 export default function useAuth(): UseAuthResult {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const pathname = usePathname();
 
+  // Asynchronously verifies the user's authentication status via a backend call
   const refreshAuth = useCallback(async () => {
     try {
       const result = await authUser();
@@ -25,6 +27,7 @@ export default function useAuth(): UseAuthResult {
     }
   }, []);
 
+  // Re-run authentication check whenever the pathname changes (i.e., route navigation)
   useEffect(() => {
     refreshAuth();
   }, [refreshAuth, pathname]);

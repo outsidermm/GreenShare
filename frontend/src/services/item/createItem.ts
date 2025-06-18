@@ -2,6 +2,7 @@ import { StandardBackendResponse } from "@/types/standardBackendResponse";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
+// Defines the expected structure of the data required to create a new item on the GreenShare platform
 interface createItemInput {
   title: string;
   description: string;
@@ -11,6 +12,8 @@ interface createItemInput {
   type: string;
 }
 
+// Sends a POST request to the backend API to create a new item using multipart/form-data.
+// Includes CSRF token validation and image uploads.
 export default async function createItem(
   input: createItemInput,
 ): Promise<StandardBackendResponse> {
@@ -21,6 +24,7 @@ export default async function createItem(
       throw new Error("No CSRF token found");
     }
 
+    // Construct FormData object to include all necessary fields and attached images
     const formData = new FormData();
     formData.append("title", title);
     formData.append("description", description);
@@ -31,6 +35,7 @@ export default async function createItem(
       formData.append("images", file);
     });
 
+    // Execute the API call with CSRF token in headers and form data in the request body
     const response = await fetch(`${API_BASE}/item/create`, {
       method: "POST",
       credentials: "include",
@@ -50,6 +55,7 @@ export default async function createItem(
     console.log("Response from server:", result);
     return result;
   } catch (error) {
+    // Handle and log any errors that occur during the API request
     console.error("Error during item creation:", error);
     throw error; // Re-throw the error so it can be displayed in the UI
   }

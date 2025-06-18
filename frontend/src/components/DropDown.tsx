@@ -1,14 +1,15 @@
 "use client";
 
+// Dynamically import the react-select component with SSR disabled to ensure compatibility with client-only rendering
 import { Option } from "@/types/option";
 import { OnChangeValue } from "react-select";
 import dynamic from "next/dynamic";
 
-// Dynamic import with SSR disabled
 export const Select = dynamic(() => import("react-select"), {
   ssr: false,
 });
 
+// Props definition for DropDown component, including customization and accessibility features
 interface DropDownProps {
   selectedOption: Option | null;
   setSelectedOption: (option: Option | null) => void;
@@ -25,6 +26,7 @@ interface DropDownProps {
   isLoading?: boolean;
 }
 
+// Default prop values to control behaviour of dropdown
 DropDown.defaultProps = {
   required: true,
   isClearable: false,
@@ -36,6 +38,9 @@ DropDown.defaultProps = {
 };
 
 export default function DropDown(props: DropDownProps) {
+  const inputId = props.label_text.toLowerCase().replace(/\s+/g, "-");
+
+  // Validate and set the selected dropdown option
   const handleSetOptions = (option: Option | unknown) => {
     if ((option === null && !props.isClearable) || option === undefined) {
       throw new Error("Selected option is null or undefined");
@@ -49,11 +54,15 @@ export default function DropDown(props: DropDownProps) {
     label_text,
     placeholder,
   } = props;
+
+  // Render dropdown component with accessibility and custom styles
   return (
-    <>
-      <label className="block mb-2 text-content">{label_text}</label>
+    <div role="group" aria-label={label_text}>
+      <label htmlFor={inputId} className="block mb-2 text-content">
+        {label_text}
+      </label>
       <Select
-        className="z-40"
+        inputId={inputId}
         options={options}
         value={selectedOption}
         onChange={(option: OnChangeValue<unknown, false>) =>
@@ -103,6 +112,6 @@ export default function DropDown(props: DropDownProps) {
           }
         }
       />
-    </>
+    </div>
   );
 }

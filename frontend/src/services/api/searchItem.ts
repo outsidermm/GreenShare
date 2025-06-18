@@ -1,9 +1,12 @@
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
+// Represents the structure of the response returned by the item search autocomplete API
 interface searchItemResponse {
   predictions: string[];
 }
 
+// Sends a POST request to the backend to retrieve item suggestions based on the user's input
+// Returns an array of item name predictions
 export default async function autocompleteAddress(
   input: string,
 ): Promise<searchItemResponse> {

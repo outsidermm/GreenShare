@@ -9,6 +9,8 @@ import { useRouter } from "next/navigation";
 
 export default function RegisterPage() {
   const router = useRouter();
+
+  // State variables for user registration form and error handling
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
@@ -22,6 +24,7 @@ export default function RegisterPage() {
   const [errorType, setErrorType] = useState("");
   const [showSuccess, setShowSuccess] = useState(false);
 
+  // Prefetches pages for smoother post-registration navigation
   useEffect(() => {
     router.prefetch("/manage_offers");
     router.prefetch("/manage_products");
@@ -73,13 +76,22 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="bg-background w-screen h-screen flex items-center justify-center align-middle">
+    <main
+      className="bg-background w-screen h-screen flex items-center justify-center align-middle"
+      role="main"
+      aria-label="Registration Page"
+    >
       <div className="sm:max-w-xl shadow-grey-shadow shadow-xl rounded-2xl p-6 px-10 sm:min-w-md w-11/12 bg-surface">
-        <h1 className="text-4xl text-center text-content font-bold">
-          Registration
-        </h1>
+        <header>
+          <h1 className="text-4xl text-center text-content font-bold">
+            Registration
+          </h1>
+        </header>
         {showSuccess && (
-          <div className="text-surface text-center mb-2 bg-action-primary rounded-lg py-2 px-4 mt-5 transition-all">
+          <div
+            aria-live="polite"
+            className="text-surface text-center mb-2 bg-action-primary rounded-lg py-2 px-4 mt-5 transition-all"
+          >
             Registration successful! Redirecting to homepage...
           </div>
         )}
@@ -91,10 +103,14 @@ export default function RegisterPage() {
           "last name",
           "email-exists",
         ].includes(errorType) && (
-          <div className="text-surface text-center mb-2 bg-alert rounded-lg py-2 px-4 mt-5 transition-all">
+          <div
+            aria-live="polite"
+            className="text-surface text-center mb-2 bg-alert rounded-lg py-2 px-4 mt-5 transition-all"
+          >
             {errorType}
           </div>
         )}
+        {/* Form for capturing user's first name, last name, email, and password */}
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -166,6 +182,7 @@ export default function RegisterPage() {
                 : ""
             }
           />
+          {/* User agreement to terms of service */}
           <div className="py-5">
             <label
               htmlFor="agreement-box"
@@ -189,6 +206,7 @@ export default function RegisterPage() {
               Create an Account
             </button>
           </div>
+          {/* Link to the login page for users who already have an account */}
           <div className="pt-5 text-center text-slate-500">
             <p>
               Already have an account?&nbsp;
@@ -203,6 +221,6 @@ export default function RegisterPage() {
           </div>
         </form>
       </div>
-    </div>
+    </main>
   );
 }

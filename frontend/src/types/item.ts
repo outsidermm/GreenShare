@@ -1,3 +1,4 @@
+// Item interface defines the shape of a product object listed on the GreenShare platform
 export interface Item {
   id: number;
   user_id: number;

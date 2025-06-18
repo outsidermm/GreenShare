@@ -1,5 +1,6 @@
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
+// Represents a single address prediction from the autocomplete API
 interface PlacePrediction {
   description: string;
   place_id: string;
@@ -9,11 +10,13 @@ interface PlacePrediction {
   };
 }
 
+// Describes the expected structure of the API response for address predictions
 interface AutocompleteResponse {
   predictions: PlacePrediction[];
   status: string;
 }
 
+// Calls the backend autocomplete API to fetch address predictions based on user input
 export default async function autocompleteAddress(
   input: string,
 ): Promise<PlacePrediction[]> {

@@ -1,6 +1,13 @@
-from backend.classes.user import User
-from flask import abort
+"""
+Authentication utility functions for user registration, login, logout, and token validation.
+"""
+
 import re
+from typing import Tuple
+
+from flask import abort
+
+from backend.classes.user import User
 from backend.data import users
 from backend.utils import sanitize_input, sanitize_email
 
@@ -19,12 +26,13 @@ def name_auth(name: str, err_prefix: str = "User") -> bool:
     Raises:
         400 Error: If name does not meet required format.
     """
-    # Regular expression for basic name validation (no Unicode characters).
-    name_pattern = r"^[A-Za-zÀ-ÖØ-öø-ÿ'-.][A-Za-zÀ-ÖØ-öø-ÿ'-. ]{1,49}$"
+    # Regular expression for basic name validation (includes accented characters, apostrophes, hyphens, periods, and spaces).
+    name_pattern: str = r"^[A-Za-zÀ-ÖØ-öø-ÿ'-.][A-Za-zÀ-ÖØ-öø-ÿ'-. ]{1,49}$"
 
     # Check if name matches the pattern and is within length limits.
     if re.match(name_pattern, name):
         return True
+    # Abort with 400 error if validation fails
     abort(
         400,
         description=err_prefix
@@ -45,11 +53,13 @@ def pwd_auth(pwd: str) -> bool:
     Raises:
         400 Error: If password does not meet required format.
     """
-    # Regular expression for strong password validation.
-    pwd_pattern = r"^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*\W)(?!.* ).{8,32}$"
+    # Regular expression for strong password validation:
+    # at least one digit, one lowercase, one uppercase, one special character, no spaces, length 8-32
+    pwd_pattern: str = r"^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*\W)(?!.* ).{8,32}$"
 
     if re.match(pwd_pattern, pwd):
         return True
+    # Abort with 400 error if validation fails
     abort(
         400,
         description="Password must be 8-32 characters, include a digit, lowercase and uppercase letter, special character, and no spaces.",
@@ -70,10 +80,13 @@ def email_auth(email: str) -> bool:
         400 Error: If email does not meet required format.
     """
     # Regular expression for basic email validation.
-    email_pattern = r"^[0-9a-z]+([0-9a-z]*[-._+])*[0-9a-z]+@[0-9a-z]+([-.][0-9a-z]+)*([0-9a-z]*[.])[a-z]{2,8}$"
+    email_pattern: str = (
+        r"^[0-9a-z]+([0-9a-z]*[-._+])*[0-9a-z]+@[0-9a-z]+([-.][0-9a-z]+)*([0-9a-z]*[.])[a-z]{2,8}$"
+    )
 
     if re.match(email_pattern, email) and 3 <= len(email) <= 320:
         return True
+    # Abort with 400 error if validation fails
     abort(
         400,
         description="Email must start with letters or numbers, include @ and a valid domain, have a 2-8 character extension, and be 3-320 characters long.",
@@ -82,7 +95,7 @@ def email_auth(email: str) -> bool:
 
 async def user_auth_register(
     email: str, pwd: str, first_name: str, last_name: str
-) -> str:
+) -> Tuple[str, str]:
     """
     Registers a new user by validating credentials and creating a user instance.
 
@@ -93,7 +106,7 @@ async def user_auth_register(
         last_name (str): User's last name.
 
     Returns:
-        tuple: New session token and CSRF token for the user.
+        Tuple[str, str]: New session token and CSRF token for the user.
 
     Raises:
         409 Error: If the email already exists in the user database.
@@ -107,30 +120,32 @@ async def user_auth_register(
         last_name.capitalize()
     )  # Normalise the last name to start with a capital letter
 
+    # Validate each input
     email_auth(email)
     pwd_auth(pwd)
     name_auth(first_name, "First")
     name_auth(last_name, "Last")
 
     # Properly sanitize input data to prevent XSS
-    safe_email = sanitize_email(email)  # Emails don't need HTML escaping
-    safe_first_name = sanitize_input(first_name)  # HTML escape for display
-    safe_last_name = sanitize_input(last_name)  # HTML escape for display
+    safe_email: str = sanitize_email(email)  # Emails don't need HTML escaping
+    safe_first_name: str = sanitize_input(first_name)  # HTML escape for display
+    safe_last_name: str = sanitize_input(last_name)  # HTML escape for display
     # Passwords should not be escaped as they're hashed, not displayed
-    safe_pwd = pwd
+    safe_pwd: str = pwd
 
     # Check if user exists using sanitized email
     if safe_email in users:
         abort(409, description="Email already exists")
 
     # Create new user with sanitized data
-    new_user = User(safe_email, safe_first_name, safe_last_name, safe_pwd)
+    new_user: User = User(safe_email, safe_first_name, safe_last_name, safe_pwd)
     users[safe_email] = new_user  # Store the user object by email
 
+    # Return session and csrf tokens for the new user
     return new_user.get_session_token(), new_user.get_csrf_token()
 
 
-async def user_auth_login(email: str, pwd_input: str) -> str:
+async def user_auth_login(email: str, pwd_input: str) -> Tuple[str, str]:
     """
     Authenticates an existing user with email and password, generating new session tokens.
 
@@ -139,7 +154,7 @@ async def user_auth_login(email: str, pwd_input: str) -> str:
         pwd_input (str): User's password input for validation.
 
     Returns:
-        tuple: New session token and CSRF token for the user.
+        Tuple[str, str]: New session token and CSRF token for the user.
 
     Raises:
         401 Error: If the email does not exist or password is incorrect.
@@ -151,15 +166,17 @@ async def user_auth_login(email: str, pwd_input: str) -> str:
     pwd_auth(pwd_input)
 
     # Sanitize email (no HTML escaping needed for emails)
-    safe_email = sanitize_email(email)
+    safe_email: str = sanitize_email(email)
     # Passwords are hashed, not displayed, so no escaping needed
-    safe_pwd = pwd_input
+    safe_pwd: str = pwd_input
 
+    # Check if user exists
     if safe_email not in users:
         abort(401, description="Email does not exist")
 
     user: User = users[safe_email]
 
+    # Verify password correctness
     if not user.verify_pwd(safe_pwd):
         abort(401, description="Invalid password")
 
@@ -167,6 +184,7 @@ async def user_auth_login(email: str, pwd_input: str) -> str:
     user.set_session_token(user.generate_session_token())
     user.set_csrf_token(user.generate_csrf_token())
 
+    # Return updated session and csrf tokens
     return user.get_session_token(), user.get_csrf_token()
 
 
@@ -181,15 +199,18 @@ async def user_auth_logout(session_token: str, csrf_token: str) -> None:
     Raises:
         401 Error: If tokens do not match any existing session.
     """
+    # Iterate through all users to find matching session and CSRF tokens
     for user in users.values():
         # Check if both session and CSRF tokens are valid
         if user.is_valid_session_token(session_token) and user.is_valid_csrf_token(
             csrf_token
         ):
+            # Revoke tokens to log out the user
             user.revoke_csrf_token()
             user.revoke_session_token()
             return  # Exit function after revoking tokens
 
+    # Abort if no matching tokens found
     abort(401, description="Matching tokens do not exist")
 
 
@@ -201,15 +222,17 @@ async def user_auth_validate_session_token(session_token: str) -> bool:
         session_token (str): Session token to validate.
 
     Returns:
-        bool: True if the session token is valid.
+        bool: True if the session token is valid, False otherwise.
 
     Raises:
         401 Error: If session token does not match any active session.
     """
+    # Check all users for a valid session token match
     for user in users.values():
         if user.is_valid_session_token(session_token):
             return True
 
+    # Return False if no valid session token found
     return False
 
 
@@ -221,29 +244,33 @@ async def user_auth_validate_csrf_token(csrf_token: str) -> bool:
         csrf_token (str): CSRF token to validate.
 
     Returns:
-        bool: True if the CSRF token is valid.
+        bool: True if the CSRF token is valid, False otherwise.
 
     Raises:
         401 Error: If CSRF token does not match any active session.
     """
-
+    # Check all users for a valid CSRF token match
     for user in users.values():
         if user.is_valid_csrf_token(csrf_token):
             return True
 
+    # Return False if no valid CSRF token found
     return False
 
-def validate_user_id(user_id: int | None) -> None:
+
+def validate_user_id(user_id: int | None = None) -> None:
     """
     Validates the user ID to ensure it is a positive integer.
 
     Args:
-        user_id (int | None): User ID to validate.
+        user_id (int | None): User ID to validate. Defaults to None.
 
     Raises:
-        400 Error: If user ID is not a positive integer.
+        403 Error: If user ID is not a positive integer.
     """
+    # Check if user_id is None, not an int, or less than or equal to zero
     if user_id is None or not isinstance(user_id, int) or user_id <= 0:
+        # Abort with 403 error indicating invalid credentials
         abort(
-        403, "Invalid credentials. Please log in again."
-    )  # Raise an error if no valid user is found
+            403, "Invalid credentials. Please log in again."
+        )  # Raise an error if no valid user is found

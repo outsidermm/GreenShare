@@ -10,6 +10,7 @@ interface FilterBarProps {
   handleTypeFilter: (value: Option | null) => void;
 }
 
+// FilterBar component renders dropdowns for filtering items by condition and type
 export default function FilterBar(FilterBarProps: FilterBarProps) {
   const {
     conditionFilter,
@@ -19,7 +20,11 @@ export default function FilterBar(FilterBarProps: FilterBarProps) {
   } = FilterBarProps;
 
   return (
-    <div className="flex flex-col items-center gap-4 py-8 lg:flex-row lg:gap-10">
+    <section
+      className="flex flex-col items-center gap-4 py-8 lg:flex-row lg:gap-10"
+      role="region"
+      aria-label="Item filters for condition and type"
+    >
       <DropDown
         label_text="Filtered Condition:"
         placeholder="Select Condition"
@@ -36,6 +41,6 @@ export default function FilterBar(FilterBarProps: FilterBarProps) {
         setSelectedOption={(option) => handleTypeFilter(option)}
         isClearable={true}
       />
-    </div>
+    </section>
   );
 }

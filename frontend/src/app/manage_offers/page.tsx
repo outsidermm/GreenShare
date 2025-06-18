@@ -1,4 +1,8 @@
 "use client";
+/**
+ * Manage Offers Page for users on GreenShare.
+ * Allows users to view and manage their incoming and outgoing offers.
+ */
 import { useRouter, usePathname } from "next/navigation";
 import logoutUser from "@/services/user/logoutUser";
 import NavBar from "@/components/NavBar";
@@ -22,6 +26,8 @@ export default function ManageOffersPage() {
   const [toggleOffer, setToggleOffer] = useState(false); // false for outgoing offers, true for incoming offers
   const [incomingOffers, setIncomingOffers] = useState<Offer[]>([]);
   const [outgoingOffers, setOutgoingOffers] = useState<Offer[]>([]);
+
+  // Fetches and sets incoming/outgoing offers on page load and handles authentication redirection.
   useEffect(() => {
     (async () => {
       try {
@@ -50,16 +56,19 @@ export default function ManageOffersPage() {
     })();
   }, [pathname, isAuthenticated, router]);
 
+  // Handler to navigate to login page.
   const handleLogin = async () => {
     router.push("/login");
   };
 
+  // Handler to log out the user and refresh authentication state.
   const handleLogout = async () => {
     await logoutUser();
     refreshAuth();
     router.refresh();
   };
 
+  // Determines the button label based on offer status.
   const getOfferActionLabel = (toggleOffer: boolean, status: string) => {
     if (status === "cancelled") {
       return "Offer Cancelled";
@@ -83,6 +92,7 @@ export default function ManageOffersPage() {
     return "Await Other Party Action";
   };
 
+  // Handles actions performed by the current user on an offer based on its status.
   const handleCurrentUserOfferAction = async (
     offer: Offer,
     toggleOffer: boolean,
@@ -91,17 +101,30 @@ export default function ManageOffersPage() {
       if (toggleOffer) {
         if (offer.status === "pending") {
           await acceptOffer(offer.id);
-          router.refresh();
+          swal(
+            "Offer Accepted",
+            "You have accepted the offer. Please wait for the other party to complete the exchange.",
+            "success",
+          );
         } else if (offer.status === "completed") {
           await confirmOfferComplete(offer.id);
-          router.refresh();
+          swal(
+            "Offer Completed",
+            "You have confirmed the completion of the offer. Thank you for using GreenShare!",
+            "success",
+          );
         }
       } else {
         if (offer.status === "accepted") {
           await completeOffer(offer.id);
-          router.refresh();
+          swal(
+            "Offer Completed",
+            "You have completed the offer. Please wait for the other party to confirm completion.",
+            "success",
+          );
         }
       }
+      router.push("/manage_offers");
     } catch (error) {
       console.error("Error performing actions on your offer:", error);
       if (error instanceof Error) {
@@ -112,6 +135,7 @@ export default function ManageOffersPage() {
     }
   };
 
+  // Handles cancelling an offer with a reason provided by the user.
   const handleCancel = async (offerId: number) => {
     try {
       const message = await swal({
@@ -144,7 +168,11 @@ export default function ManageOffersPage() {
   };
 
   return (
-    <div className="bg-background w-screen min-h-screen pt-16">
+    <main
+      className="bg-background w-screen min-h-screen pt-16"
+      role="main"
+      aria-label="Manage Offers Page"
+    >
       <div className="fixed top-0 left-0 w-full bg-contrast shadow z-50 px-6 py-4 flex items-center justify-between gap-4 sm:gap-10">
         <HeaderBar
           isAuthenticated={isAuthenticated}
@@ -152,7 +180,7 @@ export default function ManageOffersPage() {
         />
       </div>
 
-      <div className="z-49 fixed top-16 left-0 sm:w-60 w-full sm:h-[calc(100vh-4rem)] bg-contrast text-surface px-6 py-6 shadow-grey-shadow shadow-xl flex flex-col items-center sm:items-start sm:justify-between">
+      <div className="z-40 fixed top-16 left-0 sm:w-60 w-full sm:h-[calc(100vh-4rem)] bg-contrast text-surface px-6 py-6 shadow-grey-shadow shadow-xl flex flex-col items-center sm:items-start sm:justify-between">
         <NavBar
           handleLogout={handleLogout}
           pathname={pathname}
@@ -160,21 +188,29 @@ export default function ManageOffersPage() {
         />
       </div>
 
-      <div
+      <section
+        aria-labelledby="view-offers-heading"
         className={`sm:ml-60 sm:mt-0 p-6 ${isAuthenticated ? "mt-96 pt-20" : "mt-64"}`}
       >
-        <h1 className="text-2xl font-bold mb-4 text-content px-4">
+        <h1
+          id="view-offers-heading"
+          className="text-2xl font-bold mb-4 text-content px-4"
+        >
           View Offers
         </h1>
 
         <div className="p-4 flex flex-col sm:flex-row">
           <button
+            aria-label="Show Outgoing Offers"
+            aria-disabled={!toggleOffer}
             className={`flex-1 px-4 py-2 mb-4 sm:mb-0 rounded-xl sm:rounded-none sm:rounded-l-xl text-content border-2 border-grey-shadow transition-all ${!toggleOffer ? "bg-grey-shadow" : "bg-background"}`}
             onClick={() => setToggleOffer(false)}
           >
             Outgoing Offers
           </button>
           <button
+            aria-label="Show Incoming Offers"
+            aria-disabled={toggleOffer}
             className={`flex-1 px-4 py-2 rounded-xl sm:rounded-none sm:rounded-r-xl text-content border-2 border-grey-shadow transition-all ${toggleOffer ? "bg-grey-shadow" : "bg-background"}`}
             onClick={() => setToggleOffer(true)}
           >
@@ -182,10 +218,13 @@ export default function ManageOffersPage() {
           </button>
         </div>
         <div className="p-4">
+          {/* Dynamic rendering of each offer card */}
           {(toggleOffer ? incomingOffers : outgoingOffers).length > 0 ? (
             (toggleOffer ? incomingOffers : outgoingOffers).map((offer) => (
               <div
                 key={offer.id}
+                role="region"
+                aria-label="Offer Card"
                 className="bg-surface p-4 mb-4 rounded-lg shadow flex justify-between gap-8 flex-col sm:flex-row"
               >
                 <div className="flex-2 text-content">
@@ -218,6 +257,7 @@ export default function ManageOffersPage() {
                 <div className="flex-2">
                   <button
                     disabled={offer.status === "cancelled"}
+                    aria-disabled={offer.status === "cancelled"}
                     onClick={() =>
                       handleCurrentUserOfferAction(offer, toggleOffer)
                     }
@@ -242,7 +282,7 @@ export default function ManageOffersPage() {
             </p>
           )}
         </div>
-      </div>
-    </div>
+      </section>
+    </main>
   );
 }

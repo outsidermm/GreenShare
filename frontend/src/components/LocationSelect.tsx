@@ -6,6 +6,7 @@ import autocompleteAddress from "@/services/api/autocompleteAddress";
 import DropDown from "./DropDown";
 import { Option } from "@/types/option";
 
+// Props expected by LocationSelect, including current value, change handler, and optional placeholder/required flags
 interface LocationSelectProps {
   value: Option | null;
   onChange: (value: Option | null) => void;
@@ -13,6 +14,7 @@ interface LocationSelectProps {
   required?: boolean;
 }
 
+// LocationSelect fetches and displays address suggestions using a debounced input
 export default function LocationSelect(input: LocationSelectProps) {
   const { value, onChange, placeholder, required } = input;
   const [inputValue, setInputValue] = useState("");
@@ -20,6 +22,7 @@ export default function LocationSelect(input: LocationSelectProps) {
   const [isLoading, setIsLoading] = useState(false);
   const debouncedInputValue = useDebounce(inputValue, 200);
 
+  // Trigger API request for location suggestions when the debounced input value changes
   useEffect(() => {
     const fetchOptions = async () => {
       if (debouncedInputValue.length < 3) {
@@ -47,12 +50,13 @@ export default function LocationSelect(input: LocationSelectProps) {
     fetchOptions();
   }, [debouncedInputValue]);
 
+  // Render DropDown with location search results and accessibility-friendly configuration
   return (
     <DropDown
       selectedOption={value}
       setSelectedOption={onChange}
       options={options}
-      label_text="Location"
+      label_text="Location" // Accessible label for screen readers
       placeholder={placeholder || "Search for a location..."}
       isClearable
       isSearchable
