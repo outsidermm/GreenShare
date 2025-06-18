@@ -163,6 +163,7 @@ export default function ProductForm(input: ProductFormProps) {
         e.preventDefault();
         handleSubmit();
       }}
+      className="max-h-[80vh] overflow-y-auto"
     >
       <div className="p-4">
         <div className="flex justify-between flex-col sm:flex-row gap-4">
