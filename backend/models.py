@@ -156,11 +156,15 @@ class ExchangeOfferDB(db.Model):
                 offered_item.item_id for offered_item in self.offered_items
             ],
             "requested_item_id": self.requested_item_id,
-            "requested_item_name": unsanitize_output(requested_item.title) if requested_item else None,
+            "requested_item_name": (
+                unsanitize_output(requested_item.title) if requested_item else None
+            ),
             "requested_item_location": (
                 unsanitize_output(requested_item.location) if requested_item else None
             ),
-            "offered_item_names": [unsanitize_output(item.title) for item in offered_items if item],
+            "offered_item_names": [
+                unsanitize_output(item.title) for item in offered_items if item
+            ],
         }
 
 

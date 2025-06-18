@@ -349,9 +349,7 @@ async def user_cancel_offer(
         404 Error: If the offer does not exist.
         500 Error: If there is an internal server error while cancelling the offer.
     """
-    message = validate_string_length(
-        message, "Cancellation Message", 10, 1000
-    )
+    message = validate_string_length(message, "Cancellation Message", 10, 1000)
 
     # Authenticate and validate user
     new_user_id: int = admin_retrieve_user_id(session_token, csrf_token)
