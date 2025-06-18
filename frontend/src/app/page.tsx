@@ -45,7 +45,7 @@ export default function Home() {
     fetchItems();
 
     // Set up polling every 30 seconds
-    const intervalId = setInterval(fetchItems, 30000);
+    const intervalId = setInterval(fetchItems, 3000);
 
     // Clean up interval on component unmount
     return () => clearInterval(intervalId);
