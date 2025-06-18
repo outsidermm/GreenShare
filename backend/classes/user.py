@@ -11,7 +11,7 @@ import secrets
 from cryptography.fernet import Fernet
 from backend.models import UserDB
 from backend.config import db
-from backend.utils import sanitize_input
+from backend.utils import sanitize_input, unsanitize_output
 
 # Initialize Fernet encryption suite with user key from environment variables
 user_key: str = os.getenv("USER_FERNET_KEY")
@@ -279,7 +279,8 @@ class User:
         Returns:
             str: User's first name.
         """
-        return db.session.get(UserDB, self.get_user_pk()).first_name
+        first_name = db.session.get(UserDB, self.get_user_pk()).first_name
+        return unsanitize_output(first_name)
 
     def get_last_name(self) -> str:
         """
@@ -288,7 +289,8 @@ class User:
         Returns:
             str: User's last name.
         """
-        return db.session.get(UserDB, self.get_user_pk()).last_name
+        last_name = db.session.get(UserDB, self.get_user_pk()).last_name
+        return unsanitize_output(last_name)
 
     def get_email(self) -> str:
         """

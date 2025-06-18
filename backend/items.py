@@ -6,12 +6,15 @@ including item validation, creation, viewing, filtering, modification, and delet
 from difflib import SequenceMatcher
 from sqlalchemy import select, func, desc
 from flask import abort
+from backend.utils import (
+    validate_string_length,
+    sanitize_input,
+)
 from backend.auth import validate_user_id
 from backend.data import admin_retrieve_user_id, item_categorisation, items
 from backend.models import ItemDB
 from backend.config import db
 from backend.classes.item import Item
-from backend.utils import sanitize_input
 
 
 def validate_item_id(item_id: str) -> int:
@@ -99,32 +102,6 @@ def validate_category(category: str) -> str:
     if category_lc not in valid_categories:
         category_lc = "essentials"  # Default category if invalid
     return sanitize_input(category_lc)
-
-
-def validate_string_length(
-    value: str, field_name: str, min_length: int, max_length: int
-) -> str:
-    """
-    Validates the length of a string field.
-
-    Args:
-        value (str): The string to validate.
-        field_name (str): The name of the field (for error messages).
-        min_length (int): Minimum allowed length.
-        max_length (int): Maximum allowed length.
-
-    Returns:
-        str: Sanitized, validated string.
-
-    Raises:
-        400: If the string length is out of bounds.
-    """
-    if not min_length <= len(value) <= max_length:
-        abort(
-            400,
-            f"{field_name} must be between {min_length} and {max_length} characters.",
-        )
-    return sanitize_input(value.lower())
 
 
 def title_matches(user_input: str, item_title: str, threshold: float = 0.4) -> bool:
@@ -256,12 +233,12 @@ async def user_get_browse_items(
         if item.get_status() == "available":
             return {item_id_int: item}
     # Otherwise, build a filtered dictionary of available items
-    
+
     filtered_items: dict[int, Item] = {}
     for item_key, item in items.items():
         if item.get_status() == "available":
             filtered_items[item_key] = item
-            
+
     # Filter by title if provided
     filtered_items_copy = filtered_items.copy()
     if title_filter is not None:
@@ -271,7 +248,7 @@ async def user_get_browse_items(
         for item_key, item in filtered_items_copy.items():
             if not title_matches(safe_title_filter, item.get_title()):
                 del filtered_items[item_key]
-                
+
     # Filter by category if provided
     filtered_items_copy = filtered_items.copy()
     if category_filter is not None:
@@ -279,7 +256,7 @@ async def user_get_browse_items(
         for item_key, item in filtered_items_copy.items():
             if item.get_category() != safe_category_filter:
                 del filtered_items[item_key]
-                
+
     # Filter by condition if provided
     filtered_items_copy = filtered_items.copy()
     if condition_filter is not None:
@@ -287,7 +264,7 @@ async def user_get_browse_items(
         for item_key, item in filtered_items_copy.items():
             if item.get_condition() != safe_condition_filter:
                 del filtered_items[item_key]
-            
+
     # Filter by type if provided
     filtered_items_copy = filtered_items.copy()
     if type_filter is not None:
@@ -340,24 +317,24 @@ async def user_modify_item(
     if new_title is not None:
         safe_title: str = validate_string_length(new_title, "Title", 3, 100)
         items[item_id_int].set_title(sanitize_input(safe_title.lower()))
-    
+
     if new_description is not None:
         safe_description: str = validate_string_length(
             new_description, "Description", 10, 1000
         )
         items[item_id_int].set_description(sanitize_input(safe_description.lower()))
-    
+
     if new_condition is not None:
         safe_condition: str = validate_condition(new_condition)
         items[item_id_int].set_condition(sanitize_input(safe_condition.lower()))
-    
+
     if new_location is not None:
         items[item_id_int].set_location(sanitize_input(new_location.lower()))
-    
+
     if new_type is not None:
         safe_type: str = validate_type(new_type)
         items[item_id_int].set_type(sanitize_input(safe_type.lower()))
-    
+
     if new_images is not None:
         if not isinstance(new_images, list):
             abort(400, "Images must be a list of URLs.")
