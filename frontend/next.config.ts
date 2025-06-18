@@ -38,7 +38,9 @@ const nextConfig: NextConfig = {
               base-uri 'self';
               form-action 'self';
               frame-ancestors 'none';
-            `.replace(/\n\s+/g, " ").trim(),
+            `
+              .replace(/\n\s+/g, " ")
+              .trim(),
           },
           {
             key: "X-XSS-Protection",
