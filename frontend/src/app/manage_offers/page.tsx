@@ -155,11 +155,7 @@ export default function ManageOffersPage() {
   };
 
   return (
-    <main
-      className="bg-background w-screen min-h-screen pt-16"
-      role="main"
-      aria-label="Manage Offers Page"
-    >
+    <main className="bg-background w-screen min-h-screen pt-16" role="main" aria-label="Manage Offers Page">
       <div className="fixed top-0 left-0 w-full bg-contrast shadow z-50 px-6 py-4 flex items-center justify-between gap-4 sm:gap-10">
         <HeaderBar
           isAuthenticated={isAuthenticated}
@@ -179,10 +175,7 @@ export default function ManageOffersPage() {
         aria-labelledby="view-offers-heading"
         className={`sm:ml-60 sm:mt-0 p-6 ${isAuthenticated ? "mt-96 pt-20" : "mt-64"}`}
       >
-        <h1
-          id="view-offers-heading"
-          className="text-2xl font-bold mb-4 text-content px-4"
-        >
+        <h1 id="view-offers-heading" className="text-2xl font-bold mb-4 text-content px-4">
           View Offers
         </h1>
 

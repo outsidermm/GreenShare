@@ -16,14 +16,12 @@ import { Item } from "@/types/item";
 import { toTitleCase } from "@/utils/titleCase";
 
 export default function ViewProductPage() {
-  // Extract authentication state and refresh function from custom hook
   const { isAuthenticated, refreshAuth } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
   const [item, setItem] = useState<Item>();
   const item_id_filter = Number(pathname.replace("/view_product/", ""));
 
-  // Fetch the specific item based on item_id from URL and prefetch the offer page
   useEffect(() => {
     const fetchItems = async () => {
       try {
@@ -66,11 +64,7 @@ export default function ViewProductPage() {
   };
 
   return (
-    <main
-      role="main"
-      aria-label="Product Detail Page"
-      className="bg-background w-screen min-h-screen pt-16"
-    >
+    <div className="bg-background w-screen min-h-screen pt-16">
       <div className="fixed top-0 left-0 w-full bg-contrast shadow z-50 px-6 py-4 flex items-center justify-between gap-4 sm:gap-10">
         <HeaderBar
           isAuthenticated={isAuthenticated}
@@ -93,14 +87,12 @@ export default function ViewProductPage() {
           <div
             onClick={() => router.back()}
             className="cursor-pointer w-fit p-1 hover:bg-border rounded"
-            aria-label="Back to previous page"
           >
             <FaChevronLeft color="contrast" size={16} />
           </div>
         </div>
         <div className="flex flex-col sm:flex-row gap-6">
           <div className="flex-1 flex justify-center items-center">
-            {/* Carousel displaying images of the selected item */}
             <Carousel
               showArrows={true}
               showIndicators={true}
@@ -127,14 +119,12 @@ export default function ViewProductPage() {
                 ))}
             </Carousel>
           </div>
-          <div className="flex-1" aria-live="polite">
+          <div className="flex-1">
             {item ? (
               <>
-                <header>
-                  <h1 className="text-2xl font-bold text-contrast mb-4">
-                    {toTitleCase(item.title)}
-                  </h1>
-                </header>
+                <h1 className="text-2xl font-bold text-contrast mb-4">
+                  {toTitleCase(item.title)}
+                </h1>
                 <div className="text-lg leading-relaxed space-y-2 text-content">
                   <p>
                     <strong>Description:</strong>{" "}
@@ -166,11 +156,9 @@ export default function ViewProductPage() {
               </div>
             )}
             <div className="pt-10 p-6">
-              {/* Button to initiate offer; redirects based on authentication status */}
               <button
                 onClick={handleOffer}
                 className="w-full rounded bg-action-primary hover:bg-action-secondary text-contrast font-bold py-2 px-4 border-solid border-2 border-action-primary transition-all"
-                aria-label="Make an offer on this item"
               >
                 Make an Offer
               </button>
@@ -178,6 +166,6 @@ export default function ViewProductPage() {
           </div>
         </div>
       </div>
-    </main>
+    </div>
   );
 }

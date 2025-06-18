@@ -177,9 +177,7 @@ export default function AddOfferPage() {
                               setOutgoingItems([...outgoingItems, item]);
                             else
                               setOutgoingItems((prev) =>
-                                prev.filter(
-                                  (outItem) => outItem.id !== item.id,
-                                ),
+                                prev.filter((outItem) => outItem.id !== item.id),
                               );
                           }}
                           onKeyDown={(e) => {
@@ -188,9 +186,7 @@ export default function AddOfferPage() {
                                 setOutgoingItems([...outgoingItems, item]);
                               else
                                 setOutgoingItems((prev) =>
-                                  prev.filter(
-                                    (outItem) => outItem.id !== item.id,
-                                  ),
+                                  prev.filter((outItem) => outItem.id !== item.id),
                                 );
                             }
                           }}
@@ -229,15 +225,9 @@ export default function AddOfferPage() {
               ></textarea>
             </div>
           </div>
-          <section
-            className="flex-1 shadow-lg text-content w-full"
-            aria-labelledby="requested-item-heading"
-          >
+          <section className="flex-1 shadow-lg text-content w-full" aria-labelledby="requested-item-heading">
             <div className="p-4">
-              <h1
-                id="requested-item-heading"
-                className="text-content font-bold"
-              >
+              <h1 id="requested-item-heading" className="text-content font-bold">
                 Requested Item Information:
               </h1>
               {requestedItem && (

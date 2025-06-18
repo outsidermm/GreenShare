@@ -63,26 +63,16 @@ export default function LoginPage() {
 
   // Main render structure of the login UI
   return (
-    <main
-      role="main"
-      aria-label="Login Page"
-      className="bg-background w-screen h-screen flex items-center justify-center align-middle"
-    >
+    <main role="main" aria-label="Login Page" className="bg-background w-screen h-screen flex items-center justify-center align-middle">
       <div className="sm:max-w-xl shadow-grey-shadow shadow-xl rounded-2xl p-6 px-10 sm:min-w-md w-11/12 bg-surface">
         <h1 className="text-4xl text-center text-content font-bold">Login</h1>
         {showSuccess && (
-          <div
-            aria-live="polite"
-            className="text-surface text-center mb-2 bg-action-secondary rounded-lg py-2 px-4 mt-5 transition-all"
-          >
+          <div aria-live="polite" className="text-surface text-center mb-2 bg-action-secondary rounded-lg py-2 px-4 mt-5 transition-all">
             Login successful! Redirecting to homepage...
           </div>
         )}
         {!["", "email", "password"].includes(errorType) && (
-          <div
-            aria-live="polite"
-            className="text-surface text-center mb-2 bg-alert rounded-lg py-2 px-4 mt-5 transition-all"
-          >
+          <div aria-live="polite" className="text-surface text-center mb-2 bg-alert rounded-lg py-2 px-4 mt-5 transition-all">
             {errorType}
           </div>
         )}

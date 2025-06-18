@@ -66,10 +66,7 @@ export default function CategoryPage() {
 
   return (
     <main className="bg-background w-screen min-h-screen pt-16" role="main">
-      <div
-        className="fixed top-0 left-0 w-full bg-contrast shadow z-50 px-6 py-4 flex items-center justify-between gap-4 sm:gap-10"
-        aria-label="Site Header"
-      >
+      <div className="fixed top-0 left-0 w-full bg-contrast shadow z-50 px-6 py-4 flex items-center justify-between gap-4 sm:gap-10" aria-label="Site Header">
         <HeaderBar
           isAuthenticated={isAuthenticated}
           handleLogin={handleLogin}
@@ -77,10 +74,7 @@ export default function CategoryPage() {
         />
       </div>
 
-      <div
-        className="z-49 fixed top-16 left-0 sm:w-60 w-full sm:h-[calc(100vh-4rem)] bg-contrast text-surface px-6 py-6 shadow-grey-shadow shadow-xl flex flex-col items-center sm:items-start sm:justify-between"
-        aria-label="Navigation Menu"
-      >
+      <div className="z-49 fixed top-16 left-0 sm:w-60 w-full sm:h-[calc(100vh-4rem)] bg-contrast text-surface px-6 py-6 shadow-grey-shadow shadow-xl flex flex-col items-center sm:items-start sm:justify-between" aria-label="Navigation Menu">
         <NavBar
           handleLogout={handleLogout}
           pathname={pathname}
