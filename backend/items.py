@@ -1,5 +1,8 @@
-from backend.data import admin_retrieve_user_id, items
-import re
+from backend.auth import validate_user_id
+from backend.data import admin_retrieve_user_id, item_categorisation, items
+from backend.models import ItemDB
+from sqlalchemy import select, func, desc
+from backend.config import db
 from backend.classes.item import Item
 from difflib import SequenceMatcher
 from flask import abort
@@ -43,10 +46,7 @@ def validate_category(category: str) -> str:
     ]
     category = category.lower()
     if category not in valid_categories:
-        abort(
-            400,
-            "Category must be one of: essentials, living, tools-tech, style-expression, leisure-learning.",
-        )
+        category = "essentials"  # Default category if invalid
     return sanitize_input(category)
 
 
@@ -61,7 +61,7 @@ def validate_string_length(
     return sanitize_input(value.lower())
 
 
-def title_matches(user_input: str, item_title: str, threshold: float = 0.7) -> bool:
+def title_matches(user_input: str, item_title: str, threshold: float = 0.4) -> bool:
     user_input = user_input.lower()
     item_title = item_title.lower()
     return (
@@ -94,9 +94,13 @@ async def user_create_item(
         csrf_token (str): User's CSRF token.
     """
     new_user_id = admin_retrieve_user_id(session_token, csrf_token)
-    new_category = validate_category("essentials")
+    validate_user_id(new_user_id)  # Ensure the user ID is valid
     safe_title = validate_string_length(new_title, "Title", 3, 100)
     safe_description = validate_string_length(new_description, "Description", 10, 1000)
+    new_category = await item_categorisation(
+        safe_title, safe_description
+    )  # Assuming this function is defined elsewhere
+    new_category = validate_category(new_category)
     safe_condition = validate_condition(new_condition)
     safe_location = sanitize_input(new_location.lower())
     safe_type = validate_type(new_type)
@@ -142,7 +146,6 @@ async def user_view_item(session_token: str, csrf_token: str) -> list[Item]:
 async def user_get_browse_items(
     category_filter: str = None,
     condition_filter: str = None,
-    location_filter: str = None,
     type_filter: str = None,
     title_filter: str = None,
     item_id: str = None,
@@ -153,11 +156,9 @@ async def user_get_browse_items(
     Args:
         category_filter (str): Filter items by category.
         condition_filter (str): Filter items by condition.
-        location_filter (str): Filter items by location.
         type_filter (str): Filter items by type.
         title_filter (str): Filter items by title.
         item_id (str): Retrieve a single item by ID.
-        user_id (str): Filter items by user ID.
 
     Returns:
         dict[dict]: Dictionary of all item data in dictionary format.
@@ -179,7 +180,7 @@ async def user_get_browse_items(
 
     if title_filter is not None:
         safe_title_filter = validate_string_length(title_filter, "Title filter", 3, 100)
-        for item_key, item in filtered_items.items():
+        for item_key, item in filtered_items_copy.items():
             if not title_matches(safe_title_filter, item.get_title()):
                 del filtered_items[item_key]
 
@@ -201,17 +202,6 @@ async def user_get_browse_items(
         safe_condition_filter = validate_condition(condition_filter)
         for item_key, item in filtered_items_copy.items():
             if item.get_condition() != safe_condition_filter:
-                del filtered_items[item_key]
-
-    filtered_items_copy = (
-        filtered_items.copy()
-    )  # Create a copy to avoid modifying the original
-
-    if location_filter is not None:
-        safe_location_filter = sanitize_input(location_filter.lower())
-
-        for item_key, item in filtered_items_copy.items():
-            if item.get_location() != safe_location_filter:
                 del filtered_items[item_key]
 
     filtered_items_copy = (
@@ -256,6 +246,7 @@ async def user_modify_item(
         Item: The modified item object.
     """
     user_id = admin_retrieve_user_id(session_token, csrf_token)
+    validate_user_id(user_id)  # Ensure the user ID is valid
     item_id = validate_item_id(item_id)
     if items[item_id].get_user_id() != user_id:
         abort(403, "You do not have permission to modify this item.")
@@ -265,12 +256,15 @@ async def user_modify_item(
         items[item_id].set_title(sanitize_input(new_title.lower()))
 
     if new_description:
-        new_description=validate_string_length(
-            new_description, "Description", 10, 1000)
+        new_description = validate_string_length(
+            new_description, "Description", 10, 1000
+        )
         items[item_id].set_description(sanitize_input(new_description.lower()))
 
     if new_condition:
-        new_condition = validate_condition(new_condition)  # This will raise an error if invalid
+        new_condition = validate_condition(
+            new_condition
+        )  # This will raise an error if invalid
         items[item_id].set_condition(sanitize_input(new_condition.lower()))
 
     if new_location:
@@ -307,7 +301,38 @@ async def user_delete_item(
 
     if session_token and csrf_token:
         user_id = admin_retrieve_user_id(session_token, csrf_token)
+        validate_user_id(user_id)  # Ensure the user ID is valid
         if items[item_id].get_user_id() != user_id:
             abort(403, "You do not have permission to delete this item.")
 
     del items[item_id]  # Remove the item from the dictionary
+
+
+async def search_item_similarity_pg(
+    search_query: str, threshold: float = 0.4, limit: int = 6
+) -> list[str]:
+    """
+    Search items using PostgreSQL trigram similarity.
+
+    Args:
+        search_query (str): The query string to match.
+        threshold (float): Minimum similarity threshold.
+        limit (int): Maximum number of results.
+
+    Returns:
+        list[str]: Sorted list of item titles with similarity above the threshold.
+    """
+    if not search_query or len(search_query) < 3:
+        return []
+
+    stmt = (
+        select(
+            ItemDB.title, func.similarity(ItemDB.title, search_query).label("sim_score")
+        )
+        .where(func.similarity(ItemDB.title, search_query) > threshold)
+        .order_by(desc("sim_score"))
+        .limit(limit)
+    )
+
+    result = db.session.execute(stmt)
+    return [row.title for row in result]

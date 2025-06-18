@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import loginUser from "@/services/user/loginUser";
 import PasswordInput from "@/components/PasswordInput";
@@ -17,6 +17,11 @@ export default function LoginPage() {
   const [pwdChanged, setPwdChanged] = useState(false);
 
   const [showSuccess, setShowSuccess] = useState(false);
+
+  useEffect(() => {
+    router.prefetch("/manage_offers");
+    router.prefetch("/manage_products");
+  }, [router]);
 
   const handleSubmit = async () => {
     try {
@@ -48,16 +53,16 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="bg-slate-100 w-screen h-screen flex items-center justify-center align-middle">
-      <div className="sm:max-w-xl shadow-slate-200 shadow-xl rounded-2xl p-6 px-10 sm:min-w-md w-11/12 bg-white">
-        <h1 className="text-4xl text-center text-slate-800 font-bold">Login</h1>
+    <div className="bg-background w-screen h-screen flex items-center justify-center align-middle">
+      <div className="sm:max-w-xl shadow-grey-shadow shadow-xl rounded-2xl p-6 px-10 sm:min-w-md w-11/12 bg-surface">
+        <h1 className="text-4xl text-center text-content font-bold">Login</h1>
         {showSuccess && (
-          <div className="text-white text-sm text-center mb-2 bg-green-500 rounded-lg py-2 px-4 mt-5 transition-all">
+          <div className="text-surface text-center mb-2 bg-action-secondary rounded-lg py-2 px-4 mt-5 transition-all">
             Login successful! Redirecting to homepage...
           </div>
         )}
         {!["", "email", "password"].includes(errorType) && (
-          <div className="text-white text-sm text-center mb-2 bg-red-500 rounded-lg py-2 px-4 mt-5 transition-all">
+          <div className="text-surface text-center mb-2 bg-alert rounded-lg py-2 px-4 mt-5 transition-all">
             {errorType}
           </div>
         )}
@@ -93,17 +98,18 @@ export default function LoginPage() {
           <div className="pt-10">
             <button
               type="submit"
-              className="w-full rounded bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-solid border-2 border-blue-500 transition-all"
+              className="w-full rounded bg-hyperlink hover:bg-blue-400 text-surface font-bold py-2 px-4 border-solid border-2 border-hyperlink transition-all"
             >
               Login
             </button>
           </div>
-          <div className="pt-5 text-center text-slate-500">
+          <div className="pt-5 text-center text-muted">
             <p>
               Don&apos;t have an account?&nbsp;
               <Link
                 href="/register"
-                className="text-blue-500 hover:text-blue-700"
+                className="text-hyperlink hover:text-hyperlink-hover"
+                prefetch={true}
               >
                 Sign Up
               </Link>

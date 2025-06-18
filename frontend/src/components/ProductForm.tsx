@@ -15,6 +15,7 @@ import { Option } from "@/types/option";
 import { extractErrorMessage } from "@/utils/extractErrorMsg";
 import { Item } from "@/types/item";
 import { toTitleCase } from "@/utils/titleCase";
+import { conditionOptions, typeOptions } from "@/types/itemDropdownOptions";
 
 interface ProductFormProps {
   item?: Item; // Optional item prop for editing
@@ -22,7 +23,7 @@ interface ProductFormProps {
 
 export default function ProductForm(input: ProductFormProps) {
   const { item } = input;
-  const { isAuthenticated, refreshAuth } = useAuth();
+  const { isAuthenticated } = useAuth();
   const router = useRouter();
 
   const [title, setTitle] = useState("");
@@ -51,25 +52,13 @@ export default function ProductForm(input: ProductFormProps) {
       );
       setSelectedType(
         item.type
-          ? typeOptions.find((opt) => opt.value === toTitleCase(item.type)) || null
+          ? typeOptions.find((opt) => opt.value === toTitleCase(item.type)) ||
+              null
           : null,
       );
       setImageURLs(Array.isArray(item.images) ? item.images : []);
     }
   }, [item]);
-
-  const conditionOptions: Array<Option> = [
-    { value: "new", label: "New" },
-    { value: "like-new", label: "Like New" },
-    { value: "used-good", label: "Used - Good" },
-    { value: "used-fair", label: "Used - Fair" },
-    { value: "poor", label: "Poor" },
-  ];
-
-  const typeOptions: Array<Option> = [
-    { value: "Free", label: "Free to Claim" },
-    { value: "Exchange", label: "Exchange via Offer" },
-  ];
 
   const [selectedCondition, setSelectedCondition] = useState<Option | null>(
     null,
@@ -174,23 +163,25 @@ export default function ProductForm(input: ProductFormProps) {
       }}
     >
       <div className="p-4">
-        <div className="flex justify-between">
+        <div className="flex justify-between flex-col sm:flex-row gap-4">
           <div className="flex items-center gap-2">
-            <AiOutlineShop color="black" />
-            <h2 className="text-slate-800 text-lg font-bold">
+            <AiOutlineShop
+              style={{ color: "var(--color-contrast-background)" }}
+            />
+            <h2 className="text-content text-lg font-bold">
               {item ? "Edit Product" : "Add New Product"}
             </h2>
           </div>
           <button
             type="submit"
-            className="bg-green-600 text-slate-800 px-4 py-2 rounded-full hover:bg-green-500 flex items-center gap-2 transition-all border-2 border-green-600 font-bold"
+            className="bg-action-primary text-content px-4 py-2 rounded-full hover:bg-action-secondary flex items-center gap-2 transition-all border-2 border-action-primary font-bold"
           >
             <IoMdCheckmark />
             <p>{item ? "Update Product" : "Add Product"}</p>
           </button>
         </div>
         <div className="pt-6">
-          <label className="block mb-2 text-slate-800">
+          <label className="block mb-2 text-content">
             Name Product (3-100 characters)
           </label>
           <input
@@ -202,12 +193,12 @@ export default function ProductForm(input: ProductFormProps) {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             onFocus={() => setIsTitleChanged(true)}
-            className={`border-slate-500 text-slate-500 rounded-lg py-2 px-3 w-full border-2  focus:outline-green-500 ${isTitleChanged ? "invalid:border-red-500" : ""}`}
+            className={`border-muted text-slate-600 rounded-lg py-2 px-3 w-full border-2 focus:outline-action-secondary ${isTitleChanged ? "invalid:border-alert" : ""}`}
           />
         </div>
 
         <div className="pt-6">
-          <label className="block mb-2 text-slate-800">
+          <label className="block mb-2 text-content">
             Product Description (10-1000 characters)
           </label>
           <input
@@ -219,7 +210,7 @@ export default function ProductForm(input: ProductFormProps) {
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             onFocus={() => setIsDescriptionChanged(true)}
-            className={`border-slate-500 rounded-lg py-2 px-3 w-full border-2 text-slate-500 focus:outline-green-500 ${isDescriptionChanged ? "invalid:border-red-500" : ""}`}
+            className={`border-muted rounded-lg py-2 px-3 w-full border-2 text-slate-600 focus:outline-action-secondary ${isDescriptionChanged ? "invalid:border-alert" : ""}`}
           />
         </div>
 
@@ -255,10 +246,10 @@ export default function ProductForm(input: ProductFormProps) {
         </div>
 
         <div className="pt-6">
-          <label className="block mb-2 text-slate-800 font-medium">
+          <label className="block mb-2 text-content font-medium">
             Product Images
           </label>
-          <div className="border-2 border-dashed border-slate-400 rounded-lg p-4 bg-slate-50">
+          <div className="border-2 border-dashed border-grey-shadow rounded-lg p-4 bg-background/50">
             <input
               type="file"
               accept="image/*"
@@ -269,14 +260,14 @@ export default function ProductForm(input: ProductFormProps) {
                 setSelectedFiles(files);
                 setImageURLs([]);
               }}
-              className="block w-full text-sm text-slate-600 mb-4 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-400 file:text-slate-800 hover:file:bg-green-500"
+              className="block w-full text-sm text-muted mb-4 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-400 file:text-content hover:file:bg-action-secondary"
             />
             {imageURLs.length > 0 || selectedFiles.length > 0 ? (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                 {imageURLs.map((url, index) => (
                   <div
                     key={`existing-${index}`}
-                    className="w-full aspect-square bg-white border rounded-lg overflow-hidden shadow-sm flex items-center justify-center"
+                    className="w-full aspect-square bg-surface border rounded-lg overflow-hidden shadow-sm flex items-center justify-center"
                   >
                     <Image
                       src={url}
@@ -290,7 +281,7 @@ export default function ProductForm(input: ProductFormProps) {
                 {selectedFiles.map((file, index) => (
                   <div
                     key={`new-${index}`}
-                    className="w-full aspect-square bg-white border rounded-lg overflow-hidden shadow-sm flex items-center justify-center"
+                    className="w-full aspect-square bg-surface border rounded-lg overflow-hidden shadow-sm flex items-center justify-center"
                   >
                     <Image
                       src={URL.createObjectURL(file)}
@@ -303,7 +294,7 @@ export default function ProductForm(input: ProductFormProps) {
                 ))}
               </div>
             ) : (
-              <div className="w-full h-40 bg-slate-100 rounded-lg flex items-center justify-center text-slate-400">
+              <div className="w-full h-40 bg-background rounded-lg flex items-center justify-center text-muted">
                 No images selected
               </div>
             )}

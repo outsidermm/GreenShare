@@ -16,9 +16,9 @@ export default function useAuth(): UseAuthResult {
   const refreshAuth = useCallback(async () => {
     try {
       const result = await authUser();
-      const isValid =
-        result && result.message === "Token is valid and user is in session";
-      setIsAuthenticated(isValid);
+      if (result.message === "Token is valid and user is in session")
+        setIsAuthenticated(true);
+      else setIsAuthenticated(false);
     } catch (error) {
       console.error("Authentication validation failed:", error);
       setIsAuthenticated(false);

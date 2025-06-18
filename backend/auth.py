@@ -210,7 +210,7 @@ async def user_auth_validate_session_token(session_token: str) -> bool:
         if user.is_valid_session_token(session_token):
             return True
 
-    abort(401, description="Session token does not exist")
+    return False
 
 
 async def user_auth_validate_csrf_token(csrf_token: str) -> bool:
@@ -231,4 +231,19 @@ async def user_auth_validate_csrf_token(csrf_token: str) -> bool:
         if user.is_valid_csrf_token(csrf_token):
             return True
 
-    abort(401, description="CSRF token does not exist")
+    return False
+
+def validate_user_id(user_id: int | None) -> None:
+    """
+    Validates the user ID to ensure it is a positive integer.
+
+    Args:
+        user_id (int | None): User ID to validate.
+
+    Raises:
+        400 Error: If user ID is not a positive integer.
+    """
+    if user_id is None or not isinstance(user_id, int) or user_id <= 0:
+        abort(
+        403, "Invalid credentials. Please log in again."
+    )  # Raise an error if no valid user is found

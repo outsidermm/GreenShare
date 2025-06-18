@@ -32,7 +32,7 @@ export default function CredentialsInput(props: CredentialsInputProps) {
   return (
     <>
       <div className="pt-5">
-        <label className="block mb-2 text-slate-800">{label}</label>
+        <label className="block mb-2 text-content">{label}</label>
         <input
           type={type}
           placeholder={placeholder}
@@ -42,12 +42,10 @@ export default function CredentialsInput(props: CredentialsInputProps) {
           value={credential}
           onChange={(e) => setCredential(e.target.value)}
           onFocus={() => setCredentialChanged(true)}
-          className={`border-slate-500 text-slate-500 rounded py-2 px-3 w-full ${credentialChanged ? "invalid:border-red-500" : ""} border-2`}
+          className={`border-muted text-slate-800 rounded py-2 px-3 w-full ${credentialChanged ? "invalid:border-alert" : ""} border-2`}
         />
         {credentialError != "" && (
-          <div className="text-red-500 text-sm text-center pt-2">
-            {credentialError}
-          </div>
+          <div className="text-alert text-center pt-2">{credentialError}</div>
         )}
       </div>
     </>

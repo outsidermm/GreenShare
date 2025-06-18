@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import registerUser from "@/services/user/registerUser";
 import PasswordInput from "@/components/PasswordInput";
@@ -21,6 +21,11 @@ export default function RegisterPage() {
 
   const [errorType, setErrorType] = useState("");
   const [showSuccess, setShowSuccess] = useState(false);
+
+  useEffect(() => {
+    router.prefetch("/manage_offers");
+    router.prefetch("/manage_products");
+  }, [router]);
 
   const handleSubmit = async () => {
     try {
@@ -68,13 +73,13 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="bg-slate-100 w-screen h-screen flex items-center justify-center align-middle">
-      <div className="sm:max-w-xl shadow-slate-200 shadow-xl rounded-2xl p-6 px-10 sm:min-w-md w-11/12 bg-white">
-        <h1 className="text-4xl text-center text-slate-800 font-bold">
+    <div className="bg-background w-screen h-screen flex items-center justify-center align-middle">
+      <div className="sm:max-w-xl shadow-grey-shadow shadow-xl rounded-2xl p-6 px-10 sm:min-w-md w-11/12 bg-surface">
+        <h1 className="text-4xl text-center text-content font-bold">
           Registration
         </h1>
         {showSuccess && (
-          <div className="text-white text-sm text-center mb-2 bg-green-500 rounded-lg py-2 px-4 mt-5 transition-all">
+          <div className="text-surface text-center mb-2 bg-action-primary rounded-lg py-2 px-4 mt-5 transition-all">
             Registration successful! Redirecting to homepage...
           </div>
         )}
@@ -86,7 +91,7 @@ export default function RegisterPage() {
           "last name",
           "email-exists",
         ].includes(errorType) && (
-          <div className="text-white text-sm text-center mb-2 bg-red-500 rounded-lg py-2 px-4 mt-5 transition-all">
+          <div className="text-surface text-center mb-2 bg-alert rounded-lg py-2 px-4 mt-5 transition-all">
             {errorType}
           </div>
         )}
@@ -164,7 +169,7 @@ export default function RegisterPage() {
           <div className="py-5">
             <label
               htmlFor="agreement-box"
-              className="inline-flex items-center text-slate-800"
+              className="inline-flex items-center text-content"
             >
               <input
                 type="checkbox"
@@ -179,7 +184,7 @@ export default function RegisterPage() {
           <div className="pt-2">
             <button
               type="submit"
-              className="w-full rounded bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-solid border-2 border-blue-500 transition-all"
+              className="w-full rounded bg-hyperlink hover:bg-hyperlink-hover text-surface font-bold py-2 px-4 border-solid border-2 border-hyperlink transition-all"
             >
               Create an Account
             </button>
@@ -187,7 +192,11 @@ export default function RegisterPage() {
           <div className="pt-5 text-center text-slate-500">
             <p>
               Already have an account?&nbsp;
-              <Link href="/login" className="text-blue-500 hover:text-blue-700">
+              <Link
+                href="/login"
+                className="text-hyperlink hover:text-hyperlink-hover"
+                prefetch={true}
+              >
                 Log in
               </Link>
             </p>

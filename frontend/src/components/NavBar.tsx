@@ -23,19 +23,19 @@ export default function NavBar(props: NavBarProps) {
   return (
     <>
       <div>
-        <h2 className="text-sm font-bold mb-2">
+        <h2 className="font-bold mb-2">
           <Link
             href="/"
             className={`block px-4 py-1 rounded transition-all ${
               pathname === "/"
-                ? "bg-slate-800 border-l-4 border-green-400 text-green-400 font-semibold"
-                : "hover:text-green-400"
+                ? "bg-content border-l-4 border-action-secondary text-action-secondary font-semibold"
+                : "hover:text-action-secondary"
             }`}
           >
             Categories
           </Link>
         </h2>
-        <ul className="space-y-1 text-sm">
+        <ul className="space-y-1">
           {categories.map(({ label, path }) => {
             const isActive = pathname === path;
             return (
@@ -44,8 +44,8 @@ export default function NavBar(props: NavBarProps) {
                   href={path}
                   className={`block px-4 py-1 rounded transition-all ${
                     isActive
-                      ? "bg-slate-800 border-l-4 border-green-400 text-green-400 font-semibold"
-                      : "hover:text-green-400"
+                      ? "bg-content border-l-4 border-action-secondary text-action-secondary font-semibold"
+                      : "hover:text-action-secondary"
                   }`}
                 >
                   {label}
@@ -55,13 +55,13 @@ export default function NavBar(props: NavBarProps) {
           })}
         </ul>
         {isAuthenticated && (
-          <h2 className="text-sm font-bold mb-2 mt-6">
+          <h2 className="font-bold mb-2 mt-6">
             <Link
               href="/manage_products"
               className={`block px-4 py-1 rounded transition-all ${
                 pathname === "/manage_products"
-                  ? "bg-slate-800 border-l-4 border-green-400 text-green-400 font-semibold"
-                  : "hover:text-green-400"
+                  ? "bg-content border-l-4 border-action-secondary text-action-secondary font-semibold"
+                  : "hover:text-action-secondary"
               }`}
             >
               Manage your Products
@@ -69,13 +69,13 @@ export default function NavBar(props: NavBarProps) {
           </h2>
         )}
         {isAuthenticated && (
-          <h2 className="text-sm font-bold mb-2 mt-6">
+          <h2 className="font-bold mb-2 mt-6">
             <Link
               href="/manage_offers"
               className={`block px-4 py-1 rounded transition-all ${
                 pathname === "/manage_offers"
-                  ? "bg-slate-800 border-l-4 border-green-400 text-green-400 font-semibold"
-                  : "hover:text-green-400"
+                  ? "bg-content border-l-4 border-action-secondary text-action-secondary font-semibold"
+                  : "hover:text-action-secondary"
               }`}
             >
               Manage your Offers
@@ -86,10 +86,7 @@ export default function NavBar(props: NavBarProps) {
       {isAuthenticated && (
         <div className="flex flex-row transition-all cursor-pointer py-4">
           <MdLogout onClick={handleLogout} className="mr-2" />
-          <button
-            className="text-sm font-bold text-white"
-            onClick={handleLogout}
-          >
+          <button className="font-bold text-surface" onClick={handleLogout}>
             Log Out
           </button>
         </div>

@@ -1,29 +1,19 @@
 import { Item } from "@/types/item";
+import { ItemFilter } from "@/types/itemFilter";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
-
-interface getItemsInput {
-  category?: string;
-  condition?: string;
-  location?: string;
-  type?: string;
-  title?: string;
-  item_id?: number;
-}
 
 export default async function getItems({
   category,
   condition,
-  location,
   type,
   title,
   item_id,
-}: getItemsInput): Promise<Item[]> {
+}: ItemFilter): Promise<Item[]> {
   try {
     const params: URLSearchParams = new URLSearchParams();
     if (category) params.append("category", category);
     if (condition) params.append("condition", condition);
-    if (location) params.append("location", location);
     if (type) params.append("type", type);
     if (title) params.append("title", title);
     if (item_id) params.append("id", item_id.toString());
