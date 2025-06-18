@@ -414,7 +414,7 @@ async def create_exchange_offer() -> Response:
         csrf_token: str = sanitize_input(request.headers.get("X-CSRF-TOKEN"))
         offered_item_ids: list = data["offeredItemIds"]
         requested_item_id: str = data["requestedItemId"]
-        message: str = sanitize_input(data["message"])
+        message: str = data["message"]
 
         await user_create_offer(
             session_token=session_token,
@@ -584,7 +584,7 @@ async def cancel_exchange_offer() -> Response:
     data: dict = request.json
     session_token: str = sanitize_input(request.cookies.get("session_token"))
     csrf_token: str = sanitize_input(request.headers.get("X-CSRF-TOKEN"))
-    message: str = sanitize_input(data["message"])
+    message: str = data["message"]
     offer_id: str = data["offerId"]
 
     try:
