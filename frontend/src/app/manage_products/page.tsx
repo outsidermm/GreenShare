@@ -94,7 +94,7 @@ export default function ManageProductsPage() {
     <main
       role="main"
       aria-label="Manage Products Page"
-      className="bg-background w-screen h-screen pt-16"
+      className="bg-background min-h-screen"
     >
       <div className="fixed top-0 left-0 w-full bg-contrast shadow z-50 px-6 py-4 flex items-center justify-between gap-4 sm:gap-10">
         <HeaderBar
@@ -102,105 +102,107 @@ export default function ManageProductsPage() {
           handleLogin={handleLogin}
         />
       </div>
-
-      <div className="z-40 fixed top-16 left-0 sm:w-60 w-full sm:h-[calc(100vh-4rem)] bg-contrast text-surface px-6 py-6 shadow-grey-shadow shadow-xl flex flex-col items-center sm:items-start sm:justify-between">
-        <NavBar
-          handleLogout={handleLogout}
-          pathname={pathname}
-          isAuthenticated={isAuthenticated}
-        />
-      </div>
-
-      <div
-        className={`relative sm:ml-60 sm:mt-0 p-6 ${isAuthenticated ? "mt-96 pt-20" : "mt-64"}`}
-      >
-        <header>
-          <h1 className="text-2xl font-bold mb-4 text-content px-4">
-            View Your Items
-          </h1>
-        </header>
-
-        <div className="p-4" aria-live="polite">
-          {ownedItems.length > 0 ? (
-            ownedItems.map((item) => (
-              <div
-                key={item.id}
-                className="bg-surface p-4 mb-4 rounded-lg shadow flex justify-between gap-8 flex-col sm:flex-row"
-                aria-label="User Item Card"
-              >
-                <div className="flex-2 text-content">
-                  <h1 className="text-xl font-bold mb-2">
-                    {toTitleCase(item.title)}
-                  </h1>
-                  <p>
-                    <strong>Description</strong> {toTitleCase(item.description)}{" "}
-                    <br />
-                    <strong>Condition:</strong> {toTitleCase(item.condition)}{" "}
-                    <br />
-                    <strong>Status:</strong> {toTitleCase(item.status)} <br />
-                    <strong>Location:</strong> {toTitleCase(item.location)}{" "}
-                    <br />
-                    <strong>Category:</strong> {toTitleCase(item.category)}{" "}
-                    <br />
-                    <strong>Type:</strong> {toTitleCase(item.type)} <br />
-                    <strong>Last Updated:</strong>{" "}
-                    {new Date(item.updated_at).toLocaleDateString()}
-                  </p>
-                </div>
-                {item.status === "available" && (
-                  <div className="flex-2">
-                    <button
-                      onClick={() => {
-                        setSelectedItem(item);
-                        setIsEditOpen(true);
-                      }}
-                      className={
-                        "w-full rounded bg-action-primary hover:bg-action-secondary text-contrast border-action-primary font-bold py-2 px-4 border-solid border-2 transition-all mt-4"
-                      }
-                    >
-                      Edit
-                    </button>
-                    <button
-                      className="w-full rounded bg-alert hover:bg-alert-hover text-contrast font-bold py-2 px-2 border-solid border-2 border-alert transition-all mt-4"
-                      onClick={() => handleDeleteItem(item.id)}
-                    >
-                      Delete
-                    </button>
-                  </div>
-                )}
-              </div>
-            ))
-          ) : (
-            <p className="text-content">You do not own any items.</p>
-          )}
-        </div>
-        {isEditOpen && (
-          <div className="fixed top-0 left-0 w-full h-full z-50 flex items-center justify-center backdrop-blur-sm bg-contrast/40 transition-all">
-            <div className="bg-surface p-12 rounded-xl shadow-xl w-full max-w-3xl relative max-h-[80vh] overflow-y-auto">
-              <button
-                onClick={() => setIsEditOpen(false)}
-                className="absolute top-4 right-4 text-content hover:text-content text-4xl font-bold"
-                aria-label="Close edit modal"
-              >
-                &times;
-              </button>
-              <ProductForm {...(selectedItem ? { item: selectedItem } : {})} />
-            </div>
+      <div>
+        <div className="z-40 fixed top-16 left-0 sm:w-60 w-full sm:h-[calc(100vh-4rem)] bg-contrast text-surface px-2 py-6 shadow-grey-shadow shadow-xl flex flex-col items-center sm:items-start sm:justify-between">
+          <NavBar
+            handleLogout={handleLogout}
+            pathname={pathname}
+            isAuthenticated={isAuthenticated}
+          />
           </div>
-        )}
-        <div className="fixed bottom-4 right-4 z-50">
-          <button
-            onClick={() => {
-              setSelectedItem(undefined);
-              setIsEditOpen(true);
-            }}
-            className="bg-action-primary text-content px-4 py-2 rounded-full hover:bg-action-secondary flex items-center gap-2 transition-all border-2 border-action-primary font-bold shadow-xl"
-            aria-label="Add New Item"
-          >
-            Add New Item
-          </button>
-        </div>
+          <div className={`sm:ml-60 p-6 sm:mt-4 mt-96`}>
+            <header className="mt-28 sm:mt-0">
+              <h1 className="text-2xl font-bold mb-4 text-content px-4">
+                View Your Items
+              </h1>
+            </header>
+
+          <div className="p-4" aria-live="polite">
+            {ownedItems.length > 0 ? (
+              ownedItems.map((item) => (
+                <div
+                  key={item.id}
+                  className="bg-surface p-4 mb-4 rounded-lg shadow flex justify-between gap-8 flex-col sm:flex-row"
+                  aria-label="User Item Card"
+                >
+                  <div className="flex-2 text-content">
+                    <h1 className="text-xl font-bold mb-2">
+                      {toTitleCase(item.title)}
+                    </h1>
+                    <p>
+                      <strong>Description</strong> {toTitleCase(item.description)}{" "}
+                      <br />
+                      <strong>Condition:</strong> {toTitleCase(item.condition)}{" "}
+                      <br />
+                      <strong>Status:</strong> {toTitleCase(item.status)} <br />
+                      <strong>Location:</strong> {toTitleCase(item.location)}{" "}
+                      <br />
+                      <strong>Category:</strong> {toTitleCase(item.category)}{" "}
+                      <br />
+                      <strong>Type:</strong> {toTitleCase(item.type)} <br />
+                      <strong>Last Updated:</strong>{" "}
+                      {new Date(item.updated_at).toLocaleDateString()}
+                    </p>
+                  </div>
+                  {item.status === "available" && (
+                    <div className="flex-2">
+                      <button
+                        onClick={() => {
+                          setSelectedItem(item);
+                          setIsEditOpen(true);
+                        }}
+                        className={
+                          "w-full rounded bg-action-primary hover:bg-action-secondary text-contrast border-action-primary font-bold py-2 px-4 border-solid border-2 transition-all mt-4"
+                        }
+                      >
+                        Edit
+                      </button>
+                      <button
+                        className="w-full rounded bg-alert hover:bg-alert-hover text-contrast font-bold py-2 px-2 border-solid border-2 border-alert transition-all mt-4"
+                        onClick={() => handleDeleteItem(item.id)}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ))
+            ) : (
+              <p className="text-content">You do not own any items.</p>
+            )}
+          </div>
+          {isEditOpen && (
+            <div className="fixed top-0 left-0 w-full h-full z-50 flex items-center justify-center backdrop-blur-sm bg-contrast/40 transition-all">
+              <div className="bg-surface p-12 rounded-xl shadow-xl w-full max-w-3xl relative max-h-[80vh] overflow-y-auto">
+                <button
+                  onClick={() => setIsEditOpen(false)}
+                  className="absolute top-4 right-4 text-content hover:text-content text-4xl font-bold"
+                  aria-label="Close edit modal"
+                >
+                  &times;
+                </button>
+                <ProductForm {...(selectedItem ? { item: selectedItem } : {})} />
+              </div>
+            </div>
+          )}
+          <div className="fixed bottom-4 right-4 z-50">
+            <button
+              onClick={() => {
+                setSelectedItem(undefined);
+                setIsEditOpen(true);
+              }}
+              className="bg-action-primary text-content px-4 py-2 rounded-full hover:bg-action-secondary flex items-center gap-2 transition-all border-2 border-action-primary font-bold shadow-xl"
+              aria-label="Add New Item"
+            >
+              Add New Item
+            </button>
+          </div>
+        </div>        
       </div>
+
+
+
+
     </main>
   );
 }
