@@ -18,6 +18,7 @@ import completeOffer from "@/services/offer/completeOffer";
 import confirmOfferComplete from "@/services/offer/confirmOfferComplete";
 import swal from "sweetalert";
 import { extractErrorMessage } from "@/utils/extractErrorMsg";
+import { FaArrowLeft, FaArrowRight } from "react-icons/fa6";
 
 export default function ManageOffersPage() {
   const router = useRouter();
@@ -232,43 +233,69 @@ export default function ManageOffersPage() {
                   key={offer.id}
                   role="region"
                   aria-label="Offer Card"
-                  className="bg-surface p-4 mb-4 rounded-lg shadow flex justify-between gap-8 flex-col sm:flex-row"
+                  className="bg-surface p-6 mb-6 rounded-lg shadow-xl flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4"
                 >
-                  <div className="flex-2 text-content">
-                    <p>
-                      <strong>Offered To:</strong>{" "}
-                      {toTitleCase(offer.requested_item_name)}
-                    </p>
-                    <p>
-                      <strong>Offered Items:</strong>{" "}
-                      {toTitleCase(offer.offered_item_names.join(", "))}
-                    </p>
-                    <p>
-                      <strong>Message:</strong> {toTitleCase(offer.message)}
-                    </p>
-                    <p>
-                      <strong>Status:</strong> {toTitleCase(offer.status)}
-                    </p>
-                    {offer.status !== "pending" &&
-                      offer.status !== "cancelled" && (
-                        <p>
-                          <strong>Requested Item Location:</strong>{" "}
-                          {toTitleCase(offer.requested_item_location)}
+                  {/* Items */}
+                  <div className="flex-1">
+                    <h2 className="font-bold mb-2 text-content text-xl">Items</h2>
+                    <p className="font-semibold text-content">Incoming</p>
+                    <div className="flex items-center text-content gap-1">
+                      <FaArrowRight color="green"/>
+                      <p>
+                        {toTitleCase(offer.requested_item_name)}
+                      </p>
+                    </div>
+                    <hr className="my-2 border-border" />
+                    <p className="font-semibold text-content">Outgoing</p>
+                    <div className="flex items-center text-content gap-1">
+                      <FaArrowLeft color="red"/>
+                      {offer.offered_item_names.map((item, index) => (
+                        <p key={index} className="text-sm text-alert flex items-center gap-1">
+                          {toTitleCase(item)}
                         </p>
-                      )}
+                    ))}
+                    </div>
+                  </div>
+
+                  {/* Message and Location */}
+                  <div className="flex-1 text-content">
+                    <h2 className="font-bold mb-1 text-xl">Message</h2>
+                    <p className="mb-4">{toTitleCase(offer.message)}</p>
+                    <h2 className="font-bold mb-1 text-xl">Location</h2>
                     <p>
-                      <strong>Created At:</strong>{" "}
-                      {new Date(offer.created_at).toLocaleDateString()}
+                      {toTitleCase(offer.requested_item_location)}
                     </p>
                   </div>
-                  <div className="flex-2">
+
+                  {/* Stage */}
+                  <div className="flex-1">
+                    <h2 className="font-bold mb-2 text-content text-xl">Stage</h2>
+                    {["confirmed", "completed", "accepted", "pending"].map((stage) => (
+                    <p key={stage} className={`flex items-center ${offer.status === stage ? "font-bold text-action-primary" : "text-slate-500"}`}>
+                        {offer.status === stage ? (
+                          <span className="inline-block w-3 h-3 rounded-full bg-action-primary mr-2" />
+                        ) : (
+                          <span className="inline-block w-2 h-2 mr-2 rounded-full bg-muted" />
+                        )}
+                        {toTitleCase(stage)}
+                      </p>
+                    ))}
+                  </div>
+
+                  {/* Next Action */}
+                  <div className="flex-1">
+                    <h2 className="font-bold mb-2 text-content text-xl">Next Action</h2>
                     <button
                       disabled={offer.status === "cancelled"}
                       aria-disabled={offer.status === "cancelled"}
                       onClick={() =>
                         handleCurrentUserOfferAction(offer, toggleOffer)
                       }
-                      className={`w-full rounded  text-contrast ${offer.status === "cancelled" ? "bg-alert-hover border-alert-hover" : "bg-action-primary hover:bg-action-secondary border-action-primary"} font-bold py-2 px-4 border-solid border-2 transition-all mt-4`}
+                      className={`w-full rounded text-contrast ${
+                        offer.status === "cancelled"
+                          ? "bg-alert-hover border-alert-hover"
+                          : "bg-action-primary hover:bg-action-secondary border-action-primary"
+                      } font-bold py-2 px-4 border-solid border-2 transition-all`}
                     >
                       {getOfferActionLabel(toggleOffer, offer.status)}
                     </button>
