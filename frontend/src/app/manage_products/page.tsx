@@ -6,13 +6,13 @@ import NavBar from "@/components/NavBar";
 import HeaderBar from "@/components/HeaderBar";
 import useAuth from "@/hooks/useAuth";
 import { useState, useEffect } from "react";
-import { toTitleCase } from "@/utils/titleCase";
 import swal from "sweetalert";
 import { extractErrorMessage } from "@/utils/extractErrorMsg";
 import getUserItems from "@/services/item/getUserItems";
 import deleteItem from "@/services/item/deleteItem";
 import { Item } from "@/types/item";
 import ProductForm from "@/components/ProductForm";
+import ProductDetailCard from "@/components/ProductDetailCard";
 
 export default function ManageProductsPage() {
   const router = useRouter();
@@ -126,23 +126,7 @@ export default function ManageProductsPage() {
                   aria-label="User Item Card"
                 >
                   <div className="flex-2 text-content">
-                    <h1 className="text-xl font-bold mb-2">
-                      {toTitleCase(item.title)}
-                    </h1>
-                    <p>
-                      <strong>Description</strong> {toTitleCase(item.description)}{" "}
-                      <br />
-                      <strong>Condition:</strong> {toTitleCase(item.condition)}{" "}
-                      <br />
-                      <strong>Status:</strong> {toTitleCase(item.status)} <br />
-                      <strong>Location:</strong> {toTitleCase(item.location)}{" "}
-                      <br />
-                      <strong>Category:</strong> {toTitleCase(item.category)}{" "}
-                      <br />
-                      <strong>Type:</strong> {toTitleCase(item.type)} <br />
-                      <strong>Last Updated:</strong>{" "}
-                      {new Date(item.updated_at).toLocaleDateString()}
-                    </p>
+                      <ProductDetailCard item={item}/>
                   </div>
                   {item.status === "available" && (
                     <div className="flex-2">

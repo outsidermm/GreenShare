@@ -13,7 +13,7 @@ import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import swal from "sweetalert";
 import { Item } from "@/types/item";
-import { toTitleCase } from "@/utils/titleCase";
+import ProductDetailCard from "@/components/ProductDetailCard";
 
 export default function ViewProductPage() {
   // Extract authentication state and refresh function from custom hook
@@ -129,37 +129,7 @@ export default function ViewProductPage() {
           </div>
           <div className="flex-1" aria-live="polite">
             {item ? (
-              <>
-                <header>
-                  <h1 className="text-2xl font-bold text-contrast mb-4">
-                    {toTitleCase(item.title)}
-                  </h1>
-                </header>
-                <div className="text-lg leading-relaxed space-y-2 text-content">
-                  <p>
-                    <strong>Description:</strong>{" "}
-                    {toTitleCase(item.description)}
-                  </p>
-                  <p>
-                    <strong>Condition:</strong> {toTitleCase(item.condition)}
-                  </p>
-                  <p>
-                    <strong>Type:</strong> {toTitleCase(item.type)}
-                  </p>
-                  <p>
-                    <strong>Approximate Location:</strong>{" "}
-                    {toTitleCase(item.location)
-                      .split(", ")
-                      .slice(1)
-                      .join(", ")
-                      .trim()}
-                  </p>
-                  <p>
-                    <strong>Last Updated:</strong>{" "}
-                    {new Date(item.updated_at).toLocaleDateString()}
-                  </p>
-                </div>
-              </>
+              ProductDetailCard({item,approximate_loc: true,})
             ) : (
               <div className="text-center text-muted">
                 <p>Item not found.</p>
