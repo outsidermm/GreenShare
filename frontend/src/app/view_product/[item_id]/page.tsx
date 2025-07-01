@@ -115,7 +115,7 @@ export default function ViewProductPage() {
               {item.images.map((image, index) => (
                   <div
                     key={index}
-                    className="relative w-full aspect-[4/3] bg-surface overflow-hidden rounded"
+                    className="relative w-full aspect-[4/3] bg-surface overflow-hidden rounded-xl"
                   >
                     <Image
                       src={image}
