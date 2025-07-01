@@ -79,7 +79,7 @@ export default function Home() {
         />
       </div>
 
-      <div className="z-40 fixed top-16 left-0 sm:w-60 w-full sm:h-[calc(100vh-4rem)] bg-contrast text-surface px-6 py-6 shadow-grey-shadow shadow-xl flex flex-col items-center sm:items-start sm:justify-between">
+      <div className="z-40 fixed top-16 left-0 sm:w-60 w-full sm:h-[calc(100vh-4rem)] bg-contrast text-surface px-2 py-6 shadow-grey-shadow shadow-xl flex flex-col items-center sm:items-start sm:justify-between">
         <NavBar
           handleLogout={handleLogout}
           pathname="/"
@@ -88,9 +88,9 @@ export default function Home() {
       </div>
 
       <div
-        className={`sm:ml-60 sm:mt-0 p-6 ${isAuthenticated ? "mt-96 pt-20" : "mt-64"}`}
+        className={`sm:ml-60 sm:mt-2 p-6 ${isAuthenticated ? "mt-96" : "mt-64"}`}
       >
-        <div className="bg-action-primary text-white rounded-lg p-6 mb-8">
+        <div className={`bg-action-primary text-white rounded-lg p-6 mb-8 sm:mt-0 ${isAuthenticated ? "mt-16" : "mt-0"}`}>
           <h2 className="text-2xl font-bold">Welcome to GreenShare 🌱</h2>
           <p>
             Where communities thrive by giving goods a second life. Join us in

@@ -187,110 +187,110 @@ export default function ManageOffersPage() {
           handleLogin={handleLogin}
         />
       </div>
-
-      <div className="z-40 fixed top-16 left-0 sm:w-60 w-full sm:h-[calc(100vh-4rem)] bg-contrast text-surface px-6 py-6 shadow-grey-shadow shadow-xl flex flex-col items-center sm:items-start sm:justify-between">
-        <NavBar
-          handleLogout={handleLogout}
-          pathname={pathname}
-          isAuthenticated={isAuthenticated}
-        />
-      </div>
-
-      <section
-        aria-labelledby="view-offers-heading"
-        className={`sm:ml-60 sm:mt-0 p-6 ${isAuthenticated ? "mt-96 pt-20" : "mt-64"}`}
-      >
-        <h1
-          id="view-offers-heading"
-          className="text-2xl font-bold mb-4 text-content px-4"
-        >
-          View Offers
-        </h1>
-
-        <div className="p-4 flex flex-col sm:flex-row">
-          <button
-            aria-label="Show Outgoing Offers"
-            aria-disabled={!toggleOffer}
-            className={`flex-1 px-4 py-2 mb-4 sm:mb-0 rounded-xl sm:rounded-none sm:rounded-l-xl text-content border-2 border-grey-shadow transition-all ${!toggleOffer ? "bg-grey-shadow" : "bg-background"}`}
-            onClick={() => setToggleOffer(false)}
-          >
-            Outgoing Offers
-          </button>
-          <button
-            aria-label="Show Incoming Offers"
-            aria-disabled={toggleOffer}
-            className={`flex-1 px-4 py-2 rounded-xl sm:rounded-none sm:rounded-r-xl text-content border-2 border-grey-shadow transition-all ${toggleOffer ? "bg-grey-shadow" : "bg-background"}`}
-            onClick={() => setToggleOffer(true)}
-          >
-            Incoming Offers
-          </button>
+      <div>
+        <div className="z-40 fixed top-16 left-0 sm:w-60 w-full sm:h-[calc(100vh-4rem)] bg-contrast text-surface px-2 py-6 shadow-grey-shadow shadow-xl flex flex-col items-center sm:items-start sm:justify-between">
+          <NavBar
+            handleLogout={handleLogout}
+            pathname={pathname}
+            isAuthenticated={isAuthenticated}
+          />
         </div>
-        <div className="p-4">
-          {/* Dynamic rendering of each offer card */}
-          {(toggleOffer ? incomingOffers : outgoingOffers).length > 0 ? (
-            (toggleOffer ? incomingOffers : outgoingOffers).map((offer) => (
-              <div
-                key={offer.id}
-                role="region"
-                aria-label="Offer Card"
-                className="bg-surface p-4 mb-4 rounded-lg shadow flex justify-between gap-8 flex-col sm:flex-row"
-              >
-                <div className="flex-2 text-content">
-                  <p>
-                    <strong>Offered To:</strong>{" "}
-                    {toTitleCase(offer.requested_item_name)}
-                  </p>
-                  <p>
-                    <strong>Offered Items:</strong>{" "}
-                    {toTitleCase(offer.offered_item_names.join(", "))}
-                  </p>
-                  <p>
-                    <strong>Message:</strong> {toTitleCase(offer.message)}
-                  </p>
-                  <p>
-                    <strong>Status:</strong> {toTitleCase(offer.status)}
-                  </p>
-                  {offer.status !== "pending" &&
-                    offer.status !== "cancelled" && (
-                      <p>
-                        <strong>Requested Item Location:</strong>{" "}
-                        {toTitleCase(offer.requested_item_location)}
-                      </p>
-                    )}
-                  <p>
-                    <strong>Created At:</strong>{" "}
-                    {new Date(offer.created_at).toLocaleDateString()}
-                  </p>
-                </div>
-                <div className="flex-2">
-                  <button
-                    disabled={offer.status === "cancelled"}
-                    aria-disabled={offer.status === "cancelled"}
-                    onClick={() =>
-                      handleCurrentUserOfferAction(offer, toggleOffer)
-                    }
-                    className={`w-full rounded  text-contrast ${offer.status === "cancelled" ? "bg-alert-hover border-alert-hover" : "bg-action-primary hover:bg-action-secondary border-action-primary"} font-bold py-2 px-4 border-solid border-2 transition-all mt-4`}
-                  >
-                    {getOfferActionLabel(toggleOffer, offer.status)}
-                  </button>
-                  {offer.status === "pending" && (
+
+        <section
+          aria-labelledby="view-offers-heading"
+          className="sm:ml-60 sm:mt-0 p-6 mt-96 pt-8">
+          <h1
+            id="view-offers-heading"
+            className="text-2xl font-bold mb-4 text-content px-4"
+          >
+            View Offers
+          </h1>
+
+          <div className="p-4 flex flex-col sm:flex-row">
+            <button
+              aria-label="Show Outgoing Offers"
+              aria-disabled={!toggleOffer}
+              className={`flex-1 px-4 py-2 mb-4 sm:mb-0 rounded-xl sm:rounded-none sm:rounded-l-xl text-content border-2 border-grey-shadow transition-all ${!toggleOffer ? "bg-grey-shadow" : "bg-background"}`}
+              onClick={() => setToggleOffer(false)}
+            >
+              Outgoing Offers
+            </button>
+            <button
+              aria-label="Show Incoming Offers"
+              aria-disabled={toggleOffer}
+              className={`flex-1 px-4 py-2 rounded-xl sm:rounded-none sm:rounded-r-xl text-content border-2 border-grey-shadow transition-all ${toggleOffer ? "bg-grey-shadow" : "bg-background"}`}
+              onClick={() => setToggleOffer(true)}
+            >
+              Incoming Offers
+            </button>
+          </div>
+          <div className="p-4">
+            {/* Dynamic rendering of each offer card */}
+            {(toggleOffer ? incomingOffers : outgoingOffers).length > 0 ? (
+              (toggleOffer ? incomingOffers : outgoingOffers).map((offer) => (
+                <div
+                  key={offer.id}
+                  role="region"
+                  aria-label="Offer Card"
+                  className="bg-surface p-4 mb-4 rounded-lg shadow flex justify-between gap-8 flex-col sm:flex-row"
+                >
+                  <div className="flex-2 text-content">
+                    <p>
+                      <strong>Offered To:</strong>{" "}
+                      {toTitleCase(offer.requested_item_name)}
+                    </p>
+                    <p>
+                      <strong>Offered Items:</strong>{" "}
+                      {toTitleCase(offer.offered_item_names.join(", "))}
+                    </p>
+                    <p>
+                      <strong>Message:</strong> {toTitleCase(offer.message)}
+                    </p>
+                    <p>
+                      <strong>Status:</strong> {toTitleCase(offer.status)}
+                    </p>
+                    {offer.status !== "pending" &&
+                      offer.status !== "cancelled" && (
+                        <p>
+                          <strong>Requested Item Location:</strong>{" "}
+                          {toTitleCase(offer.requested_item_location)}
+                        </p>
+                      )}
+                    <p>
+                      <strong>Created At:</strong>{" "}
+                      {new Date(offer.created_at).toLocaleDateString()}
+                    </p>
+                  </div>
+                  <div className="flex-2">
                     <button
-                      className="w-full rounded bg-alert-hover hover:bg-alert text-contrast font-bold py-2 px-2 border-solid border-2 border-alert-hover transition-all mt-4"
-                      onClick={() => handleCancel(offer.id)}
+                      disabled={offer.status === "cancelled"}
+                      aria-disabled={offer.status === "cancelled"}
+                      onClick={() =>
+                        handleCurrentUserOfferAction(offer, toggleOffer)
+                      }
+                      className={`w-full rounded  text-contrast ${offer.status === "cancelled" ? "bg-alert-hover border-alert-hover" : "bg-action-primary hover:bg-action-secondary border-action-primary"} font-bold py-2 px-4 border-solid border-2 transition-all mt-4`}
                     >
-                      Cancel
+                      {getOfferActionLabel(toggleOffer, offer.status)}
                     </button>
-                  )}
+                    {offer.status === "pending" && (
+                      <button
+                        className="w-full rounded bg-alert-hover hover:bg-alert text-contrast font-bold py-2 px-2 border-solid border-2 border-alert-hover transition-all mt-4"
+                        onClick={() => handleCancel(offer.id)}
+                      >
+                        Cancel
+                      </button>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))
-          ) : (
-            <p className="text-content">
-              No {toggleOffer ? "incoming" : "outgoing"} offers found.
-            </p>
-          )}
-        </div>
-      </section>
+              ))
+            ) : (
+              <p className="text-content">
+                No {toggleOffer ? "incoming" : "outgoing"} offers found.
+              </p>
+            )}
+          </div>
+        </section>
+      </div>
     </main>
   );
 }
