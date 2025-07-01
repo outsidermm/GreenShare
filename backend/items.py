@@ -232,46 +232,35 @@ async def user_get_browse_items(
         item: Item = items[item_id_int]
         if item.get_status() == "available":
             return {item_id_int: item}
-    # Otherwise, build a filtered dictionary of available items
+        
+    # Otherwise, build a filtered dictionary of available items in one pass
+    safe_title_filter: str | None = None
+    safe_category_filter: str | None = None
+    safe_condition_filter: str | None = None
+    safe_type_filter: str | None = None
+    
+    if title_filter is not None:
+        safe_title_filter = validate_string_length(title_filter, "Title filter", 3, 100)
+    if category_filter is not None:
+        safe_category_filter = validate_category(category_filter)
+    if condition_filter is not None:
+        safe_condition_filter = validate_condition(condition_filter)
+    if type_filter is not None:
+        safe_type_filter = validate_type(type_filter)
 
     filtered_items: dict[int, Item] = {}
     for item_key, item in items.items():
-        if item.get_status() == "available":
-            filtered_items[item_key] = item
-
-    # Filter by title if provided
-    filtered_items_copy = filtered_items.copy()
-    if title_filter is not None:
-        safe_title_filter: str = validate_string_length(
-            title_filter, "Title filter", 3, 100
-        )
-        for item_key, item in filtered_items_copy.items():
-            if not title_matches(safe_title_filter, item.get_title()):
-                del filtered_items[item_key]
-
-    # Filter by category if provided
-    filtered_items_copy = filtered_items.copy()
-    if category_filter is not None:
-        safe_category_filter: str = validate_category(category_filter)
-        for item_key, item in filtered_items_copy.items():
-            if item.get_category() != safe_category_filter:
-                del filtered_items[item_key]
-
-    # Filter by condition if provided
-    filtered_items_copy = filtered_items.copy()
-    if condition_filter is not None:
-        safe_condition_filter: str = validate_condition(condition_filter)
-        for item_key, item in filtered_items_copy.items():
-            if item.get_condition() != safe_condition_filter:
-                del filtered_items[item_key]
-
-    # Filter by type if provided
-    filtered_items_copy = filtered_items.copy()
-    if type_filter is not None:
-        safe_type_filter: str = validate_type(type_filter)
-        for item_key, item in filtered_items_copy.items():
-            if item.get_type() != safe_type_filter:
-                del filtered_items[item_key]
+        if item.get_status() != "available":
+            continue
+        if safe_title_filter is not None and not title_matches(safe_title_filter, item.get_title()):
+            continue
+        if safe_category_filter is not None and item.get_category() != safe_category_filter:
+            continue
+        if safe_condition_filter is not None and item.get_condition() != safe_condition_filter:
+            continue
+        if safe_type_filter is not None and item.get_type() != safe_type_filter:
+            continue
+        filtered_items[item_key] = item
     return filtered_items
 
 
@@ -316,24 +305,24 @@ async def user_modify_item(
     # Update fields if provided, validating and sanitizing as needed
     if new_title is not None:
         safe_title: str = validate_string_length(new_title, "Title", 3, 100)
-        items[item_id_int].set_title(sanitize_input(safe_title.lower()))
+        items[item_id_int].set_title(safe_title)
 
     if new_description is not None:
         safe_description: str = validate_string_length(
             new_description, "Description", 10, 1000
         )
-        items[item_id_int].set_description(sanitize_input(safe_description.lower()))
+        items[item_id_int].set_description(safe_description)
 
     if new_condition is not None:
         safe_condition: str = validate_condition(new_condition)
-        items[item_id_int].set_condition(sanitize_input(safe_condition.lower()))
+        items[item_id_int].set_condition(safe_condition)
 
     if new_location is not None:
         items[item_id_int].set_location(sanitize_input(new_location.lower()))
 
     if new_type is not None:
         safe_type: str = validate_type(new_type)
-        items[item_id_int].set_type(sanitize_input(safe_type.lower()))
+        items[item_id_int].set_type(safe_type)
 
     if new_images is not None:
         if not isinstance(new_images, list):
@@ -366,12 +355,11 @@ async def user_delete_item(
     """
     item_id_int: int = validate_item_id(item_id)
     # Only allow deletion if valid session/CSRF tokens are provided
-    if session_token and csrf_token:
-        user_id: int = admin_retrieve_user_id(session_token, csrf_token)
-        validate_user_id(user_id)  # Ensure the user ID is valid
-        if items[item_id_int].get_user_id() != user_id:
-            abort(403, "You do not have permission to delete this item.")
-    # Remove the item from the global items dictionary
+    user_id: int = admin_retrieve_user_id(session_token, csrf_token)
+    validate_user_id(user_id)  # Ensure the user ID is valid
+    if items[item_id_int].get_user_id() != user_id:
+        abort(403, "You do not have permission to delete this item.")
+# Remove the item from the global items dictionary
     del items[item_id_int]
 
 
