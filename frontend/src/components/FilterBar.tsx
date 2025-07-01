@@ -32,6 +32,7 @@ export default function FilterBar(FilterBarProps: FilterBarProps) {
         selectedOption={conditionFilter}
         setSelectedOption={(option) => handleConditionFilter(option)}
         isClearable={true}
+        width="16rem"
       />
       <DropDown
         label_text="Filtered Type:"
@@ -40,6 +41,7 @@ export default function FilterBar(FilterBarProps: FilterBarProps) {
         options={typeOptions}
         setSelectedOption={(option) => handleTypeFilter(option)}
         isClearable={true}
+        width="16rem"
       />
     </section>
   );
