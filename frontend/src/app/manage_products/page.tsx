@@ -110,7 +110,7 @@ export default function ManageProductsPage() {
             isAuthenticated={isAuthenticated}
           />
           </div>
-          <div className={`sm:ml-60 p-6 sm:mt-4 mt-96`}>
+          <div className={`sm:ml-60 p-6 sm:mt-16 mt-96`}>
             <header className="mt-28 sm:mt-0">
               <h1 className="text-2xl font-bold mb-4 text-content px-4">
                 View Your Items
