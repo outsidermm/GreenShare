@@ -131,9 +131,10 @@ export default function HeaderBar(HeaderBarProps: HeaderBarProps) {
               router.push("/");
             }
           }}
-          className="absolute right-4 text-surface bg-action-primary hover:bg-action-secondary px-3 py-2 rounded-r-xl"
+          className="absolute text-surface bg-action-primary hover:bg-action-secondary px-3 py-2 rounded-r-xl"
+          style={{ right: "1.04rem"}}
         >
-          Enter
+          Search
         </button>
 
         {/* Render list of search suggestions below input if available */}
@@ -145,7 +146,7 @@ export default function HeaderBar(HeaderBarProps: HeaderBarProps) {
             {options.map((option, index) => (
               <div
                 key={index}
-                className="px-3 py-2 hover:bg-selected-highlight cursor-pointer text-content hover:font-semibold"
+                className="px-3 py-2 cursor-pointer text-content hover:font-semibold"
                 onClick={() => {
                   setSearchTerm(option);
                 }}
