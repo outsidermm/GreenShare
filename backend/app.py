@@ -657,4 +657,4 @@ if __name__ == "__main__":
         exchange_offers.update(ExchangeOffer.backup())
 
     # Run Flask server in production mode on port 4000 for local testing
-    app.run(host="0.0.0.0", port=4000)
+    app.run(host="0.0.0.0", port=4000, debug=True)
