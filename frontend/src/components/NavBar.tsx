@@ -56,8 +56,9 @@ export default function NavBar(props: NavBarProps) {
             );
           })}
         </ul>
+        {isAuthenticated && <hr className="my-2 border-t border-surface mx-4" />}
         {isAuthenticated && (
-          <h2 className="font-bold mb-2 mt-6">
+          <h2 className="font-bold my-4">
             <Link
               href="/manage_products"
               className={`block ml-2 px-2 py-1 rounded transition-all ${
@@ -70,8 +71,9 @@ export default function NavBar(props: NavBarProps) {
             </Link>
           </h2>
         )}
+        {isAuthenticated && <hr className="my-2 border-t border-surface mx-4" />}
         {isAuthenticated && (
-          <h2 className="font-bold mb-2 mt-6">
+          <h2 className="font-bold my-4">
             <Link
               href="/manage_offers"
               className={`block ml-2 px-2 py-1 rounded transition-all ${
