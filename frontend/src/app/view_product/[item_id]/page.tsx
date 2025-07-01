@@ -87,30 +87,32 @@ export default function ViewProductPage() {
       </div>
 
       <div
-        className={`sm:ml-60 sm:mt-0 p-6 ${isAuthenticated ? "mt-96 pt-20" : "mt-64"}`}
+        className={`sm:ml-60 sm:pt-6 sm:mt-0 p-6 ${isAuthenticated ? "mt-96 pt-20" : "mt-64"}`}
       >
-        <div className="p-2 mb-4">
-          <div
+        <div className="mb-4 flex flex-row items-center gap-4">
+          <button
             onClick={() => router.back()}
-            className="cursor-pointer w-fit p-1 hover:bg-border rounded"
+            className="cursor-pointer w-fit p-2 hover:bg-border rounded-full transition-all"
             aria-label="Back to previous page"
           >
             <FaChevronLeft color="contrast" size={16} />
-          </div>
+          </button>
+          <p className="font-bold">
+            Product Information
+          </p>
         </div>
-        <div className="flex flex-col sm:flex-row gap-6">
+        {item ? <div className="flex flex-col sm:flex-row gap-6">
           <div className="flex-1 flex justify-center items-center">
             {/* Carousel displaying images of the selected item */}
-            <Carousel
-              showArrows={true}
-              showIndicators={true}
-              infiniteLoop={true}
-              dynamicHeight={false}
-              showThumbs={false}
-              className="w-full rounded-xl shadow-xl"
-            >
-              {item &&
-                item.images.map((image, index) => (
+              <Carousel
+                showArrows={item.images.length > 1}
+                showIndicators={item.images.length > 1}
+                infiniteLoop={item.images.length > 1}
+                dynamicHeight={false}
+                showThumbs={false}
+                className="w-full rounded-xl shadow-xl"
+              >
+              {item.images.map((image, index) => (
                   <div
                     key={index}
                     className="relative w-full aspect-[4/3] bg-surface overflow-hidden rounded"
@@ -128,13 +130,8 @@ export default function ViewProductPage() {
             </Carousel>
           </div>
           <div className="flex-1" aria-live="polite">
-            {item ? (
-              ProductDetailCard({item,approximate_loc: true,})
-            ) : (
-              <div className="text-center text-muted">
-                <p>Item not found.</p>
-              </div>
-            )}
+            {/* Product detail card displaying item information */}
+              <ProductDetailCard item={item} approximate_loc={true}/>
             <div className="pt-10 p-6">
               {/* Button to initiate offer; redirects based on authentication status */}
               <button
@@ -147,6 +144,8 @@ export default function ViewProductPage() {
             </div>
           </div>
         </div>
+        : (<p>Item not found.</p>)  
+      }
       </div>
     </main>
   );
