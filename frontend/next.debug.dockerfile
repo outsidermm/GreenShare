@@ -11,6 +11,8 @@ COPY . .
 
 ENV NODE_ENV=development
 ENV PORT=3000
+ENV CHOKIDAR_USEPOLLING=true
+ENV WATCHPACK_POLLING=true
 
 # Expose port 3000 (Next.js default dev port)
 EXPOSE 3000
