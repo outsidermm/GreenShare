@@ -28,7 +28,7 @@ export default function NavBar(props: NavBarProps) {
         <h2 className="font-bold mb-2">
           <Link
             href="/"
-            className={`block px-4 py-1 rounded transition-all ${
+            className={`block ml-2 px-2 py-1 rounded transition-all ${
               pathname === "/"
                 ? "bg-content border-l-4 border-action-secondary text-action-secondary font-semibold"
                 : "hover:text-action-secondary"
@@ -44,7 +44,7 @@ export default function NavBar(props: NavBarProps) {
               <li key={path}>
                 <Link
                   href={path}
-                  className={`block px-4 py-1 rounded transition-all ${
+                  className={`block ml-2 px-2 py-1 rounded transition-all ${
                     isActive
                       ? "bg-content border-l-4 border-action-secondary text-action-secondary font-semibold"
                       : "hover:text-action-secondary"
@@ -60,7 +60,7 @@ export default function NavBar(props: NavBarProps) {
           <h2 className="font-bold mb-2 mt-6">
             <Link
               href="/manage_products"
-              className={`block px-4 py-1 rounded transition-all ${
+              className={`block ml-2 px-2 py-1 rounded transition-all ${
                 pathname === "/manage_products"
                   ? "bg-content border-l-4 border-action-secondary text-action-secondary font-semibold"
                   : "hover:text-action-secondary"
@@ -74,7 +74,7 @@ export default function NavBar(props: NavBarProps) {
           <h2 className="font-bold mb-2 mt-6">
             <Link
               href="/manage_offers"
-              className={`block px-4 py-1 rounded transition-all ${
+              className={`block ml-2 px-2 py-1 rounded transition-all ${
                 pathname === "/manage_offers"
                   ? "bg-content border-l-4 border-action-secondary text-action-secondary font-semibold"
                   : "hover:text-action-secondary"
@@ -87,7 +87,7 @@ export default function NavBar(props: NavBarProps) {
       </nav>
       {/* Render logout button and icon for authenticated users */}
       {isAuthenticated && (
-        <div className="flex flex-row transition-all cursor-pointer py-4">
+        <div className="flex flex-row items-center transition-all cursor-pointer py-4 ml-3">
           <MdLogout onClick={handleLogout} className="mr-2" />
           <button
             className="font-bold text-surface"
