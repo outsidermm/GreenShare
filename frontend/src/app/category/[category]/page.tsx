@@ -100,7 +100,7 @@ export default function CategoryPage() {
           handleTypeFilter={setTypeFilter}
         />
         {/* Display a grid of items that match the selected filters */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-6">
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-6">
           {items.length > 0 ? (
             items.map((item) => (
               <Link
