@@ -75,7 +75,7 @@ export default function HeaderBar(HeaderBarProps: HeaderBarProps) {
       <nav
         role="navigation"
         aria-label="Site-wide navigation"
-        className="flex items-center gap-4 flex-grow px-4 relative"
+        className="flex items-center gap-4 flex-grow px-4 relative ml-20"
       >
         {/* Text input for searching item titles */}
         <input
