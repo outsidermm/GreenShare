@@ -7,12 +7,11 @@ import HeaderBar from "@/components/HeaderBar";
 import { useEffect, useState } from "react";
 import getItems from "@/services/item/getItems";
 import Link from "next/link";
-import Image from "next/image";
 import { Item } from "@/types/item";
-import { toTitleCase } from "@/utils/titleCase";
 import FilterBar from "@/components/FilterBar";
 import { Option } from "@/types/option";
 import { ItemFilter } from "@/types/itemFilter";
+import ItemCard from "@/components/ItemCard";
 
 export default function Home() {
   const { isAuthenticated, refreshAuth } = useAuth();
@@ -124,30 +123,7 @@ export default function Home() {
         </h3>
         <div className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-6">
           {items.length > 0 ? (
-            items.map((item) => (
-              <Link
-                key={item.id}
-                href={`/view_product/${item.id}`}
-                prefetch={true}
-              >
-                <div className="bg-surface rounded shadow p-4 cursor-pointer hover:shadow-lg transition-all h-full">
-                  <Image
-                    src={item.images[0]}
-                    alt={item.title}
-                    width={200}
-                    height={200}
-                    className="w-full h-32 object-cover mb-3 rounded"
-                  />
-                  <h4 className="text-content font-bold">
-                    {toTitleCase(item.title)}
-                  </h4>
-                  <p className="text-hyperlink">
-                    {toTitleCase(item.condition)}
-                  </p>
-                  <p className="text-muted">{toTitleCase(item.type)}</p>
-                </div>
-              </Link>
-            ))
+            items.map((item) => (ItemCard({ item })))
           ) : (
             <div className="col-span-4 text-center text-muted">
               <p>No items available at the moment.</p>

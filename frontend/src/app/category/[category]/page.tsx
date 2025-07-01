@@ -10,13 +10,11 @@ import NavBar from "@/components/NavBar";
 import HeaderBar from "@/components/HeaderBar";
 import { useEffect, useState } from "react";
 import getItems from "@/services/item/getItems";
-import Link from "next/link";
-import Image from "next/image";
 import { Item } from "@/types/item";
-import { toTitleCase } from "@/utils/titleCase";
 import { Option } from "@/types/option";
 import FilterBar from "@/components/FilterBar";
 import { ItemFilter } from "@/types/itemFilter";
+import ItemCard from "@/components/ItemCard";
 
 export default function CategoryPage() {
   const { isAuthenticated, refreshAuth } = useAuth();
@@ -102,31 +100,7 @@ export default function CategoryPage() {
         {/* Display a grid of items that match the selected filters */}
         <div className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-6">
           {items.length > 0 ? (
-            items.map((item) => (
-              <Link
-                key={item.id}
-                href={`/view_product/${item.id}`}
-                prefetch={true}
-                aria-label={`View details for ${item.title}`}
-              >
-                <div className="bg-surface rounded shadow p-4 cursor-pointer hover:shadow-lg transition-all h-full">
-                  <Image
-                    src={item.images[0]}
-                    alt={item.title}
-                    width={200}
-                    height={200}
-                    className="w-full h-32 object-cover mb-3 rounded"
-                  />
-                  <h4 className="text-content font-bold">
-                    {toTitleCase(item.title)}
-                  </h4>
-                  <p className="text-hyperlink">
-                    {toTitleCase(item.condition)}
-                  </p>
-                  <p className="text-muted">{toTitleCase(item.type)}</p>
-                </div>
-              </Link>
-            ))
+            items.map((item) => (ItemCard({ item })))
           ) : (
             // Message shown when no items are found for the current filter
             <div className="col-span-4 text-center text-muted">
