@@ -175,7 +175,7 @@ export default function HeaderBar(HeaderBarProps: HeaderBarProps) {
         <div className="px-4">
           <button
             onClick={handleLogin}
-            className="text-action-primary border border-surface px-3 py-1 rounded hover:bg-action-hover"
+            className="text-surface border border-surface px-3 py-1 rounded hover:bg-action-hover"
             aria-label="Login to GreenShare"
           >
             Login
