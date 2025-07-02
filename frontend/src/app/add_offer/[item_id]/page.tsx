@@ -15,8 +15,9 @@ import { extractErrorMessage } from "@/utils/extractErrorMsg";
 import ProductDetailCard from "@/components/ProductDetailCard";
 import Image from "next/image";
 import { Carousel } from "react-responsive-carousel";
-import { FaChevronLeft, FaMinus } from "react-icons/fa6";
+import { FaArrowLeft, FaChevronLeft, FaMinus } from "react-icons/fa6";
 import { ImCross } from "react-icons/im";
+import { FaArrowRight } from "react-icons/fa";
 
 export default function AddOfferPage() {
   const router = useRouter();
@@ -196,7 +197,48 @@ export default function AddOfferPage() {
                 infiniteLoop={requestedItem.images.length > 1}
                 dynamicHeight={false}
                 showThumbs={false}
+                showStatus={false}
                 className="w-full rounded-xl"
+                renderArrowPrev={(onClickHandler, hasPrev, label) =>
+                  hasPrev && (
+                    <button
+                      type="button"
+                      onClick={onClickHandler}
+                      title={label}
+                      className="absolute z-10 left-2 top-1/2 bg-mono-contrast text-mono-primary rounded-full p-2 shadow-md hover:bg-mono-ascent hover:text-mono-contrast transition-all"
+                    >
+                      <FaArrowLeft />
+                    </button>
+                  )
+                }
+                renderArrowNext={(onClickHandler, hasNext, label) =>
+                  hasNext && (
+                    <button
+                      type="button"
+                      onClick={onClickHandler}
+                      title={label}
+                      className="absolute z-10 right-2 top-1/2 bg-mono-contrast text-mono-primary rounded-full p-2 shadow-md hover:bg-mono-ascent hover:text-mono-contrast transition-all"
+                    >
+                      <FaArrowRight />
+                    </button>
+                  )
+                }
+                renderIndicator={(onClickHandler, isSelected, index, label) => {
+                  const baseStyle = "inline-block w-3 h-3 mx-1 rounded-full transition-all";
+                  const selectedStyle = "bg-main-primary";
+                  const unselectedStyle = "bg-mono-contrast";
+                  return (
+                    <li
+                      className={`${baseStyle} ${isSelected ? selectedStyle : unselectedStyle}`}
+                      onClick={onClickHandler}
+                      key={index}
+                      title={label}
+                      role="button"
+                      tabIndex={0}
+                      aria-label={`Slide ${index + 1}`}
+                    />
+                  );
+                }}
               >
                 {requestedItem.images.map((image, index) => (
                   <div
