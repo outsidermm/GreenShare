@@ -247,7 +247,7 @@ export default function ManageOffersPage() {
                   initial={{ opacity: 0, scale: 0.95, y: 20 }}
                   whileInView={{ opacity: 1, scale: 1, y: 0 }}
                   transition={{ duration: 0.5, ease: "easeOut" }}
-                  viewport={{amount: 0.3 }}
+                  viewport={{ amount: 0.3 }}
                 >
                   {/* Items */}
                   <div className="flex-1">
@@ -323,29 +323,38 @@ export default function ManageOffersPage() {
                     <h2 className="font-bold mb-2 text-mono-primary text-xl">
                       Next Action
                     </h2>
-                    <button
-                      disabled={offer.status === "cancelled"}
-                      aria-disabled={offer.status === "cancelled"}
-                      onClick={() =>
-                        handleCurrentUserOfferAction(offer, toggleOffer)
-                      }
-                      className={`w-full rounded text-mono-primary font-bold py-2 px-4 border-solid border-2 transition-all
-                        ${
-                          offer.status === "cancelled"
-                            ? "bg-alert-light border-alert-primary"
-                            : "bg-main-light hover:bg-main-secondary active:bg-main-primary border-main-primary"
-                        }
-                      `}
-                    >
-                      {getOfferActionLabel(toggleOffer, offer.status)}
-                    </button>
-                    {offer.status === "pending" && (
-                      <button
-                        className="w-full rounded bg-alert-light hover:bg-alert-secondary active:bg-alert-primary text-mono-primary font-bold py-2 px-2 border-solid border-2 border-alert-primary transition-all mt-4"
-                        onClick={() => handleCancel(offer.id)}
-                      >
-                        Cancel
-                      </button>
+                    {getOfferActionLabel(toggleOffer, offer.status) ===
+                    "Await Other Party Action" ? (
+                      <p className="text-mono-secondary">
+                        Awaiting action from the other party.
+                      </p>
+                    ) : (
+                      <>
+                        <button
+                          disabled={offer.status === "cancelled"}
+                          aria-disabled={offer.status === "cancelled"}
+                          onClick={() =>
+                            handleCurrentUserOfferAction(offer, toggleOffer)
+                          }
+                          className={`w-full rounded text-mono-primary font-bold py-2 px-4 border-solid border-2 transition-all
+                          ${
+                            offer.status === "cancelled"
+                              ? "bg-alert-light border-alert-primary"
+                              : "bg-main-light hover:bg-main-secondary active:bg-main-primary border-main-primary"
+                          }
+                        `}
+                        >
+                          {getOfferActionLabel(toggleOffer, offer.status)}
+                        </button>
+                        {offer.status === "pending" && (
+                          <button
+                            className="w-full rounded bg-alert-light hover:bg-alert-secondary active:bg-alert-primary text-mono-primary font-bold py-2 px-2 border-solid border-2 border-alert-primary transition-all mt-4"
+                            onClick={() => handleCancel(offer.id)}
+                          >
+                            Cancel
+                          </button>
+                        )}
+                      </>
                     )}
                   </div>
                 </motion.div>
