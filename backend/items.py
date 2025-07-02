@@ -4,6 +4,7 @@ including item validation, creation, viewing, filtering, modification, and delet
 """
 
 from difflib import SequenceMatcher
+import requests
 from sqlalchemy import select, func, desc
 from flask import abort
 from backend.utils import (
@@ -11,7 +12,7 @@ from backend.utils import (
     sanitize_input,
 )
 from backend.auth import validate_user_id
-from backend.data import admin_retrieve_user_id, item_categorisation, items
+from backend.data import PLACES_API_KEY, admin_retrieve_user_id, item_categorisation, items
 from backend.models import ItemDB
 from backend.config import db
 from backend.classes.item import Item
@@ -118,6 +119,30 @@ def validate_category(category: str) -> str:
         category_lc = "essentials"  # Default category if invalid
     return sanitize_input(category_lc)
 
+async def validate_location(location: str) -> str:
+    """ Validates the location of an item using Google Maps Address Validation API.
+    Args:
+        location (str): The location string to validate.
+    Returns:
+        str: Sanitized, validated location string.
+    Raises:
+        400: If the location is invalid or cannot be validated.
+    """
+    response = requests.post(
+        'https://addressvalidation.googleapis.com/v1:validateAddress?key=' + PLACES_API_KEY,
+        json={"address": {"addressLines": [location]}},
+        timeout=3000
+    ).json()
+
+    result = response["result"]
+    verdict = result["verdict"]
+    formatted_address = result["address"]["formattedAddress"]
+
+    # Check if address is likely bad or incomplete
+    if verdict.get("hasUnresolvedTokens") or verdict.get("hasUnconfirmedComponents") or not formatted_address:
+        abort(400, "Invalid or unconfirmed address. Please check your input.")
+
+    return sanitize_input(formatted_address.lower())
 
 def title_matches(user_input: str, item_title: str, threshold: float = 0.3) -> bool:
     """
@@ -181,8 +206,8 @@ async def user_create_item(
     new_category_raw: str = await item_categorisation(safe_title, safe_description)
     new_category: str = validate_category(new_category_raw)
     safe_condition: str = validate_condition(new_condition)
-    safe_location: str = sanitize_input(new_location.lower())
     safe_type: str = validate_type(new_type)
+    safe_location: str = await validate_location(new_location)
     try:
         # Create Item instance and store in global items dictionary
         new_item: Item = Item(
@@ -344,7 +369,8 @@ async def user_modify_item(
         items[item_id_int].set_condition(safe_condition)
 
     if new_location is not None:
-        items[item_id_int].set_location(sanitize_input(new_location.lower()))
+        new_location = await validate_location(new_location)  # Validate location format
+        items[item_id_int].set_location(new_location)
 
     if new_type is not None:
         safe_type: str = validate_type(new_type)
