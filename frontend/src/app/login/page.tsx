@@ -10,6 +10,7 @@ import loginUser from "@/services/user/loginUser";
 import PasswordInput from "@/components/PasswordInput";
 import CredentialsInput from "@/components/CredentialsInput";
 import { useRouter } from "next/navigation";
+import swal from "sweetalert";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -19,8 +20,6 @@ export default function LoginPage() {
 
   const [emailChanged, setEmailChanged] = useState(false);
   const [pwdChanged, setPwdChanged] = useState(false);
-
-  const [showSuccess, setShowSuccess] = useState(false);
 
   // Prefetch post-login pages for improved responsiveness
   useEffect(() => {
@@ -36,6 +35,7 @@ export default function LoginPage() {
     try {
       const csrf_token = await loginUser(email, password);
       localStorage.setItem("csrfToken", csrf_token);
+      swal("Success!", "Login successful! Redirecting to homepage.", "success");
       setPassword("");
       setEmail("");
       setErrorType("");
@@ -43,10 +43,7 @@ export default function LoginPage() {
       setEmailChanged(false);
       setPwdChanged(false);
 
-      setShowSuccess(true);
-      setTimeout(() => {
-        router.replace("/");
-      }, 500);
+      router.replace("/");
     } catch (err: unknown) {
       if (err instanceof Error) {
         if (err.message.toLowerCase().includes("email")) {
@@ -70,14 +67,6 @@ export default function LoginPage() {
     >
       <div className="sm:max-w-xl shadow-xl rounded-2xl p-6 px-10 sm:min-w-md w-11/12 bg-mono-contrast">
         <h1 className="text-4xl text-center text-mono-primary font-bold">Login</h1>
-        {showSuccess && (
-          <div
-            aria-live="polite"
-            className="text-mono-primary text-center mb-2 bg-main-secondary rounded-lg py-2 px-4 mt-5 transition-all"
-          >
-            Login successful! Redirecting to homepage...
-          </div>
-        )}
         {!["", "email", "password"].includes(errorType) && (
           <div
             aria-live="polite"

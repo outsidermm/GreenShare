@@ -6,6 +6,7 @@ import registerUser from "@/services/user/registerUser";
 import PasswordInput from "@/components/PasswordInput";
 import CredentialsInput from "@/components/CredentialsInput";
 import { useRouter } from "next/navigation";
+import swal from "sweetalert";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -22,7 +23,6 @@ export default function RegisterPage() {
   const [pwdChanged, setPwdChanged] = useState(false);
 
   const [errorType, setErrorType] = useState("");
-  const [showSuccess, setShowSuccess] = useState(false);
 
   // Prefetches pages for smoother post-registration navigation
   useEffect(() => {
@@ -39,6 +39,8 @@ export default function RegisterPage() {
         lastName,
       });
       localStorage.setItem("csrfToken", csrf_token);
+      swal("Success!", "Registration successful! Redirecting to homepage.", "success");
+
       setPassword("");
       setEmail("");
       setFirstName("");
@@ -50,11 +52,7 @@ export default function RegisterPage() {
       setPwdChanged(false);
 
       setErrorType("");
-
-      setShowSuccess(true);
-      setTimeout(() => {
-        router.replace("/");
-      }, 500);
+      router.replace("/");
     } catch (err: unknown) {
       if (err instanceof Error) {
         if (err.message.toLowerCase().includes("exist")) {
@@ -81,20 +79,12 @@ export default function RegisterPage() {
       role="main"
       aria-label="Registration Page"
     >
-      <div className="sm:max-w-xl shadow-xl rounded-2xl p-6 px-10 sm:min-w-md w-11/12 bg-mono-contrast-light">
+      <div className="sm:max-w-xl shadow-xl rounded-2xl p-6 px-10 sm:min-w-md w-11/12 bg-mono-contrast">
         <header>
           <h1 className="text-4xl text-center text-mono-primary font-bold">
             Registration
           </h1>
         </header>
-        {showSuccess && (
-          <div
-            aria-live="polite"
-            className="text-mono-primary text-center mb-2 bg-main-secondary rounded-lg py-2 px-4 mt-5 transition-all"
-          >
-            Registration successful! Redirecting to homepage...
-          </div>
-        )}
         {![
           "",
           "email",
