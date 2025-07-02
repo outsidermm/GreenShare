@@ -6,15 +6,13 @@ import NavBar from "@/components/NavBar";
 import HeaderBar from "@/components/HeaderBar";
 import { useEffect, useState } from "react";
 import getItems from "@/services/item/getItems";
-import Image from "next/image";
-import { FaArrowLeft, FaChevronLeft } from "react-icons/fa6";
+import {FaChevronLeft } from "react-icons/fa6";
 import "swiper/css";
-import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import swal from "sweetalert";
 import { Item } from "@/types/item";
 import ProductDetailCard from "@/components/ProductDetailCard";
-import { FaArrowRight } from "react-icons/fa";
+import ProductCarousel from "@/components/ProductCarousel";
 
 export default function ViewProductPage() {
   // Extract authentication state and refresh function from custom hook
@@ -104,71 +102,7 @@ export default function ViewProductPage() {
           <div className="flex flex-col sm:flex-row gap-6">
             <div className="flex-1 flex justify-center items-center">
               {/* Carousel displaying images of the selected item */}
-              <Carousel
-                showArrows={item.images.length > 1}
-                showIndicators={item.images.length > 1}
-                infiniteLoop={item.images.length > 1}
-                dynamicHeight={false}
-                showThumbs={false}
-                showStatus={false}
-                className="w-full rounded-xl"
-                renderArrowPrev={(onClickHandler, hasPrev, label) =>
-                  hasPrev && (
-                    <button
-                      type="button"
-                      onClick={onClickHandler}
-                      title={label}
-                      className="absolute z-10 left-2 top-1/2 bg-mono-contrast text-mono-primary rounded-full p-2 shadow-md hover:bg-mono-ascent hover:text-mono-contrast transition-all"
-                    >
-                      <FaArrowLeft />
-                    </button>
-                  )
-                }
-                renderArrowNext={(onClickHandler, hasNext, label) =>
-                  hasNext && (
-                    <button
-                      type="button"
-                      onClick={onClickHandler}
-                      title={label}
-                      className="absolute z-10 right-2 top-1/2 bg-mono-contrast text-mono-primary rounded-full p-2 shadow-md hover:bg-mono-ascent hover:text-mono-contrast transition-all"
-                    >
-                      <FaArrowRight />
-                    </button>
-                  )
-                }
-                renderIndicator={(onClickHandler, isSelected, index, label) => {
-                  const baseStyle = "inline-block w-3 h-3 mx-1 rounded-full transition-all";
-                  const selectedStyle = "bg-main-primary";
-                  const unselectedStyle = "bg-mono-contrast";
-                  return (
-                    <li
-                      className={`${baseStyle} ${isSelected ? selectedStyle : unselectedStyle}`}
-                      onClick={onClickHandler}
-                      key={index}
-                      title={label}
-                      role="button"
-                      tabIndex={0}
-                      aria-label={`Slide ${index + 1}`}
-                    />
-                  );
-                }}
-              >
-                {item.images.map((image, index) => (
-                  <div
-                    key={index}
-                    className="relative w-full aspect-[4/3] bg-mono-contrast-light overflow-hidden rounded-xl"
-                  >
-                    <Image
-                      src={image}
-                      alt={item.title}
-                      fill
-                      sizes="(min-width: 1024px) 50vw, 100vw"
-                      className="object-contain"
-                      priority={true}
-                    />
-                  </div>
-                ))}
-              </Carousel>
+              <ProductCarousel item={item} aspectRatio="4/3"/>
             </div>
             <div
               className="flex-1 flex flex-col gap-4 justify-center"

@@ -13,11 +13,9 @@ import swal from "sweetalert";
 import createOffer from "@/services/offer/createOffer";
 import { extractErrorMessage } from "@/utils/extractErrorMsg";
 import ProductDetailCard from "@/components/ProductDetailCard";
-import Image from "next/image";
-import { Carousel } from "react-responsive-carousel";
-import { FaArrowLeft, FaChevronLeft, FaMinus } from "react-icons/fa6";
+import { FaChevronLeft, FaMinus } from "react-icons/fa6";
 import { ImCross } from "react-icons/im";
-import { FaArrowRight } from "react-icons/fa";
+import ProductCarousel from "@/components/ProductCarousel";
 
 export default function AddOfferPage() {
   const router = useRouter();
@@ -45,7 +43,8 @@ export default function AddOfferPage() {
         if (
           offerable_items_response.length > 0 &&
           requested_item_response.length === 1 &&
-          offerable_items_response[0].user_id === requested_item_response[0].user_id
+          offerable_items_response[0].user_id ===
+            requested_item_response[0].user_id
         ) {
           router.push("/");
           throw new Error("You cannot offer your own item.");
@@ -83,12 +82,7 @@ export default function AddOfferPage() {
     };
 
     fetchItems();
-  }, [
-    pathname,
-    requested_item_id,
-    isAuthenticated,
-    router,
-  ]);
+  }, [pathname, requested_item_id, isAuthenticated, router]);
 
   const handleLogin = async () => {
     router.push("/login");
@@ -191,71 +185,7 @@ export default function AddOfferPage() {
           <div className="flex flex-col sm:flex-row gap-6">
             <div className="flex-1 flex justify-center items-center">
               {/* Carousel displaying images of the selected item */}
-              <Carousel
-                showArrows={requestedItem.images.length > 1}
-                showIndicators={requestedItem.images.length > 1}
-                infiniteLoop={requestedItem.images.length > 1}
-                dynamicHeight={false}
-                showThumbs={false}
-                showStatus={false}
-                className="w-full rounded-xl"
-                renderArrowPrev={(onClickHandler, hasPrev, label) =>
-                  hasPrev && (
-                    <button
-                      type="button"
-                      onClick={onClickHandler}
-                      title={label}
-                      className="absolute z-10 left-2 top-1/2 bg-mono-contrast text-mono-primary rounded-full p-2 shadow-md hover:bg-mono-ascent hover:text-mono-contrast transition-all"
-                    >
-                      <FaArrowLeft />
-                    </button>
-                  )
-                }
-                renderArrowNext={(onClickHandler, hasNext, label) =>
-                  hasNext && (
-                    <button
-                      type="button"
-                      onClick={onClickHandler}
-                      title={label}
-                      className="absolute z-10 right-2 top-1/2 bg-mono-contrast text-mono-primary rounded-full p-2 shadow-md hover:bg-mono-ascent hover:text-mono-contrast transition-all"
-                    >
-                      <FaArrowRight />
-                    </button>
-                  )
-                }
-                renderIndicator={(onClickHandler, isSelected, index, label) => {
-                  const baseStyle = "inline-block w-3 h-3 mx-1 rounded-full transition-all";
-                  const selectedStyle = "bg-main-primary";
-                  const unselectedStyle = "bg-mono-contrast";
-                  return (
-                    <li
-                      className={`${baseStyle} ${isSelected ? selectedStyle : unselectedStyle}`}
-                      onClick={onClickHandler}
-                      key={index}
-                      title={label}
-                      role="button"
-                      tabIndex={0}
-                      aria-label={`Slide ${index + 1}`}
-                    />
-                  );
-                }}
-              >
-                {requestedItem.images.map((image, index) => (
-                  <div
-                    key={index}
-                    className="relative w-full aspect-[5/3] bg-mono-contrast-light overflow-hidden rounded-xl"
-                  >
-                    <Image
-                      src={image}
-                      alt={requestedItem.title}
-                      fill
-                      sizes="(min-width: 1024px) 50vw, 100vw"
-                      className="object-contain"
-                      priority={true}
-                    />
-                  </div>
-                ))}
-              </Carousel>
+              <ProductCarousel item={requestedItem} aspectRatio="5/3"/>
             </div>
             <div
               className="flex-1 justify-center flex-col flex"
@@ -355,7 +285,8 @@ export default function AddOfferPage() {
               <h1 className="text-mono-primary font-bold text-2xl">
                 Your Inventory
               </h1>
-              {offerableItems.filter((item) => item.status === "available").length > 0 ? (
+              {offerableItems.filter((item) => item.status === "available")
+                .length > 0 ? (
                 <ul className="pl-2 mt-4">
                   {offerableItems
                     .filter((item) => item.status === "available")
