@@ -116,7 +116,16 @@ export default function LoginPage() {
             setPwdChanged={setPwdChanged}
             passwordError={errorType === "password" ? "Invalid password" : ""}
           />
-          <div className="pt-10">
+          <div className="pt-2 text-left text-sm">
+              <Link
+                href="/forgot_password"
+                className="text-hyperlink-primary hover:text-hyperlink-secondary"
+                prefetch={true}
+              >
+                Forgot your password?
+              </Link>
+          </div>
+          <div className="pt-8">
             <button
               type="submit"
               aria-label="Submit Login"
