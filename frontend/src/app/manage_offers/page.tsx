@@ -274,7 +274,7 @@ export default function ManageOffersPage() {
                     <h2 className="font-bold mb-1 text-xl">Message</h2>
                     <p className="mb-4">{toTitleCase(offer.message)}</p>
                     <h2 className="font-bold mb-1 text-xl">Location</h2>
-                    <p>{toTitleCase(offer.requested_item_location)}</p>
+                    <p>{(!toggleOffer && offer.status === "pending") ? toTitleCase(offer.requested_item_location.split(", ").slice(1).join(", ").trim()) : toTitleCase(offer.requested_item_location)}</p>
                   </div>
 
                   {/* Stage */}
