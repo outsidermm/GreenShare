@@ -45,7 +45,7 @@ export default function HeaderBar(HeaderBarProps: HeaderBarProps) {
   // Fetch search suggestions when the debounced search term changes
   useEffect(() => {
     const fetchOptions = async () => {
-      if (debouncedSearchTerm.length < 3) {
+      if (debouncedSearchTerm.length < 2) {
         setOptions([]);
         return;
       }
@@ -124,7 +124,6 @@ export default function HeaderBar(HeaderBarProps: HeaderBarProps) {
             } else {
               swal("Redirecting to home page", {
                 icon: "info",
-                timer: 750,
               });
               setSearchTerm("");
               router.push("/");

@@ -119,7 +119,7 @@ def validate_category(category: str) -> str:
     return sanitize_input(category_lc)
 
 
-def title_matches(user_input: str, item_title: str, threshold: float = 0.4) -> bool:
+def title_matches(user_input: str, item_title: str, threshold: float = 0.3) -> bool:
     """
     Determines if the user input matches the item title by substring or similarity.
 
@@ -392,7 +392,7 @@ async def user_delete_item(
 
 
 async def search_item_similarity_pg(
-    search_query: str, threshold: float = 0.4, limit: int = 6
+    search_query: str, threshold: float = 0.3, limit: int = 6
 ) -> list[str]:
     """
     Search items using PostgreSQL trigram similarity.
@@ -406,7 +406,7 @@ async def search_item_similarity_pg(
         list[str]: Sorted list of item titles with similarity above the threshold.
     """
     # Return empty list for invalid queries
-    if not search_query or len(search_query) < 3:
+    if not search_query or len(search_query) < 2:
         return []
     # Prepare SQL statement using trigram similarity
     stmt = (
