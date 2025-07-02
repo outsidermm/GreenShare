@@ -252,7 +252,7 @@ export default function ManageOffersPage() {
                     <p className="font-semibold text-mono-primary">Incoming</p>
                     <div className="flex items-center text-mono-primary gap-1">
                       <FaArrowRight color="green" />
-                      <p>{toTitleCase(offer.requested_item_name)}</p>
+                      <p className="break-words whitespace-normal">{toTitleCase(offer.requested_item_name)}</p>
                     </div>
                     <hr className="my-2 border-mono-secondary" />
                     <p className="font-semibold text-mono-primary">Outgoing</p>
@@ -261,7 +261,7 @@ export default function ManageOffersPage() {
                       {offer.offered_item_names.map((item, index) => (
                         <p
                           key={index}
-                          className="text-mono-primary flex items-center gap-1"
+                          className="text-mono-primary flex items-center gap-1 break-words whitespace-normal"
                         >
                           {toTitleCase(item)}
                         </p>
@@ -272,9 +272,9 @@ export default function ManageOffersPage() {
                   {/* Message and Location */}
                   <div className="flex-1 text-mono-primary">
                     <h2 className="font-bold mb-1 text-xl">Message</h2>
-                    <p className="mb-4">{toTitleCase(offer.message)}</p>
+                    <p className="mb-4 break-words whitespace-normal">{toTitleCase(offer.message)}</p>
                     <h2 className="font-bold mb-1 text-xl">Location</h2>
-                    <p>
+                    <p className="break-words whitespace-normal">
                       {!toggleOffer && offer.status === "pending"
                         ? `Your offer has not been accepted. Approximate location is ${toTitleCase(
                             offer.requested_item_location.split(", ").slice(1).join(", ").trim()
