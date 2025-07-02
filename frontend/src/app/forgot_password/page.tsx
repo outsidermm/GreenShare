@@ -29,12 +29,16 @@ export default function LoginPage() {
   const handleSubmit = async () => {
     try {
       await forgotPwd(email);
-      swal("Success!", "Please check your email address for a password reset link.", "success");
+      swal(
+        "Success!",
+        "Please check your email address for a password reset link.",
+        "success",
+      );
       setEmail("");
       setEmailChanged(false);
     } catch (error: unknown) {
       if (error instanceof Error) {
-          swal("Error", extractErrorMessage(error.message), "error");
+        swal("Error", extractErrorMessage(error.message), "error");
       }
     }
   };
@@ -47,9 +51,12 @@ export default function LoginPage() {
       className="bg-mono-light w-screen h-screen flex items-center justify-center align-middle"
     >
       <div className="sm:max-w-xl shadow-xl rounded-2xl p-6 px-10 sm:min-w-md w-11/12 bg-mono-contrast">
-        <h1 className="text-4xl text-center text-mono-primary font-bold">Account Recovery</h1>
-        <p className = "text-center text-mono-primary mt-4 px-5">
-          Please enter the email address associated with your account. We will send you a link to reset your password.
+        <h1 className="text-4xl text-center text-mono-primary font-bold">
+          Account Recovery
+        </h1>
+        <p className="text-center text-mono-primary mt-4 px-5">
+          Please enter the email address associated with your account. We will
+          send you a link to reset your password.
         </p>
         <form
           aria-label="Forgot Password Form"
@@ -81,14 +88,14 @@ export default function LoginPage() {
               Request Password Reset
             </button>
           </div>
-              <div className="pt-2 text-center text-sm">
-              <Link
-                href="/login"
-                className="text-hyperlink-primary hover:text-hyperlink-secondary"
-                prefetch={true}
-              >
-                Back To Login
-              </Link>
+          <div className="pt-2 text-center text-sm">
+            <Link
+              href="/login"
+              className="text-hyperlink-primary hover:text-hyperlink-secondary"
+              prefetch={true}
+            >
+              Back To Login
+            </Link>
           </div>
         </form>
       </div>

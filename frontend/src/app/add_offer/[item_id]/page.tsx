@@ -163,7 +163,7 @@ export default function AddOfferPage() {
       <div
         className={`sm:ml-60 sm:pt-6 sm:mt-0 p-6 ${isAuthenticated ? "mt-96 pt-20" : "mt-64"}`}
       >
-          <div className="mb-4 flex flex-row items-center gap-4">
+        <div className="mb-4 flex flex-row items-center gap-4">
           <button
             onClick={() => router.back()}
             className="cursor-pointer w-fit p-2 hover:bg-mono-ascent rounded-full transition-all"
@@ -171,13 +171,12 @@ export default function AddOfferPage() {
           >
             <FaChevronLeft color="contrast" size={16} />
           </button>
-          <p className="font-bold">
-            Make an Offer
-          </p>
+          <p className="font-bold">Make an Offer</p>
         </div>
-          {requestedItem ? <div className="flex flex-col sm:flex-row gap-6">
-          <div className="flex-1 flex justify-center items-center">
-            {/* Carousel displaying images of the selected item */}
+        {requestedItem ? (
+          <div className="flex flex-col sm:flex-row gap-6">
+            <div className="flex-1 flex justify-center items-center">
+              {/* Carousel displaying images of the selected item */}
               <Carousel
                 showArrows={requestedItem.images.length > 1}
                 showIndicators={requestedItem.images.length > 1}
@@ -186,7 +185,7 @@ export default function AddOfferPage() {
                 showThumbs={false}
                 className="w-full rounded-xl"
               >
-              {requestedItem.images.map((image, index) => (
+                {requestedItem.images.map((image, index) => (
                   <div
                     key={index}
                     className="relative w-full aspect-[5/3] bg-mono-contrast-light overflow-hidden rounded-xl"
@@ -201,134 +200,151 @@ export default function AddOfferPage() {
                     />
                   </div>
                 ))}
-            </Carousel>
+              </Carousel>
+            </div>
+            <div
+              className="flex-1 justify-center flex-col flex"
+              aria-live="polite"
+            >
+              {/* Product detail card displaying item information */}
+              <ProductDetailCard item={requestedItem} approximate_loc={true} />
+            </div>
           </div>
-          <div className="flex-1 justify-center flex-col flex" aria-live="polite">
-            {/* Product detail card displaying item information */}
-              <ProductDetailCard item={requestedItem} approximate_loc={true}/>
-          </div>
-        </div>
-        : (<p>Item not found.</p>)  
-        }
+        ) : (
+          <p>Item not found.</p>
+        )}
         <div className="flex flex-col gap-8 mt-10">
-            <div className="shadow-lg p-4 bg-mono-contrast relative rounded-xl">
-              <div className="flex flex-col sm:flex-row justify-between items-center">
-                <h1 className="text-mono-primary font-bold text-2xl">Offered Item</h1>
-                <button
-                  onClick={() => {setIsModalOpen(true)}}
-                  className="bg-main-light hover:bg-main-secondary text-mono-primary font-bold py-2 px-4 border-solid border-2 border-main-primary transition-all rounded-full"
-                  aria-label="Add Items to Offer"
-                >
-                  Add Items to Offer
-                </button>
-              </div>
-              {outgoingItems.length > 0 ? (
-                <ul className="list-disc pl-5 mt-4">
-                  {outgoingItems.map((item) => {
+          <div className="shadow-lg p-4 bg-mono-contrast relative rounded-xl">
+            <div className="flex flex-col sm:flex-row justify-between items-center">
+              <h1 className="text-mono-primary font-bold text-2xl">
+                Offered Item
+              </h1>
+              <button
+                onClick={() => {
+                  setIsModalOpen(true);
+                }}
+                className="bg-main-light hover:bg-main-secondary text-mono-primary font-bold py-2 px-4 border-solid border-2 border-main-primary transition-all rounded-full"
+                aria-label="Add Items to Offer"
+              >
+                Add Items to Offer
+              </button>
+            </div>
+            {outgoingItems.length > 0 ? (
+              <ul className="list-disc pl-5 mt-4">
+                {outgoingItems.map((item) => {
+                  return (
+                    <li key={item.id} className="mb-2">
+                      <div className="flex flex-col sm:flex-row justify-between items-center">
+                        <p className="text-mono-primary">
+                          {toTitleCase(item.title)} -{" "}
+                          {toTitleCase(item.description)}
+                        </p>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setOutgoingItems((prev) =>
+                              prev.filter((outItem) => outItem.id !== item.id),
+                            );
+                          }}
+                          className={
+                            "text-left p-2 text-mono-primary cursor-pointer rounded hover:bg-alert transition-all"
+                          }
+                          aria-label={`{Deselect item ${toTitleCase(item.title)} - ${toTitleCase(item.description)}`}
+                        >
+                          <FaMinus />
+                        </button>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            ) : (
+              <p className="text-mono-secondary">You have no items to offer.</p>
+            )}
+          </div>
+          <div className="shadow-lg p-4 bg-mono-contrast rounded-xl">
+            <h1 className="text-mono-primary font-bold text-2xl">
+              Offer Message
+            </h1>
+            <h1 className="text-mono-primary mt-2">
+              Enter a message with your offer:
+            </h1>
+            <textarea
+              aria-label="Offer message" // Describes the purpose of the textarea for screen readers
+              className="w-full h-32 p-2 border border-mono-secondary rounded text-mono-primary"
+              placeholder="Type your message here..."
+              minLength={10}
+              maxLength={2000}
+              required
+              onChange={(e) => setOfferMessage(e.target.value)}
+            ></textarea>
+          </div>
+          <button
+            aria-label="Submit offer" // Clarifies button action for screen readers
+            onClick={() => handleOfferSubmit()}
+            className="w-full rounded-xl bg-main-light hover:bg-main-secondary text-mono-primary font-bold py-2 px-4 border-solid border-2 border-main-primary transition-all mt-2 shadow-lg"
+          >
+            Make an Offer
+          </button>
+        </div>
+        {isModalOpen && (
+          <div className="fixed top-0 left-0 w-full h-full z-50 flex items-center justify-center backdrop-blur-sm bg-mono-contrast/40 transition-all">
+            <div className="bg-mono-contrast p-12 rounded-xl shadow-xl w-full max-w-3xl relative max-h-[80vh] overflow-y-auto">
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="absolute top-4 right-4 hover:bg-alert-light font-bold rounded-full p-2 transition-all"
+                aria-label="Close edit modal"
+              >
+                <ImCross />
+              </button>
+              <h1 className="text-mono-primary font-bold text-2xl">
+                Your Inventory
+              </h1>
+              {offerableItems.length > 0 ? (
+                <ul className="pl-2 mt-4">
+                  {offerableItems.map((item) => {
+                    const isSelected = outgoingItems.find(
+                      (outItem) => outItem.id === item.id,
+                    );
                     return (
                       <li key={item.id} className="mb-2">
-                        <div className="flex flex-col sm:flex-row justify-between items-center">
-                          <p className="text-mono-primary">
-                            {toTitleCase(item.title)} -{" "}
-                            {toTitleCase(item.description)}
-                          </p>
-                          <button
-                            type="button"
-                            onClick={() => {
+                        <label className="flex items-center gap-4 cursor-pointer p-2 rounded w-full transition-all hover:bg-main-ascent">
+                          <input
+                            type="checkbox"
+                            checked={!!isSelected}
+                            onChange={() => {
+                              if (!isSelected)
+                                setOutgoingItems([...outgoingItems, item]);
+                              else
                                 setOutgoingItems((prev) =>
                                   prev.filter(
                                     (outItem) => outItem.id !== item.id,
                                   ),
                                 );
                             }}
-                            className={"text-left p-2 text-mono-primary cursor-pointer rounded hover:bg-alert transition-all"}
-                            aria-label={`{Deselect item ${toTitleCase(item.title)} - ${toTitleCase(item.description)}`}
-                          >
-                            <FaMinus />
-                          </button>
-                        </div>
+                            className="accent-main-primary"
+                            aria-label={`${
+                              isSelected ? "Deselect" : "Select"
+                            } item ${toTitleCase(item.title)} - ${toTitleCase(item.description)}`}
+                          />
+                          <span className="text-mono-primary leading-tight">
+                            {toTitleCase(item.title)} -{" "}
+                            {toTitleCase(item.description)}
+                          </span>
+                        </label>
                       </li>
                     );
                   })}
                 </ul>
               ) : (
-                <p className="text-mono-secondary">You have no items to offer.</p>
+                <p className="text-mono-secondary">
+                  You have no items to offer.
+                </p>
               )}
             </div>
-            <div className="shadow-lg p-4 bg-mono-contrast rounded-xl">
-              <h1 className="text-mono-primary font-bold text-2xl">Offer Message</h1>
-              <h1 className="text-mono-primary mt-2">
-                Enter a message with your offer:
-              </h1>
-              <textarea
-                aria-label="Offer message" // Describes the purpose of the textarea for screen readers
-                className="w-full h-32 p-2 border border-mono-secondary rounded text-mono-primary"
-                placeholder="Type your message here..."
-                minLength={10}
-                maxLength={2000}
-                required
-                onChange={(e) => setOfferMessage(e.target.value)}
-              ></textarea>
-            </div>
-            <button
-              aria-label="Submit offer" // Clarifies button action for screen readers
-              onClick={() => handleOfferSubmit()}
-              className="w-full rounded-xl bg-main-light hover:bg-main-secondary text-mono-primary font-bold py-2 px-4 border-solid border-2 border-main-primary transition-all mt-2 shadow-lg"
-              >
-              Make an Offer
-            </button>
           </div>
-          {isModalOpen && (
-            <div className="fixed top-0 left-0 w-full h-full z-50 flex items-center justify-center backdrop-blur-sm bg-mono-contrast/40 transition-all">
-              <div className="bg-mono-contrast p-12 rounded-xl shadow-xl w-full max-w-3xl relative max-h-[80vh] overflow-y-auto">
-                <button
-                  onClick={() => setIsModalOpen(false)}
-                  className="absolute top-4 right-4 hover:bg-alert-light font-bold rounded-full p-2 transition-all"
-                  aria-label="Close edit modal"
-                >
-                  <ImCross />
-                </button>
-                <h1 className="text-mono-primary font-bold text-2xl">Your Inventory</h1>
-                {offerableItems.length > 0 ? (
-                  <ul className="pl-2 mt-4">
-                    {offerableItems.map((item) => {
-                      const isSelected = outgoingItems.find(
-                        (outItem) => outItem.id === item.id,
-                      );
-                      return (
-                        <li key={item.id} className="mb-2">
-                          <label className="flex items-center gap-4 cursor-pointer p-2 rounded w-full transition-all hover:bg-main-ascent">
-                            <input
-                              type="checkbox"
-                              checked={!!isSelected}
-                              onChange={() => {
-                                if (!isSelected)
-                                  setOutgoingItems([...outgoingItems, item]);
-                                else
-                                  setOutgoingItems((prev) =>
-                                    prev.filter((outItem) => outItem.id !== item.id),
-                                  );
-                              }}
-                              className="accent-main-primary"
-                              aria-label={`${
-                                isSelected ? "Deselect" : "Select"
-                              } item ${toTitleCase(item.title)} - ${toTitleCase(item.description)}`}
-                            />
-                            <span className="text-mono-primary leading-tight">
-                              {toTitleCase(item.title)} - {toTitleCase(item.description)}
-                            </span>
-                          </label>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                ) : (
-                  <p className="text-mono-secondary">You have no items to offer.</p>
-                )}
-              </div>
-            </div>
-          )}
-        </div>
+        )}
+      </div>
     </main>
   );
 }

@@ -66,7 +66,9 @@ export default function LoginPage() {
       className="bg-mono-light w-screen h-screen flex items-center justify-center align-middle"
     >
       <div className="sm:max-w-xl shadow-xl rounded-2xl p-6 px-10 sm:min-w-md w-11/12 bg-mono-contrast">
-        <h1 className="text-4xl text-center text-mono-primary font-bold">Login</h1>
+        <h1 className="text-4xl text-center text-mono-primary font-bold">
+          Login
+        </h1>
         {!["", "email", "password"].includes(errorType) && (
           <div
             aria-live="polite"
@@ -106,13 +108,13 @@ export default function LoginPage() {
             passwordError={errorType === "password" ? "Invalid password" : ""}
           />
           <div className="pt-2 text-left text-sm">
-              <Link
-                href="/forgot_password"
-                className="text-hyperlink-primary hover:text-hyperlink-secondary"
-                prefetch={true}
-              >
-                Forgot your password?
-              </Link>
+            <Link
+              href="/forgot_password"
+              className="text-hyperlink-primary hover:text-hyperlink-secondary"
+              prefetch={true}
+            >
+              Forgot your password?
+            </Link>
           </div>
           <div className="pt-8">
             <button

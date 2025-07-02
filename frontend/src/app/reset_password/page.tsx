@@ -11,14 +11,12 @@ import resetPwd from "@/services/user/resetPwd";
 import { extractErrorMessage } from "@/utils/extractErrorMsg";
 import swal from "sweetalert";
 
-
 export default function ResetPwdPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
   const [password, setPassword] = useState("");
   const [pwdChanged, setPwdChanged] = useState(false);
-
 
   // Prefetch post-reset password pages for improved responsiveness
   useEffect(() => {
@@ -35,14 +33,14 @@ export default function ResetPwdPage() {
         swal("Error", "Invalid or missing token.", "error");
         return;
       }
-      await resetPwd(token, password)
+      await resetPwd(token, password);
       setPassword("");
       setPwdChanged(false);
       swal("Success!", "Your password has been resetted.", "success");
       router.replace("/login");
     } catch (error: unknown) {
       if (error instanceof Error) {
-          swal("Error", extractErrorMessage(error.message), "error");
+        swal("Error", extractErrorMessage(error.message), "error");
       }
     }
   };
@@ -55,8 +53,10 @@ export default function ResetPwdPage() {
       className="bg-mono-light w-screen h-screen flex items-center justify-center align-middle"
     >
       <div className="sm:max-w-xl shadow-xl rounded-2xl p-6 px-10 sm:min-w-md w-11/12 bg-mono-contrast">
-        <h1 className="text-4xl text-center text-mono-primary font-bold">Change Password</h1>
-        <p className = "text-center text-mono-primary mt-3">
+        <h1 className="text-4xl text-center text-mono-primary font-bold">
+          Change Password
+        </h1>
+        <p className="text-center text-mono-primary mt-3">
           Enter your new password below to reset your password.
         </p>
         <form

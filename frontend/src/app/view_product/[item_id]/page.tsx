@@ -97,13 +97,12 @@ export default function ViewProductPage() {
           >
             <FaChevronLeft color="contrast" size={16} />
           </button>
-          <p className="font-bold">
-            Product Information
-          </p>
+          <p className="font-bold">Product Information</p>
         </div>
-        {item ? <div className="flex flex-col sm:flex-row gap-6">
-          <div className="flex-1 flex justify-center items-center">
-            {/* Carousel displaying images of the selected item */}
+        {item ? (
+          <div className="flex flex-col sm:flex-row gap-6">
+            <div className="flex-1 flex justify-center items-center">
+              {/* Carousel displaying images of the selected item */}
               <Carousel
                 showArrows={item.images.length > 1}
                 showIndicators={item.images.length > 1}
@@ -112,7 +111,7 @@ export default function ViewProductPage() {
                 showThumbs={false}
                 className="w-full rounded-xl"
               >
-              {item.images.map((image, index) => (
+                {item.images.map((image, index) => (
                   <div
                     key={index}
                     className="relative w-full aspect-[4/3] bg-mono-contrast-light overflow-hidden rounded-xl"
@@ -127,25 +126,29 @@ export default function ViewProductPage() {
                     />
                   </div>
                 ))}
-            </Carousel>
-          </div>
-          <div className="flex-1 flex flex-col gap-4 justify-center" aria-live="polite">
-            {/* Product detail card displaying item information */}
-              <ProductDetailCard item={item} approximate_loc={true}/>
-            <div className="pt-10 p-6">
-              {/* Button to initiate offer; redirects based on authentication status */}
-              <button
-                onClick={handleOffer}
-                className="w-full rounded bg-main-light hover:bg-main-secondary text-mono-primary font-bold py-2 px-4 border-solid border-2 border-main-primary transition-all"
-                aria-label="Make an offer on this item"
-              >
-                Make an Offer
-              </button>
+              </Carousel>
+            </div>
+            <div
+              className="flex-1 flex flex-col gap-4 justify-center"
+              aria-live="polite"
+            >
+              {/* Product detail card displaying item information */}
+              <ProductDetailCard item={item} approximate_loc={true} />
+              <div className="pt-10 p-6">
+                {/* Button to initiate offer; redirects based on authentication status */}
+                <button
+                  onClick={handleOffer}
+                  className="w-full rounded bg-main-light hover:bg-main-secondary text-mono-primary font-bold py-2 px-4 border-solid border-2 border-main-primary transition-all"
+                  aria-label="Make an offer on this item"
+                >
+                  Make an Offer
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-        : (<p>Item not found.</p>)  
-      }
+        ) : (
+          <p>Item not found.</p>
+        )}
       </div>
     </main>
   );

@@ -4,58 +4,58 @@
 
 .light {
   /* Mono palette */
-  --mono-primary: rgba(51, 65, 85, 1);       /* softer slate-700 */
-  --mono-secondary: rgba(71, 85, 105, 1);    /* slate-600 */
-  --mono-ascent: rgba(100, 116, 139, 1);     /* slate-500 */
+  --mono-primary: rgba(51, 65, 85, 1); /* softer slate-700 */
+  --mono-secondary: rgba(71, 85, 105, 1); /* slate-600 */
+  --mono-ascent: rgba(100, 116, 139, 1); /* slate-500 */
   --mono-contrast: rgba(255, 255, 255, 1);
   --mono-contrast-light: rgba(248, 250, 252, 1); /* slate-50 */
-  --mono-light: rgba(234, 236, 240, 1);      /* lighter slate-200 */
+  --mono-light: rgba(234, 236, 240, 1); /* lighter slate-200 */
 
   /* Main (green) palette */
   --main-primary: rgba(22, 163, 74, 1);
   --main-secondary: rgba(52, 211, 113, 1);
-  --main-ascent: rgba(187, 247, 208, 1);     /* green-200 */
-  --main-light: rgba(220, 252, 231, 1);      /* green-100 */
+  --main-ascent: rgba(187, 247, 208, 1); /* green-200 */
+  --main-light: rgba(220, 252, 231, 1); /* green-100 */
 
   /* Alert (red) palette */
   --alert-primary: rgba(248, 113, 113, 1);
   --alert-secondary: rgba(254, 202, 202, 1); /* red-200 */
   --alert-ascent: rgba(239, 68, 68, 1);
-  --alert-light: rgba(254, 226, 226, 1);     /* red-100 */
+  --alert-light: rgba(254, 226, 226, 1); /* red-100 */
 
   /* Hyperlink (blue) palette */
-  --hyperlink-primary: rgba(96, 165, 250, 1);    /* blue-400 */
+  --hyperlink-primary: rgba(96, 165, 250, 1); /* blue-400 */
   --hyperlink-secondary: rgba(147, 197, 253, 1); /* blue-300 */
-  --hyperlink-ascent: rgba(191, 219, 254, 1);    /* blue-200 */
-  --hyperlink-light: rgba(219, 234, 254, 1);     /* blue-100 */
+  --hyperlink-ascent: rgba(191, 219, 254, 1); /* blue-200 */
+  --hyperlink-light: rgba(219, 234, 254, 1); /* blue-100 */
 }
 
 .dark {
   /* Mono palette */
-  --mono-primary: rgba(226, 232, 240, 1);     /* slate-200 */
-  --mono-secondary: rgba(203, 213, 225, 1);   /* slate-300 */
-  --mono-ascent: rgba(148, 163, 184, 1);      /* slate-400 */
-  --mono-contrast: rgba(30, 41, 59, 1);       /* slate-800 */
+  --mono-primary: rgba(226, 232, 240, 1); /* slate-200 */
+  --mono-secondary: rgba(203, 213, 225, 1); /* slate-300 */
+  --mono-ascent: rgba(148, 163, 184, 1); /* slate-400 */
+  --mono-contrast: rgba(30, 41, 59, 1); /* slate-800 */
   --mono-contrast-light: rgba(51, 65, 85, 1); /* slate-700 */
-  --mono-light: rgba(71, 85, 105, 1);         /* slate-600 */
+  --mono-light: rgba(71, 85, 105, 1); /* slate-600 */
 
   /* Main (green) palette */
   --main-primary: rgba(22, 163, 74, 1);
   --main-secondary: rgba(21, 128, 61, 1);
-  --main-ascent: rgba(34, 197, 94, 1);        /* green-500 */
+  --main-ascent: rgba(34, 197, 94, 1); /* green-500 */
   --main-light: rgba(22, 163, 74, 0.2);
 
   /* Alert (red) palette */
   --alert-primary: rgba(239, 68, 68, 1);
-  --alert-secondary: rgba(248, 113, 113, 1);  /* red-400 */
+  --alert-secondary: rgba(248, 113, 113, 1); /* red-400 */
   --alert-ascent: rgba(220, 38, 38, 1);
-  --alert-light: rgba(239, 68, 68, 0.4);      /* red-500 with alpha */
+  --alert-light: rgba(239, 68, 68, 0.4); /* red-500 with alpha */
 
   /* Hyperlink (blue) palette */
-  --hyperlink-primary: rgba(96, 165, 250, 1);     /* blue-400 */
-  --hyperlink-secondary: rgba(147, 197, 253, 1);  /* blue-300 */
-  --hyperlink-ascent: rgba(191, 219, 254, 1);     /* blue-200 */
-  --hyperlink-light: rgba(219, 234, 254, 0.3);    /* transparent hover */
+  --hyperlink-primary: rgba(96, 165, 250, 1); /* blue-400 */
+  --hyperlink-secondary: rgba(147, 197, 253, 1); /* blue-300 */
+  --hyperlink-ascent: rgba(191, 219, 254, 1); /* blue-200 */
+  --hyperlink-light: rgba(219, 234, 254, 0.3); /* transparent hover */
 }
 
 .color-blind {
@@ -68,16 +68,16 @@
   --mono-light: rgba(221, 221, 221, 1);
 
   /* Main (blue-green) palette */
-  --main-primary: rgba(96, 165, 250, 1);        /* blue-400 */
-  --main-secondary: rgba(147, 197, 253, 1);     /* blue-300 */
-  --main-ascent: rgba(178, 222, 250, 1);         /* pale blue */
-  --main-light: rgba(229, 246, 255, 1);          /* lightest blue */
+  --main-primary: rgba(96, 165, 250, 1); /* blue-400 */
+  --main-secondary: rgba(147, 197, 253, 1); /* blue-300 */
+  --main-ascent: rgba(178, 222, 250, 1); /* pale blue */
+  --main-light: rgba(229, 246, 255, 1); /* lightest blue */
 
   /* Alert (yellow) palette */
   --alert-primary: rgba(234, 179, 8, 1);
-  --alert-secondary: rgba(253, 224, 71, 1);      /* yellow-light */
+  --alert-secondary: rgba(253, 224, 71, 1); /* yellow-light */
   --alert-ascent: rgba(234, 179, 8, 1);
-  --alert-light: rgba(255, 251, 191, 1);         /* very light yellow */
+  --alert-light: rgba(255, 251, 191, 1); /* very light yellow */
 
   /* Hyperlink (blue) palette */
   --hyperlink-primary: rgba(0, 122, 204, 1);

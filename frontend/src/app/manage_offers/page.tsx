@@ -199,7 +199,8 @@ export default function ManageOffersPage() {
 
         <section
           aria-labelledby="view-offers-heading"
-          className="sm:ml-60 sm:mt-0 p-6 mt-96 pt-8">
+          className="sm:ml-60 sm:mt-0 p-6 mt-96 pt-8"
+        >
           <h1
             id="view-offers-heading"
             className="text-2xl font-bold mb-4 text-mono-primary px-4"
@@ -245,23 +246,26 @@ export default function ManageOffersPage() {
                 >
                   {/* Items */}
                   <div className="flex-1">
-                    <h2 className="font-bold mb-2 text-mono-primary text-xl">Items</h2>
+                    <h2 className="font-bold mb-2 text-mono-primary text-xl">
+                      Items
+                    </h2>
                     <p className="font-semibold text-mono-primary">Incoming</p>
                     <div className="flex items-center text-mono-primary gap-1">
-                      <FaArrowRight color="green"/>
-                      <p>
-                        {toTitleCase(offer.requested_item_name)}
-                      </p>
+                      <FaArrowRight color="green" />
+                      <p>{toTitleCase(offer.requested_item_name)}</p>
                     </div>
                     <hr className="my-2 border-mono-secondary" />
                     <p className="font-semibold text-mono-primary">Outgoing</p>
                     <div className="flex items-center text-mono-primary gap-1">
-                      <FaArrowLeft color="red"/>
+                      <FaArrowLeft color="red" />
                       {offer.offered_item_names.map((item, index) => (
-                        <p key={index} className="text-mono-primary flex items-center gap-1">
+                        <p
+                          key={index}
+                          className="text-mono-primary flex items-center gap-1"
+                        >
                           {toTitleCase(item)}
                         </p>
-                    ))}
+                      ))}
                     </div>
                   </div>
 
@@ -270,29 +274,36 @@ export default function ManageOffersPage() {
                     <h2 className="font-bold mb-1 text-xl">Message</h2>
                     <p className="mb-4">{toTitleCase(offer.message)}</p>
                     <h2 className="font-bold mb-1 text-xl">Location</h2>
-                    <p>
-                      {toTitleCase(offer.requested_item_location)}
-                    </p>
+                    <p>{toTitleCase(offer.requested_item_location)}</p>
                   </div>
 
                   {/* Stage */}
                   <div className="flex-1">
-                    <h2 className="font-bold mb-2 text-mono-primary text-xl">Stage</h2>
-                    {["confirmed", "completed", "accepted", "pending"].map((stage) => (
-                    <p key={stage} className={`flex items-center ${offer.status === stage ? "font-bold text-main-primary" : "text-mono-secondary"}`}>
-                        {offer.status === stage ? (
-                          <span className="inline-block w-3 h-3 rounded-full bg-main-primary mr-2" />
-                        ) : (
-                          <span className="inline-block w-2 h-2 mr-2 rounded-full bg-mono-secondary" />
-                        )}
-                        {toTitleCase(stage)}
-                      </p>
-                    ))}
+                    <h2 className="font-bold mb-2 text-mono-primary text-xl">
+                      Stage
+                    </h2>
+                    {["confirmed", "completed", "accepted", "pending"].map(
+                      (stage) => (
+                        <p
+                          key={stage}
+                          className={`flex items-center ${offer.status === stage ? "font-bold text-main-primary" : "text-mono-secondary"}`}
+                        >
+                          {offer.status === stage ? (
+                            <span className="inline-block w-3 h-3 rounded-full bg-main-primary mr-2" />
+                          ) : (
+                            <span className="inline-block w-2 h-2 mr-2 rounded-full bg-mono-secondary" />
+                          )}
+                          {toTitleCase(stage)}
+                        </p>
+                      ),
+                    )}
                   </div>
 
                   {/* Next Action */}
                   <div className="flex-1">
-                    <h2 className="font-bold mb-2 text-mono-primary text-xl">Next Action</h2>
+                    <h2 className="font-bold mb-2 text-mono-primary text-xl">
+                      Next Action
+                    </h2>
                     <button
                       disabled={offer.status === "cancelled"}
                       aria-disabled={offer.status === "cancelled"}

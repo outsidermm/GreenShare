@@ -110,13 +110,13 @@ export default function ManageProductsPage() {
             pathname={pathname}
             isAuthenticated={isAuthenticated}
           />
-          </div>
-          <div className={`sm:ml-60 p-6 sm:mt-16 pb-24`}>
-            <header className="mt-28 sm:mt-0">
-              <h1 className="text-2xl font-bold mb-4 text-content px-4">
-                View Your Items
-              </h1>
-            </header>
+        </div>
+        <div className={`sm:ml-60 p-6 sm:mt-16 pb-24`}>
+          <header className="mt-28 sm:mt-0">
+            <h1 className="text-2xl font-bold mb-4 text-content px-4">
+              View Your Items
+            </h1>
+          </header>
 
           <div className="p-4" aria-live="polite">
             {ownedItems.length > 0 ? (
@@ -127,7 +127,7 @@ export default function ManageProductsPage() {
                   aria-label="User Item Card"
                 >
                   <div className="flex-2 text-content">
-                      <ProductDetailCard item={item}/>
+                    <ProductDetailCard item={item} />
                   </div>
                   {item.status === "available" && (
                     <div className="flex-2">
@@ -165,9 +165,10 @@ export default function ManageProductsPage() {
                   aria-label="Close edit modal"
                 >
                   <ImCross />
-                  
                 </button>
-                <ProductForm {...(selectedItem ? { item: selectedItem } : {})} />
+                <ProductForm
+                  {...(selectedItem ? { item: selectedItem } : {})}
+                />
               </div>
             </div>
           )}
@@ -183,12 +184,8 @@ export default function ManageProductsPage() {
               Add New Item
             </button>
           </div>
-        </div>        
+        </div>
       </div>
-
-
-
-
     </main>
   );
 }

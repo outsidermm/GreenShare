@@ -89,7 +89,9 @@ export default function Home() {
       <div
         className={`sm:ml-60 sm:mt-2 p-6 ${isAuthenticated ? "mt-96" : "mt-64"}`}
       >
-        <div className={`bg-main-light text-mono-primary rounded-xl shadow-lg p-6 mb-8 sm:mt-0 ${isAuthenticated ? "mt-16" : "mt-0"}`}>
+        <div
+          className={`bg-main-light text-mono-primary rounded-xl shadow-lg p-6 mb-8 sm:mt-0 ${isAuthenticated ? "mt-16" : "mt-0"}`}
+        >
           <h2 className="text-2xl font-bold">Welcome to GreenShare 🌱</h2>
           <p>
             Where communities thrive by giving goods a second life. Join us in
@@ -123,7 +125,7 @@ export default function Home() {
         </h3>
         <div className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-6">
           {items.length > 0 ? (
-            items.map((item) => (ItemCard({ item })))
+            items.map((item) => ItemCard({ item }))
           ) : (
             <div className="col-span-4 text-center text-mono-secondary">
               <p>No items available at the moment.</p>

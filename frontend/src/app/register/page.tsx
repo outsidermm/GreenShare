@@ -39,7 +39,11 @@ export default function RegisterPage() {
         lastName,
       });
       localStorage.setItem("csrfToken", csrf_token);
-      swal("Success!", "Registration successful! Redirecting to homepage.", "success");
+      swal(
+        "Success!",
+        "Registration successful! Redirecting to homepage.",
+        "success",
+      );
 
       setPassword("");
       setEmail("");

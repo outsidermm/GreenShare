@@ -100,7 +100,7 @@ export default function CategoryPage() {
         {/* Display a grid of items that match the selected filters */}
         <div className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-6">
           {items.length > 0 ? (
-            items.map((item) => (ItemCard({ item })))
+            items.map((item) => ItemCard({ item }))
           ) : (
             // Message shown when no items are found for the current filter
             <div className="col-span-4 text-center text-mono-secondary">
