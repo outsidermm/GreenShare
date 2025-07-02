@@ -36,7 +36,7 @@ export default function CredentialsInput(props: CredentialsInputProps) {
     <>
       <div className="pt-5">
         {/* Label for the input field, improves accessibility and usability */}
-        <label htmlFor={inputId} className="block mb-2 text-content">
+        <label htmlFor={inputId} className="block mb-2 text-mono-primary">
           {label}
         </label>
         {/* Input field bound to parent component's state with dynamic validation styling */}
@@ -51,10 +51,10 @@ export default function CredentialsInput(props: CredentialsInputProps) {
           value={credential}
           onChange={(e) => setCredential(e.target.value)}
           onFocus={() => setCredentialChanged(true)}
-          className={`border-muted text-slate-800 rounded py-2 px-3 w-full ${credentialChanged ? "invalid:border-alert" : ""} border-2`}
+          className={`border-mono-secondary text-mono-primary rounded py-2 px-3 w-full ${credentialChanged ? "invalid:border-alert-primary" : ""} border-2`}
         />
         {credentialError != "" && (
-          <div id={inputId + "-error"} className="text-alert text-center pt-2">
+          <div id={inputId + "-error"} className="text-alert-primary text-center pt-2">
             {credentialError}
           </div>
         )}
