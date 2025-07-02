@@ -185,7 +185,7 @@ export default function AddOfferPage() {
           <div className="flex flex-col sm:flex-row gap-6">
             <div className="flex-1 flex justify-center items-center">
               {/* Carousel displaying images of the selected item */}
-              <ProductCarousel item={requestedItem} aspectRatio="5/3"/>
+              <ProductCarousel item={requestedItem} aspectRatio="5/3" />
             </div>
             <div
               className="flex-1 justify-center flex-col flex"

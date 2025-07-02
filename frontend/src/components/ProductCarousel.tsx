@@ -1,5 +1,5 @@
 import Image from "next/image";
-import {FaChevronLeft, FaChevronRight } from "react-icons/fa6";
+import { FaChevronLeft, FaChevronRight } from "react-icons/fa6";
 import { Carousel } from "react-responsive-carousel";
 import { Item } from "@/types/item";
 

@@ -167,9 +167,7 @@ export default function ProductForm(input: ProductFormProps) {
       <div className="p-4">
         <div className="flex justify-between flex-col sm:flex-row gap-4">
           <div className="flex items-center gap-2">
-            <AiOutlineShop
-              style={{ color: "var(--color-contrast-background)" }}
-            />
+            <AiOutlineShop style={{ color: "var(--color-mono-primary)" }} />
             <h2 className="text-mono-primary text-xl font-bold">
               {item ? "Edit Product" : "Add New Product"}
             </h2>
@@ -179,7 +177,7 @@ export default function ProductForm(input: ProductFormProps) {
             aria-label={item ? "Update Product" : "Add Product"}
             className="bg-main-light text-mono-primary px-4 py-2 rounded-full hover:bg-main-secondary active:bg-main-primary flex items-center gap-2 transition-all border-2 border-main-primary font-bold"
           >
-            <IoMdCheckmark />
+            <IoMdCheckmark style={{ color: "var(--color-mono-primary)" }} />
             <p>{item ? "Update Product" : "Add Product"}</p>
           </button>
         </div>
