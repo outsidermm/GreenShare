@@ -301,28 +301,41 @@ export default function ManageOffersPage() {
                     <h2 className="font-bold mb-2 text-mono-primary text-xl">
                       Stage
                     </h2>
-                    {["confirmed", "completed", "accepted", "pending"].map(
-                      (stage) => (
-                        <p
-                          key={stage}
-                          className={`flex items-center ${offer.status === stage ? "font-bold text-main-primary" : "text-mono-secondary"}`}
-                        >
-                          {offer.status === stage ? (
-                            <span className="inline-block w-3 h-3 rounded-full bg-main-primary mr-2" />
-                          ) : (
-                            <span className="inline-block w-2 h-2 mr-2 rounded-full bg-mono-secondary" />
-                          )}
-                          {toTitleCase(stage)}
-                        </p>
-                      ),
+                    {offer.status === "cancelled" ? (
+                      <p
+                        key="cancelled"
+                        className="flex items-center font-bold text-alert-primary"
+                      >
+                        <span className="inline-block w-3 h-3 rounded-full bg-alert-primary mr-2" />
+                        Offer Cancelled
+                      </p>
+                    ) : (
+                      ["confirmed", "completed", "accepted", "pending"].map(
+                        (stage) => (
+                          <p
+                            key={stage}
+                            className={`flex items-center ${offer.status === stage ? "font-bold text-main-primary" : "text-mono-secondary"}`}
+                          >
+                            {offer.status === stage ? (
+                              <span className="inline-block w-3 h-3 rounded-full bg-main-primary mr-2" />
+                            ) : (
+                              <span className="inline-block w-2 h-2 mr-2 rounded-full bg-mono-secondary" />
+                            )}
+                            {toTitleCase(stage)}
+                          </p>
+                        ),
+                      )
                     )}
                   </div>
 
                   {/* Next Action */}
                   <div className="flex-1">
-                    <h2 className="font-bold mb-2 text-mono-primary text-xl">
-                      Next Action
-                    </h2>
+                    {offer.status !== "cancelled" &&
+                      offer.status !== "confirmed" && (
+                        <h2 className="font-bold mb-2 text-mono-primary text-xl">
+                          Next Action
+                        </h2>
+                      )}
                     {getOfferActionLabel(toggleOffer, offer.status) ===
                     "Await Other Party Action" ? (
                       <p className="text-mono-secondary">
@@ -330,22 +343,28 @@ export default function ManageOffersPage() {
                       </p>
                     ) : (
                       <>
-                        <button
-                          disabled={offer.status === "cancelled" || offer.status === "confirmed"}
-                          aria-disabled={offer.status === "cancelled" || offer.status === "confirmed"}
-                          onClick={() =>
-                            handleCurrentUserOfferAction(offer, toggleOffer)
-                          }
-                          className={`w-full rounded text-mono-primary font-bold py-2 px-4 border-solid border-2 transition-all
-                          ${
-                            (offer.status === "cancelled" || offer.status === "confirmed")
-                              ? "bg-alert-light border-alert-primary"
-                              : "bg-main-light hover:bg-main-secondary active:bg-main-primary border-main-primary"
-                          }
-                        `}
-                        >
-                          {getOfferActionLabel(toggleOffer, offer.status)}
-                        </button>
+                        {offer.status === "cancelled" ||
+                        offer.status === "confirmed" ? (
+                          <div
+                            className={`w-full rounded font-bold py-2 px-4 text-center border-2 transition-all text-mono-primary
+                            ${
+                              offer.status === "cancelled"
+                                ? "bg-alert-light border-alert-primary"
+                                : "bg-main-light border-main-secondary"
+                            }`}
+                          >
+                            {getOfferActionLabel(toggleOffer, offer.status)}
+                          </div>
+                        ) : (
+                          <button
+                            onClick={() =>
+                              handleCurrentUserOfferAction(offer, toggleOffer)
+                            }
+                            className="w-full rounded bg-main-light hover:bg-main-secondary active:bg-main-primary text-mono-primary font-bold py-2 px-4 border-solid border-2 border-main-primary transition-all"
+                          >
+                            {getOfferActionLabel(toggleOffer, offer.status)}
+                          </button>
+                        )}
                         {offer.status === "pending" && (
                           <button
                             className="w-full rounded bg-alert-light hover:bg-alert-secondary active:bg-alert-primary text-mono-primary font-bold py-2 px-2 border-solid border-2 border-alert-primary transition-all mt-4"

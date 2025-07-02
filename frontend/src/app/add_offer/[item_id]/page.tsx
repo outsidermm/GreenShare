@@ -51,11 +51,10 @@ export default function AddOfferPage() {
         }
 
         if (offerableItems.length > 0 && requestedItem) {
-          if(offerableItems[0].user_id === requestedItem.user_id) {
+          if (offerableItems[0].user_id === requestedItem.user_id) {
             throw new Error("You cannot offer your own item.");
           }
         }
-
       } catch (error) {
         console.error("Error fetching offer item:", error);
         if (error instanceof Error) {
@@ -78,7 +77,14 @@ export default function AddOfferPage() {
     };
 
     fetchItems();
-  }, [pathname, requested_item_id, isAuthenticated, router, offerableItems, requestedItem]);
+  }, [
+    pathname,
+    requested_item_id,
+    isAuthenticated,
+    router,
+    offerableItems,
+    requestedItem,
+  ]);
 
   const handleLogin = async () => {
     router.push("/login");
@@ -306,39 +312,41 @@ export default function AddOfferPage() {
               </h1>
               {offerableItems.length > 0 ? (
                 <ul className="pl-2 mt-4">
-                  {offerableItems.filter((item) => item.status === "available").map((item) => {
-                    const isSelected = outgoingItems.find(
-                      (outItem) => outItem.id === item.id,
-                    );
-                    return (
-                      <li key={item.id} className="mb-2">
-                        <label className="flex items-center gap-4 cursor-pointer p-2 rounded w-full transition-all hover:bg-main-ascent">
-                          <input
-                            type="checkbox"
-                            checked={!!isSelected}
-                            onChange={() => {
-                              if (!isSelected)
-                                setOutgoingItems([...outgoingItems, item]);
-                              else
-                                setOutgoingItems((prev) =>
-                                  prev.filter(
-                                    (outItem) => outItem.id !== item.id,
-                                  ),
-                                );
-                            }}
-                            className="accent-main-primary"
-                            aria-label={`${
-                              isSelected ? "Deselect" : "Select"
-                            } item ${toTitleCase(item.title)} - ${toTitleCase(item.description)}`}
-                          />
-                          <span className="text-mono-primary leading-tight">
-                            {toTitleCase(item.title)} -{" "}
-                            {toTitleCase(item.description)}
-                          </span>
-                        </label>
-                      </li>
-                    );
-                  })}
+                  {offerableItems
+                    .filter((item) => item.status === "available")
+                    .map((item) => {
+                      const isSelected = outgoingItems.find(
+                        (outItem) => outItem.id === item.id,
+                      );
+                      return (
+                        <li key={item.id} className="mb-2">
+                          <label className="flex items-center gap-4 cursor-pointer p-2 rounded w-full transition-all hover:bg-main-ascent">
+                            <input
+                              type="checkbox"
+                              checked={!!isSelected}
+                              onChange={() => {
+                                if (!isSelected)
+                                  setOutgoingItems([...outgoingItems, item]);
+                                else
+                                  setOutgoingItems((prev) =>
+                                    prev.filter(
+                                      (outItem) => outItem.id !== item.id,
+                                    ),
+                                  );
+                              }}
+                              className="accent-main-primary"
+                              aria-label={`${
+                                isSelected ? "Deselect" : "Select"
+                              } item ${toTitleCase(item.title)} - ${toTitleCase(item.description)}`}
+                            />
+                            <span className="text-mono-primary leading-tight">
+                              {toTitleCase(item.title)} -{" "}
+                              {toTitleCase(item.description)}
+                            </span>
+                          </label>
+                        </li>
+                      );
+                    })}
                 </ul>
               ) : (
                 <p className="text-mono-secondary">
