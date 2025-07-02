@@ -66,14 +66,14 @@ export default function LoginPage() {
     <main
       role="main"
       aria-label="Login Page"
-      className="bg-background w-screen h-screen flex items-center justify-center align-middle"
+      className="bg-mono-light w-screen h-screen flex items-center justify-center align-middle"
     >
-      <div className="sm:max-w-xl shadow-grey-shadow shadow-xl rounded-2xl p-6 px-10 sm:min-w-md w-11/12 bg-surface">
-        <h1 className="text-4xl text-center text-content font-bold">Login</h1>
+      <div className="sm:max-w-xl shadow-xl rounded-2xl p-6 px-10 sm:min-w-md w-11/12 bg-mono-contrast">
+        <h1 className="text-4xl text-center text-mono-primary font-bold">Login</h1>
         {showSuccess && (
           <div
             aria-live="polite"
-            className="text-surface text-center mb-2 bg-action-secondary rounded-lg py-2 px-4 mt-5 transition-all"
+            className="text-mono-primary text-center mb-2 bg-main-secondary rounded-lg py-2 px-4 mt-5 transition-all"
           >
             Login successful! Redirecting to homepage...
           </div>
@@ -81,7 +81,7 @@ export default function LoginPage() {
         {!["", "email", "password"].includes(errorType) && (
           <div
             aria-live="polite"
-            className="text-surface text-center mb-2 bg-alert rounded-lg py-2 px-4 mt-5 transition-all"
+            className="text-mono-primary text-center mb-2 bg-alert-primary rounded-lg py-2 px-4 mt-5 transition-all"
           >
             {errorType}
           </div>
@@ -120,17 +120,17 @@ export default function LoginPage() {
             <button
               type="submit"
               aria-label="Submit Login"
-              className="w-full rounded bg-hyperlink hover:bg-blue-400 text-surface font-bold py-2 px-4 border-solid border-2 border-hyperlink transition-all"
+              className="w-full rounded bg-hyperlink-light hover:bg-hyperlink-secondary text-mono-primary font-bold py-2 px-4 border-solid border-2 border-hyperlink-primary transition-all"
             >
               Login
             </button>
           </div>
-          <div className="pt-5 text-center text-muted">
+          <div className="pt-5 text-center text-mono-secondary">
             <p>
               Don&apos;t have an account?&nbsp;
               <Link
                 href="/register"
-                className="text-hyperlink hover:text-hyperlink-hover"
+                className="text-hyperlink-primary hover:text-hyperlink-secondary"
                 prefetch={true}
               >
                 Sign Up

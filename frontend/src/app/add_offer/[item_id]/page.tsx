@@ -139,9 +139,9 @@ export default function AddOfferPage() {
   };
 
   return (
-    <main className="bg-background w-screen min-h-screen pt-16" role="main">
+    <main className="bg-mono-light w-screen min-h-screen pt-16" role="main">
       {/* Top fixed header containing authentication and site branding */}
-      <div className="fixed top-0 left-0 w-full bg-contrast shadow z-50 px-6 py-4 flex items-center justify-between gap-4 sm:gap-10">
+      <div className="fixed top-0 left-0 w-full bg-mono-contrast shadow z-50 px-6 py-4 flex items-center justify-between gap-4 sm:gap-10">
         <HeaderBar
           isAuthenticated={isAuthenticated}
           handleLogin={handleLogin}
@@ -149,7 +149,7 @@ export default function AddOfferPage() {
       </div>
 
       <nav
-        className="z-40 fixed top-16 left-0 sm:w-60 w-full sm:h-[calc(100vh-4rem)] bg-contrast text-surface px-2 py-6 shadow-grey-shadow shadow-xl flex flex-col items-center sm:items-start sm:justify-between"
+        className="z-40 fixed top-16 left-0 sm:w-60 w-full sm:h-[calc(100vh-4rem)] bg-mono-contrast text-mono-primary px-2 py-6 shadow-xl flex flex-col items-center sm:items-start sm:justify-between"
         aria-label="Main navigation"
       >
         <NavBar
@@ -166,7 +166,7 @@ export default function AddOfferPage() {
           <div className="mb-4 flex flex-row items-center gap-4">
           <button
             onClick={() => router.back()}
-            className="cursor-pointer w-fit p-2 hover:bg-border rounded-full transition-all"
+            className="cursor-pointer w-fit p-2 hover:bg-mono-ascent rounded-full transition-all"
             aria-label="Back to previous page"
           >
             <FaChevronLeft color="contrast" size={16} />
@@ -184,12 +184,12 @@ export default function AddOfferPage() {
                 infiniteLoop={requestedItem.images.length > 1}
                 dynamicHeight={false}
                 showThumbs={false}
-                className="w-full rounded-xl shadow-xl"
+                className="w-full rounded-xl"
               >
               {requestedItem.images.map((image, index) => (
                   <div
                     key={index}
-                    className="relative w-full aspect-[5/3] bg-surface overflow-hidden rounded-xl"
+                    className="relative w-full aspect-[5/3] bg-mono-contrast-light overflow-hidden rounded-xl"
                   >
                     <Image
                       src={image}
@@ -211,12 +211,12 @@ export default function AddOfferPage() {
         : (<p>Item not found.</p>)  
         }
         <div className="flex flex-col gap-8 mt-10">
-            <div className="shadow-lg p-4 bg-surface relative rounded-xl">
+            <div className="shadow-lg p-4 bg-mono-contrast relative rounded-xl">
               <div className="flex flex-col sm:flex-row justify-between items-center">
-                <h1 className="text-content font-bold text-2xl">Offered Item</h1>
+                <h1 className="text-mono-primary font-bold text-2xl">Offered Item</h1>
                 <button
                   onClick={() => {setIsModalOpen(true)}}
-                  className="rounded bg-action-primary hover:bg-action-secondary text-contrast font-bold py-2 px-4 border-solid border-2 border-action-primary transition-all"
+                  className="bg-main-light hover:bg-main-secondary text-mono-primary font-bold py-2 px-4 border-solid border-2 border-main-primary transition-all rounded-full"
                   aria-label="Add Items to Offer"
                 >
                   Add Items to Offer
@@ -228,7 +228,7 @@ export default function AddOfferPage() {
                     return (
                       <li key={item.id} className="mb-2">
                         <div className="flex flex-col sm:flex-row justify-between items-center">
-                          <p>
+                          <p className="text-mono-primary">
                             {toTitleCase(item.title)} -{" "}
                             {toTitleCase(item.description)}
                           </p>
@@ -241,7 +241,7 @@ export default function AddOfferPage() {
                                   ),
                                 );
                             }}
-                            className={"text-left p-2 text-content cursor-pointer rounded hover:bg-alert transition-all"}
+                            className={"text-left p-2 text-mono-primary cursor-pointer rounded hover:bg-alert transition-all"}
                             aria-label={`{Deselect item ${toTitleCase(item.title)} - ${toTitleCase(item.description)}`}
                           >
                             <FaMinus />
@@ -252,17 +252,17 @@ export default function AddOfferPage() {
                   })}
                 </ul>
               ) : (
-                <p className="text-muted">You have no items to offer.</p>
+                <p className="text-mono-secondary">You have no items to offer.</p>
               )}
             </div>
-            <div className="shadow-lg p-4 bg-surface rounded-xl">
-              <h1 className="text-content font-bold text-2xl">Offer Message</h1>
-              <h1 className="text-content mt-2">
+            <div className="shadow-lg p-4 bg-mono-contrast rounded-xl">
+              <h1 className="text-mono-primary font-bold text-2xl">Offer Message</h1>
+              <h1 className="text-mono-primary mt-2">
                 Enter a message with your offer:
               </h1>
               <textarea
                 aria-label="Offer message" // Describes the purpose of the textarea for screen readers
-                className="w-full h-32 p-2 border border-border rounded text-slate-600"
+                className="w-full h-32 p-2 border border-mono-secondary rounded text-mono-primary"
                 placeholder="Type your message here..."
                 minLength={10}
                 maxLength={2000}
@@ -273,22 +273,22 @@ export default function AddOfferPage() {
             <button
               aria-label="Submit offer" // Clarifies button action for screen readers
               onClick={() => handleOfferSubmit()}
-              className="w-full rounded-xl bg-action-primary hover:bg-action-secondary text-contrast font-bold py-2 px-4 border-solid border-2 border-action-primary transition-all mt-2 shadow-lg"
+              className="w-full rounded-xl bg-main-light hover:bg-main-secondary text-mono-primary font-bold py-2 px-4 border-solid border-2 border-main-primary transition-all mt-2 shadow-lg"
               >
               Make an Offer
             </button>
           </div>
           {isModalOpen && (
-            <div className="fixed top-0 left-0 w-full h-full z-50 flex items-center justify-center backdrop-blur-sm bg-contrast/40 transition-all">
-              <div className="bg-surface p-12 rounded-xl shadow-xl w-full max-w-3xl relative max-h-[80vh] overflow-y-auto">
+            <div className="fixed top-0 left-0 w-full h-full z-50 flex items-center justify-center backdrop-blur-sm bg-mono-contrast/40 transition-all">
+              <div className="bg-mono-contrast p-12 rounded-xl shadow-xl w-full max-w-3xl relative max-h-[80vh] overflow-y-auto">
                 <button
                   onClick={() => setIsModalOpen(false)}
-                  className="absolute top-4 right-4 hover:bg-alert font-bold rounded-full p-2 transition-all"
+                  className="absolute top-4 right-4 hover:bg-alert-light font-bold rounded-full p-2 transition-all"
                   aria-label="Close edit modal"
                 >
                   <ImCross />
                 </button>
-                <h1 className="text-content font-bold text-2xl">Your Inventory</h1>
+                <h1 className="text-mono-primary font-bold text-2xl">Your Inventory</h1>
                 {offerableItems.length > 0 ? (
                   <ul className="pl-2 mt-4">
                     {offerableItems.map((item) => {
@@ -297,7 +297,7 @@ export default function AddOfferPage() {
                       );
                       return (
                         <li key={item.id} className="mb-2">
-                          <label className="flex items-center gap-4 cursor-pointer p-2 rounded w-full transition-all hover:bg-unselected-highlight">
+                          <label className="flex items-center gap-4 cursor-pointer p-2 rounded w-full transition-all hover:bg-main-ascent">
                             <input
                               type="checkbox"
                               checked={!!isSelected}
@@ -309,12 +309,12 @@ export default function AddOfferPage() {
                                     prev.filter((outItem) => outItem.id !== item.id),
                                   );
                               }}
-                              className="accent-action-primary"
+                              className="accent-main-primary"
                               aria-label={`${
                                 isSelected ? "Deselect" : "Select"
                               } item ${toTitleCase(item.title)} - ${toTitleCase(item.description)}`}
                             />
-                            <span className="text-content leading-tight">
+                            <span className="text-mono-primary leading-tight">
                               {toTitleCase(item.title)} - {toTitleCase(item.description)}
                             </span>
                           </label>
@@ -323,7 +323,7 @@ export default function AddOfferPage() {
                     })}
                   </ul>
                 ) : (
-                  <p className="text-muted">You have no items to offer.</p>
+                  <p className="text-mono-secondary">You have no items to offer.</p>
                 )}
               </div>
             </div>

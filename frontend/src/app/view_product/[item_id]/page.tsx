@@ -69,16 +69,16 @@ export default function ViewProductPage() {
     <main
       role="main"
       aria-label="Product Detail Page"
-      className="bg-background w-screen min-h-screen pt-16"
+      className="bg-mono-light w-screen min-h-screen pt-16"
     >
-      <div className="fixed top-0 left-0 w-full bg-contrast shadow z-50 px-6 py-4 flex items-center justify-between gap-4 sm:gap-10">
+      <div className="fixed top-0 left-0 w-full bg-mono-contrast shadow z-50 px-6 py-4 flex items-center justify-between gap-4 sm:gap-10">
         <HeaderBar
           isAuthenticated={isAuthenticated}
           handleLogin={handleLogin}
         />
       </div>
 
-      <div className="z-49 fixed top-16 left-0 sm:w-60 w-full sm:h-[calc(100vh-4rem)] bg-contrast text-surface px-2 py-6 shadow-grey-shadow shadow-xl flex flex-col items-center sm:items-start sm:justify-between">
+      <div className="z-49 fixed top-16 left-0 sm:w-60 w-full sm:h-[calc(100vh-4rem)] bg-mono-contrast text-mono-primary px-2 py-6 shadow-grey-shadow shadow-xl flex flex-col items-center sm:items-start sm:justify-between">
         <NavBar
           handleLogout={handleLogout}
           pathname="/"
@@ -92,7 +92,7 @@ export default function ViewProductPage() {
         <div className="mb-4 flex flex-row items-center gap-4">
           <button
             onClick={() => router.back()}
-            className="cursor-pointer w-fit p-2 hover:bg-border rounded-full transition-all"
+            className="cursor-pointer w-fit p-2 hover:bg-mono-ascent rounded-full transition-all"
             aria-label="Back to previous page"
           >
             <FaChevronLeft color="contrast" size={16} />
@@ -110,12 +110,12 @@ export default function ViewProductPage() {
                 infiniteLoop={item.images.length > 1}
                 dynamicHeight={false}
                 showThumbs={false}
-                className="w-full rounded-xl shadow-xl"
+                className="w-full rounded-xl"
               >
               {item.images.map((image, index) => (
                   <div
                     key={index}
-                    className="relative w-full aspect-[4/3] bg-surface overflow-hidden rounded-xl"
+                    className="relative w-full aspect-[4/3] bg-mono-contrast-light overflow-hidden rounded-xl"
                   >
                     <Image
                       src={image}
@@ -129,14 +129,14 @@ export default function ViewProductPage() {
                 ))}
             </Carousel>
           </div>
-          <div className="flex-1" aria-live="polite">
+          <div className="flex-1 flex flex-col gap-4 justify-center" aria-live="polite">
             {/* Product detail card displaying item information */}
               <ProductDetailCard item={item} approximate_loc={true}/>
             <div className="pt-10 p-6">
               {/* Button to initiate offer; redirects based on authentication status */}
               <button
                 onClick={handleOffer}
-                className="w-full rounded bg-action-primary hover:bg-action-secondary text-contrast font-bold py-2 px-4 border-solid border-2 border-action-primary transition-all"
+                className="w-full rounded bg-main-light hover:bg-main-secondary text-mono-primary font-bold py-2 px-4 border-solid border-2 border-main-primary transition-all"
                 aria-label="Make an offer on this item"
               >
                 Make an Offer

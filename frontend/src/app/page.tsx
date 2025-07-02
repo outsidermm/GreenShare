@@ -69,8 +69,8 @@ export default function Home() {
   };
 
   return (
-    <div className="bg-background w-screen min-h-screen pt-16">
-      <div className="fixed top-0 left-0 w-full bg-contrast shadow z-50 px-6 py-4 flex items-center justify-between gap-4 sm:gap-10">
+    <div className="bg-mono-light w-screen min-h-screen pt-16">
+      <div className="fixed top-0 left-0 w-full bg-mono-contrast shadow z-50 px-6 py-4 flex items-center justify-between gap-4 sm:gap-10">
         <HeaderBar
           isAuthenticated={isAuthenticated}
           handleLogin={handleLogin}
@@ -78,7 +78,7 @@ export default function Home() {
         />
       </div>
 
-      <div className="z-40 fixed top-16 left-0 sm:w-60 w-full sm:h-[calc(100vh-4rem)] bg-contrast text-surface px-2 py-6 shadow-grey-shadow shadow-xl flex flex-col items-center sm:items-start sm:justify-between">
+      <div className="z-40 fixed top-16 left-0 sm:w-60 w-full sm:h-[calc(100vh-4rem)] bg-mono-contrast text-surface px-2 py-6 shadow-grey-shadow shadow-xl flex flex-col items-center sm:items-start sm:justify-between">
         <NavBar
           handleLogout={handleLogout}
           pathname="/"
@@ -89,7 +89,7 @@ export default function Home() {
       <div
         className={`sm:ml-60 sm:mt-2 p-6 ${isAuthenticated ? "mt-96" : "mt-64"}`}
       >
-        <div className={`bg-action-primary text-white rounded-lg p-6 mb-8 sm:mt-0 ${isAuthenticated ? "mt-16" : "mt-0"}`}>
+        <div className={`bg-main-light text-mono-primary rounded-xl shadow-lg p-6 mb-8 sm:mt-0 ${isAuthenticated ? "mt-16" : "mt-0"}`}>
           <h2 className="text-2xl font-bold">Welcome to GreenShare 🌱</h2>
           <p>
             Where communities thrive by giving goods a second life. Join us in
@@ -98,13 +98,13 @@ export default function Home() {
           </p>
           {isAuthenticated ? (
             <Link href="/manage_products" prefetch={true}>
-              <button className="mt-4 bg-surface hover:bg-unselected-highlight text-action-primary font-semibold px-4 py-2 rounded transition-all">
+              <button className="mt-4 bg-mono-contrast-light hover:bg-main-secondary border-main-primary border-2 text-mono-primary active:bg-main-primary font-semibold px-4 py-2 rounded-full transition-all">
                 Add a New Item
               </button>
             </Link>
           ) : (
             <Link href="/login" prefetch={true}>
-              <button className="mt-4 bg-surface hover:bg-unselected-highlight text-action-primary font-semibold px-4 py-2 rounded transition-all">
+              <button className="mt-4 bg-mono-contrast-light hover:bg-main-secondary border-main-primary border-2 text-mono-primary active:bg-main-primary font-semibold px-4 py-2 rounded-full transition-all">
                 Login to Add a New Item
               </button>
             </Link>
@@ -118,14 +118,14 @@ export default function Home() {
           handleTypeFilter={setTypeFilter}
         />
 
-        <h3 className="text-xl text-content font-semibold mb-4">
+        <h3 className="text-xl text-mono-primary font-semibold mb-4">
           Hot Deals 🔥
         </h3>
         <div className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-6">
           {items.length > 0 ? (
             items.map((item) => (ItemCard({ item })))
           ) : (
-            <div className="col-span-4 text-center text-muted">
+            <div className="col-span-4 text-center text-mono-secondary">
               <p>No items available at the moment.</p>
             </div>
           )}

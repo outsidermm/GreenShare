@@ -148,7 +148,7 @@ export default function ManageOffersPage() {
             placeholder: "Reason for cancelling...",
             type: "text",
             className:
-              "border-slate-500 rounded-lg py-2 px-3 w-full border-2 text-slate-500 focus:outline-action-secondary",
+              "border-mono-secondary rounded-lg py-2 px-3 w-full border-2 text-mono-secondary focus:outline-action-secondary",
           },
         },
         buttons: ["No", "Yes"],
@@ -178,18 +178,18 @@ export default function ManageOffersPage() {
 
   return (
     <main
-      className="bg-background w-screen min-h-screen pt-16"
+      className="bg-mono-contrast-light w-screen min-h-screen pt-16"
       role="main"
       aria-label="Manage Offers Page"
     >
-      <div className="fixed top-0 left-0 w-full bg-contrast shadow z-50 px-6 py-4 flex items-center justify-between gap-4 sm:gap-10">
+      <div className="fixed top-0 left-0 w-full bg-mono-contrast shadow z-50 px-6 py-4 flex items-center justify-between gap-4 sm:gap-10">
         <HeaderBar
           isAuthenticated={isAuthenticated}
           handleLogin={handleLogin}
         />
       </div>
       <div>
-        <div className="z-40 fixed top-16 left-0 sm:w-60 w-full sm:h-[calc(100vh-4rem)] bg-contrast text-surface px-2 py-6 shadow-grey-shadow shadow-xl flex flex-col items-center sm:items-start sm:justify-between">
+        <div className="z-40 fixed top-16 left-0 sm:w-60 w-full sm:h-[calc(100vh-4rem)] bg-mono-contrast text-mono-light px-2 py-6 shadow-xl flex flex-col items-center sm:items-start sm:justify-between">
           <NavBar
             handleLogout={handleLogout}
             pathname={pathname}
@@ -202,7 +202,7 @@ export default function ManageOffersPage() {
           className="sm:ml-60 sm:mt-0 p-6 mt-96 pt-8">
           <h1
             id="view-offers-heading"
-            className="text-2xl font-bold mb-4 text-content px-4"
+            className="text-2xl font-bold mb-4 text-mono-primary px-4"
           >
             View Offers
           </h1>
@@ -211,7 +211,11 @@ export default function ManageOffersPage() {
             <button
               aria-label="Show Outgoing Offers"
               aria-disabled={!toggleOffer}
-              className={`flex-1 px-4 py-2 mb-4 sm:mb-0 rounded-xl sm:rounded-none sm:rounded-l-xl text-content border-2 border-grey-shadow transition-all ${!toggleOffer ? "bg-grey-shadow" : "bg-background"}`}
+              className={`flex-1 px-4 py-2 mb-4 sm:mb-0 rounded-xl sm:rounded-none sm:rounded-l-xl border-2 transition-all ${
+                !toggleOffer
+                  ? "bg-mono-primary text-mono-contrast border-mono-primary"
+                  : "bg-mono-contrast-light text-mono-secondary border-mono-primary hover:bg-mono-secondary active:bg-mono-primary"
+              }`}
               onClick={() => setToggleOffer(false)}
             >
               Outgoing Offers
@@ -219,7 +223,11 @@ export default function ManageOffersPage() {
             <button
               aria-label="Show Incoming Offers"
               aria-disabled={toggleOffer}
-              className={`flex-1 px-4 py-2 rounded-xl sm:rounded-none sm:rounded-r-xl text-content border-2 border-grey-shadow transition-all ${toggleOffer ? "bg-grey-shadow" : "bg-background"}`}
+              className={`flex-1 px-4 py-2 rounded-xl sm:rounded-none sm:rounded-r-xl border-2 transition-all ${
+                toggleOffer
+                  ? "bg-mono-primary text-mono-contrast border-mono-primary"
+                  : "bg-mono-contrast-light text-mono-secondary border-mono-primary hover:bg-mono-secondary active:bg-mono-primary"
+              }`}
               onClick={() => setToggleOffer(true)}
             >
               Incoming Offers
@@ -233,24 +241,24 @@ export default function ManageOffersPage() {
                   key={offer.id}
                   role="region"
                   aria-label="Offer Card"
-                  className="bg-surface p-6 mb-6 rounded-lg shadow-xl flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4"
+                  className="bg-mono-contrast p-6 mb-6 rounded-lg shadow-xl flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4"
                 >
                   {/* Items */}
                   <div className="flex-1">
-                    <h2 className="font-bold mb-2 text-content text-xl">Items</h2>
-                    <p className="font-semibold text-content">Incoming</p>
-                    <div className="flex items-center text-content gap-1">
+                    <h2 className="font-bold mb-2 text-mono-primary text-xl">Items</h2>
+                    <p className="font-semibold text-mono-primary">Incoming</p>
+                    <div className="flex items-center text-mono-primary gap-1">
                       <FaArrowRight color="green"/>
                       <p>
                         {toTitleCase(offer.requested_item_name)}
                       </p>
                     </div>
-                    <hr className="my-2 border-border" />
-                    <p className="font-semibold text-content">Outgoing</p>
-                    <div className="flex items-center text-content gap-1">
+                    <hr className="my-2 border-mono-secondary" />
+                    <p className="font-semibold text-mono-primary">Outgoing</p>
+                    <div className="flex items-center text-mono-primary gap-1">
                       <FaArrowLeft color="red"/>
                       {offer.offered_item_names.map((item, index) => (
-                        <p key={index} className="text-sm text-alert flex items-center gap-1">
+                        <p key={index} className="text-mono-primary flex items-center gap-1">
                           {toTitleCase(item)}
                         </p>
                     ))}
@@ -258,7 +266,7 @@ export default function ManageOffersPage() {
                   </div>
 
                   {/* Message and Location */}
-                  <div className="flex-1 text-content">
+                  <div className="flex-1 text-mono-primary">
                     <h2 className="font-bold mb-1 text-xl">Message</h2>
                     <p className="mb-4">{toTitleCase(offer.message)}</p>
                     <h2 className="font-bold mb-1 text-xl">Location</h2>
@@ -269,13 +277,13 @@ export default function ManageOffersPage() {
 
                   {/* Stage */}
                   <div className="flex-1">
-                    <h2 className="font-bold mb-2 text-content text-xl">Stage</h2>
+                    <h2 className="font-bold mb-2 text-mono-primary text-xl">Stage</h2>
                     {["confirmed", "completed", "accepted", "pending"].map((stage) => (
-                    <p key={stage} className={`flex items-center ${offer.status === stage ? "font-bold text-action-primary" : "text-slate-500"}`}>
+                    <p key={stage} className={`flex items-center ${offer.status === stage ? "font-bold text-main-primary" : "text-mono-secondary"}`}>
                         {offer.status === stage ? (
-                          <span className="inline-block w-3 h-3 rounded-full bg-action-primary mr-2" />
+                          <span className="inline-block w-3 h-3 rounded-full bg-main-primary mr-2" />
                         ) : (
-                          <span className="inline-block w-2 h-2 mr-2 rounded-full bg-muted" />
+                          <span className="inline-block w-2 h-2 mr-2 rounded-full bg-mono-secondary" />
                         )}
                         {toTitleCase(stage)}
                       </p>
@@ -284,24 +292,26 @@ export default function ManageOffersPage() {
 
                   {/* Next Action */}
                   <div className="flex-1">
-                    <h2 className="font-bold mb-2 text-content text-xl">Next Action</h2>
+                    <h2 className="font-bold mb-2 text-mono-primary text-xl">Next Action</h2>
                     <button
                       disabled={offer.status === "cancelled"}
                       aria-disabled={offer.status === "cancelled"}
                       onClick={() =>
                         handleCurrentUserOfferAction(offer, toggleOffer)
                       }
-                      className={`w-full rounded text-contrast ${
-                        offer.status === "cancelled"
-                          ? "bg-alert-hover border-alert-hover"
-                          : "bg-action-primary hover:bg-action-secondary border-action-primary"
-                      } font-bold py-2 px-4 border-solid border-2 transition-all`}
+                      className={`w-full rounded text-mono-primary font-bold py-2 px-4 border-solid border-2 transition-all
+                        ${
+                          offer.status === "cancelled"
+                            ? "bg-alert-light border-alert-primary"
+                            : "bg-main-light hover:bg-main-secondary active:bg-main-primary border-main-primary"
+                        }
+                      `}
                     >
                       {getOfferActionLabel(toggleOffer, offer.status)}
                     </button>
                     {offer.status === "pending" && (
                       <button
-                        className="w-full rounded bg-alert-hover hover:bg-alert text-contrast font-bold py-2 px-2 border-solid border-2 border-alert-hover transition-all mt-4"
+                        className="w-full rounded bg-alert-light hover:bg-alert-secondary active:bg-alert-primary text-mono-primary font-bold py-2 px-2 border-solid border-2 border-alert-primary transition-all mt-4"
                         onClick={() => handleCancel(offer.id)}
                       >
                         Cancel
@@ -311,7 +321,7 @@ export default function ManageOffersPage() {
                 </div>
               ))
             ) : (
-              <p className="text-content">
+              <p className="text-mono-primary">
                 No {toggleOffer ? "incoming" : "outgoing"} offers found.
               </p>
             )}

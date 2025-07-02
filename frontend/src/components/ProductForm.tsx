@@ -170,21 +170,21 @@ export default function ProductForm(input: ProductFormProps) {
             <AiOutlineShop
               style={{ color: "var(--color-contrast-background)" }}
             />
-            <h2 className="text-content text-lg font-bold">
+            <h2 className="text-mono-primary text-xl font-bold">
               {item ? "Edit Product" : "Add New Product"}
             </h2>
           </div>
           <button
             type="submit"
             aria-label={item ? "Update Product" : "Add Product"}
-            className="bg-action-primary text-content px-4 py-2 rounded-full hover:bg-action-secondary flex items-center gap-2 transition-all border-2 border-action-primary font-bold"
+            className="bg-main-light text-mono-primary px-4 py-2 rounded-full hover:bg-main-secondary active:bg-main-primary flex items-center gap-2 transition-all border-2 border-main-primary font-bold"
           >
             <IoMdCheckmark />
             <p>{item ? "Update Product" : "Add Product"}</p>
           </button>
         </div>
         <fieldset>
-          <legend className="block pt-6 mb-2 text-content font-medium">
+          <legend className="block pt-6 mb-2 text-mono-primary font-medium">
             Product Title
           </legend>
           <input
@@ -196,12 +196,12 @@ export default function ProductForm(input: ProductFormProps) {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             onFocus={() => setIsTitleChanged(true)}
-            className={`border-muted text-slate-600 rounded-lg py-2 px-3 w-full border-2 focus:outline-action-secondary ${isTitleChanged ? "invalid:border-alert" : ""}`}
+            className={`border-mono-secondary text-mono-primary rounded-lg py-2 px-3 w-full border-2 focus:outline-main-secondary ${isTitleChanged ? "invalid:border-alert-primary" : ""}`}
           />
         </fieldset>
 
         <fieldset>
-          <legend className="pt-6 block mb-2 text-content font-medium">
+          <legend className="pt-6 block mb-2 text-mono-primary font-medium">
             Product Description
           </legend>
           <input
@@ -213,7 +213,7 @@ export default function ProductForm(input: ProductFormProps) {
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             onFocus={() => setIsDescriptionChanged(true)}
-            className={`border-muted rounded-lg py-2 px-3 w-full border-2 text-slate-600 focus:outline-action-secondary ${isDescriptionChanged ? "invalid:border-alert" : ""}`}
+            className={`border-mono-secondary rounded-lg py-2 px-3 w-full border-2 text-mono-primary focus:outline-main-secondary ${isDescriptionChanged ? "invalid:border-alert-primary" : ""}`}
           />
         </fieldset>
 
@@ -249,10 +249,10 @@ export default function ProductForm(input: ProductFormProps) {
         </div>
 
         <fieldset>
-          <legend className="pt-6 block mb-2 text-content font-medium">
+          <legend className="pt-6 block mb-2 text-mono-primary font-medium">
             Product Images
           </legend>
-          <div className="border-2 border-dashed border-grey-shadow rounded-lg p-4 bg-background/50">
+          <div className="border-2 border-dashed border-mono-secondary rounded-lg p-4 bg-mono-light">
             <input
               type="file"
               accept="image/*"
@@ -263,7 +263,7 @@ export default function ProductForm(input: ProductFormProps) {
                 setSelectedFiles(files);
                 setImageURLs([]);
               }}
-              className="block w-full text-sm text-muted mb-4 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-400 file:text-content hover:file:bg-action-secondary"
+              className="block w-full text-sm text-muted mb-4 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-main-light file:text-mono-primary hover:file:bg-main-secondary"
             />
             {/* Conditional rendering of image previews (existing and newly selected) */}
             {imageURLs.length > 0 || selectedFiles.length > 0 ? (
@@ -271,7 +271,7 @@ export default function ProductForm(input: ProductFormProps) {
                 {imageURLs.map((url, index) => (
                   <div
                     key={`existing-${index}`}
-                    className="w-full aspect-square bg-surface border rounded-lg overflow-hidden shadow-sm flex items-center justify-center"
+                    className="w-full aspect-square bg-mono-contrast-light border rounded-lg overflow-hidden shadow-sm flex items-center justify-center"
                   >
                     <Image
                       src={url}
@@ -286,7 +286,7 @@ export default function ProductForm(input: ProductFormProps) {
                 {selectedFiles.map((file, index) => (
                   <div
                     key={`new-${index}`}
-                    className="w-full aspect-square bg-surface border rounded-lg overflow-hidden shadow-sm flex items-center justify-center"
+                    className="w-full aspect-square bg-mono-contrast-light border rounded-lg overflow-hidden shadow-sm flex items-center justify-center"
                   >
                     <Image
                       src={URL.createObjectURL(file)}
@@ -300,7 +300,7 @@ export default function ProductForm(input: ProductFormProps) {
                 ))}
               </div>
             ) : (
-              <div className="w-full h-40 bg-background rounded-lg flex items-center justify-center text-muted">
+              <div className="w-full h-40 bg-mono-light rounded-lg flex items-center justify-center text-mono-secondary">
                 No images selected
               </div>
             )}

@@ -10,14 +10,14 @@ export default function ProductDetailCard({ item, approximate_loc = false }: { i
           <h1 className="text-2xl font-bold text-contrast">
             {toTitleCase(item.title)}
           </h1>
-          <p className="text-action-secondary border-action-secondary rounded-2xl border-2 px-4 text-sm">
+          <p className="text-main-primary border border-main-primary rounded-2xl px-4">
             {toTitleCase(toTitleCase(item.category))}
           </p>
         </div>
 
       </header>
 
-      <div className= "border-l-2 border-action-primary text-base pl-4 space-y-1">
+      <div className= "border-l-2 border-main-secondary pl-4 space-y-1">
         <p>
           {toTitleCase(item.description)}
         </p>
@@ -27,14 +27,14 @@ export default function ProductDetailCard({ item, approximate_loc = false }: { i
             : item.location)}
         </p>
         <div className="flex flex-row gap-2 flex-wrap items-center">
-          <p className="text-action-primary border-action-hover bg-action-hover rounded-2xl border-2 px-4 text-sm">
-          {toTitleCase(toTitleCase(item.type))}
+          <p className="bg-main-light text-main-primary border-l-1 border-main-primary rounded-2xl px-4">
+            {toTitleCase(toTitleCase(item.type))}
           </p>
-          <p className="text-action-primary border-action-hover bg-action-hover rounded-2xl border-2 px-4 text-sm">
-          {toTitleCase(toTitleCase(item.status))}
+          <p className="bg-main-light text-main-primary border-l-1 border-main-primary rounded-2xl px-4">
+            {toTitleCase(toTitleCase(item.status))}
           </p>
-          <p className="text-action-primary border-action-hover bg-action-hover rounded-2xl border-2 px-4 text-sm">
-          {toTitleCase(toTitleCase(item.condition))}
+          <p className="bg-main-light text-main-primary border-l-1 border-main-primary rounded-2xl px-4">
+            {toTitleCase(toTitleCase(item.condition))}
           </p>
         </div>
       </div>
