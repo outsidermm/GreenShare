@@ -37,23 +37,28 @@ export default function AddOfferPage() {
     const fetchItems = async () => {
       try {
         const offerable_items_response = await getUserItems();
-        setOfferableItems(offerable_items_response);
-
         const requested_item_response = await getItems({
           item_id: requested_item_id,
         });
+
+        if (
+          offerable_items_response.length > 0 &&
+          requested_item_response.length === 1 &&
+          offerable_items_response[0].user_id === requested_item_response[0].user_id
+        ) {
+          router.push("/");
+          throw new Error("You cannot offer your own item.");
+        }
+
+        setOfferableItems(offerable_items_response);
+
         if (requested_item_response.length === 1) {
           setRequestedItem(requested_item_response[0]);
         } else {
+          router.push("/");
           throw new Error(
             "Requested item not found or multiple item returned.",
           );
-        }
-
-        if (offerableItems.length > 0 && requestedItem) {
-          if (offerableItems[0].user_id === requestedItem.user_id) {
-            throw new Error("You cannot offer your own item.");
-          }
         }
       } catch (error) {
         console.error("Error fetching offer item:", error);
@@ -82,8 +87,6 @@ export default function AddOfferPage() {
     requested_item_id,
     isAuthenticated,
     router,
-    offerableItems,
-    requestedItem,
   ]);
 
   const handleLogin = async () => {
