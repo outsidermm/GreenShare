@@ -317,7 +317,9 @@ class User:
         Args:
             new_pwd (str): New encrypted password to set.
         """
-        db.session.get(UserDB, self.get_user_pk()).password = self.encrypt_pwd(self.hash_pwd(new_pwd))
+        db.session.get(UserDB, self.get_user_pk()).password = self.encrypt_pwd(
+            self.hash_pwd(new_pwd)
+        )
         db.session.commit()
 
     def set_first_name(self, new_first_name: str) -> None:

@@ -17,9 +17,10 @@ from backend.utils import sanitize_input, sanitize_email
 from backend.config import app
 
 
-def generate_reset_token(email:str) -> str:
+def generate_reset_token(email: str) -> str:
     serialiser = URLSafeTimedSerializer(app.config["SECRET_KEY"])
     return serialiser.dumps(email, salt="reset-password-salt")
+
 
 def verify_reset_token(token: str, expiration=300) -> str:
     serialiser = URLSafeTimedSerializer(app.config["SECRET_KEY"])
@@ -28,6 +29,7 @@ def verify_reset_token(token: str, expiration=300) -> str:
         return email
     except Exception as e:
         abort(400, description=f"Invalid or expired token: {str(e)}")
+
 
 def name_auth(name: str, err_prefix: str = "User") -> bool:
     """
@@ -292,6 +294,7 @@ def validate_user_id(user_id: int | None = None) -> None:
             403, "Invalid credentials. Please log in again."
         )  # Raise an error if no valid user is found
 
+
 async def user_auth_forgot_pwd(email: str) -> None:
     """
     Initiates the password reset process for a user by validating their email.
@@ -311,7 +314,7 @@ async def user_auth_forgot_pwd(email: str) -> None:
     # Check if user exists
     if safe_email not in users:
         abort(400, description="Email does not exist")
-    
+
     token = generate_reset_token(safe_email)
     email_sender = "greenshare1234@gmail.com"
     email_subject = "GreenShare Password Reset"
@@ -326,19 +329,19 @@ async def user_auth_forgot_pwd(email: str) -> None:
     Thank you,<br>
     GreenShare Team
     """
-    
+
     email = EmailMessage()
     email["From"] = email_sender
     email["To"] = safe_email
     email["Subject"] = email_subject
     email.set_content(email_body, subtype="html")
-    
+
     context = ssl.create_default_context()
     with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
         server.login(email_sender, email_password)
         server.sendmail(email_sender, safe_email, email.as_string())
-    
-    
+
+
 async def user_auth_reset_pwd(token: str, new_pwd: str) -> None:
     """
     Resets the user's password using a valid reset token.

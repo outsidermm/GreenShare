@@ -222,6 +222,7 @@ async def validate_token() -> Response:
         # Return error response if tokens are invalid
         return jsonify({"error": str(e)}), 401
 
+
 @app.route("/auth/forgot_pwd", methods=["POST"])
 async def forgot_pwd() -> Response:
     """
@@ -241,7 +242,8 @@ async def forgot_pwd() -> Response:
         return jsonify({"message": "Password reset link sent to your email."}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 400
-    
+
+
 @app.route("/auth/reset_pwd", methods=["POST"])
 async def reset_pwd() -> Response:
     """

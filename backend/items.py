@@ -232,13 +232,13 @@ async def user_get_browse_items(
         item: Item = items[item_id_int]
         if item.get_status() == "available":
             return {item_id_int: item}
-        
+
     # Otherwise, build a filtered dictionary of available items in one pass
     safe_title_filter: str | None = None
     safe_category_filter: str | None = None
     safe_condition_filter: str | None = None
     safe_type_filter: str | None = None
-    
+
     if title_filter is not None:
         safe_title_filter = validate_string_length(title_filter, "Title filter", 3, 100)
     if category_filter is not None:
@@ -252,11 +252,19 @@ async def user_get_browse_items(
     for item_key, item in items.items():
         if item.get_status() != "available":
             continue
-        if safe_title_filter is not None and not title_matches(safe_title_filter, item.get_title()):
+        if safe_title_filter is not None and not title_matches(
+            safe_title_filter, item.get_title()
+        ):
             continue
-        if safe_category_filter is not None and item.get_category() != safe_category_filter:
+        if (
+            safe_category_filter is not None
+            and item.get_category() != safe_category_filter
+        ):
             continue
-        if safe_condition_filter is not None and item.get_condition() != safe_condition_filter:
+        if (
+            safe_condition_filter is not None
+            and item.get_condition() != safe_condition_filter
+        ):
             continue
         if safe_type_filter is not None and item.get_type() != safe_type_filter:
             continue
@@ -359,7 +367,7 @@ async def user_delete_item(
     validate_user_id(user_id)  # Ensure the user ID is valid
     if items[item_id_int].get_user_id() != user_id:
         abort(403, "You do not have permission to delete this item.")
-# Remove the item from the global items dictionary
+    # Remove the item from the global items dictionary
     del items[item_id_int]
 
 
