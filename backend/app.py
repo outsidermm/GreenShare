@@ -6,7 +6,6 @@ It includes endpoints for user authentication, item management, exchange offers,
 and auxiliary services such as autocomplete and item search.
 """
 
-import os
 import requests
 from flask import request, jsonify, make_response, Response
 
@@ -30,7 +29,7 @@ from backend.classes.item import Item
 from backend.classes.exchange_offer import ExchangeOffer
 
 # Data management
-from backend.data import image_upload, users, items, exchange_offers
+from backend.data import image_upload, users, items, exchange_offers, PLACES_API_KEY
 
 # Items
 from backend.items import (
@@ -54,8 +53,6 @@ from backend.offers import (
 
 # Utils
 from backend.utils import sanitize_input
-
-PLACES_API_KEY = os.getenv("PLACES_API_KEY")
 
 
 @app.route("/")

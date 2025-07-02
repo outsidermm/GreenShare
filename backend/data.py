@@ -28,6 +28,9 @@ exchange_offers: dict[int, ExchangeOffer] = (
 # Load environment variables for external service credentials
 IMGUR_CLIENT_ID: str | None = os.getenv("IMGUR_CLIENT_ID")
 GENAI_API_KEY: str | None = os.getenv("GENAI_API_KEY")
+PLACES_API_KEY: str | None = os.getenv("PLACES_API_KEY")
+EMAIL_PASSWORD: str | None = os.getenv("EMAIL_PASSWORD")
+NEXT_PUBLIC_URL: str | None = os.getenv("NEXT_PUBLIC_URL")
 
 
 def admin_retrieve_user_id(session_token: str, csrf_token: str) -> int | None:

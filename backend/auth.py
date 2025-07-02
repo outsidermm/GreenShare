@@ -2,7 +2,6 @@
 Authentication utility functions for user registration, login, logout, and token validation.
 """
 
-import os
 from email.message import EmailMessage
 import re
 import smtplib
@@ -13,7 +12,7 @@ from flask import abort
 from itsdangerous import URLSafeTimedSerializer
 
 from backend.classes.user import User
-from backend.data import users
+from backend.data import EMAIL_PASSWORD, NEXT_PUBLIC_URL, users
 from backend.utils import sanitize_input, sanitize_email
 from backend.config import app
 
@@ -316,13 +315,13 @@ async def user_auth_forgot_pwd(email: str) -> None:
     token = generate_reset_token(safe_email)
     email_sender = "greenshare1234@gmail.com"
     email_subject = "GreenShare Password Reset"
-    email_password = os.environ.get("EMAIL_PASSWORD")
+    email_password = EMAIL_PASSWORD
     email_body = f"""
     Dear {users[safe_email].get_first_name()} {users[safe_email].get_last_name()},
     <br><br>
     You have requested a password reset for your GreenShare account.<br>
     Please click the link below to reset your password:<br>
-    <a href="{os.environ.get("NEXT_PUBLIC_URL")}/reset_password?token={token}">Reset Password</a><br><br>
+    <a href="{NEXT_PUBLIC_URL}/reset_password?token={token}">Reset Password</a><br><br>
     If you did not request this, please ignore this email.<br><br>
     Thank you,<br>
     GreenShare Team
