@@ -3,14 +3,12 @@ import { StandardBackendResponse } from "@/types/standardBackendResponse";
 // Define the base URL for the backend API, pulled from environment variables
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
-
 // Function to handle user reset password by sending email to the backend
 export default async function resetPwd(
   token: string,
   newPassword: string,
 ): Promise<StandardBackendResponse> {
   try {
-
     const data = {
       token,
       newPassword,

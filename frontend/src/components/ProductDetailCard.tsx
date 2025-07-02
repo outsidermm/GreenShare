@@ -1,8 +1,13 @@
 import { Item } from "@/types/item";
 import { toTitleCase } from "@/utils/titleCase";
 
-
-export default function ProductDetailCard({ item, approximate_loc = false }: { item: Item , approximate_loc?: boolean }) {
+export default function ProductDetailCard({
+  item,
+  approximate_loc = false,
+}: {
+  item: Item;
+  approximate_loc?: boolean;
+}) {
   return (
     <div>
       <header>
@@ -14,17 +19,18 @@ export default function ProductDetailCard({ item, approximate_loc = false }: { i
             {toTitleCase(toTitleCase(item.category))}
           </p>
         </div>
-
       </header>
 
-      <div className= "border-l-2 border-main-secondary pl-4 space-y-1">
+      <div className="border-l-2 border-main-secondary pl-4 space-y-1">
         <p className="break-words whitespace-normal">
           {toTitleCase(item.description)}
         </p>
         <p className="break-words whitespace-normal">
-          {toTitleCase(approximate_loc
-            ? item.location.split(", ").slice(1).join(", ").trim()
-            : item.location)}
+          {toTitleCase(
+            approximate_loc
+              ? item.location.split(", ").slice(1).join(", ").trim()
+              : item.location,
+          )}
         </p>
         <div className="flex flex-row gap-2 flex-wrap items-center">
           <p className="bg-main-light text-main-primary border-l-1 border-main-primary rounded-2xl px-4 break-words whitespace-normal">

@@ -14,6 +14,7 @@ import { Item } from "@/types/item";
 import ProductForm from "@/components/ProductForm";
 import ProductDetailCard from "@/components/ProductDetailCard";
 import { ImCross } from "react-icons/im";
+import { motion } from "framer-motion";
 
 export default function ManageProductsPage() {
   const router = useRouter();
@@ -121,10 +122,14 @@ export default function ManageProductsPage() {
           <div className="p-4" aria-live="polite">
             {ownedItems.length > 0 ? (
               ownedItems.map((item) => (
-                <div
+                <motion.div
                   key={item.id}
                   className="bg-mono-contrast p-4 mb-4 rounded-lg shadow-xl flex justify-between gap-8 flex-col sm:flex-row"
                   aria-label="User Item Card"
+                  initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                  whileInView={{ opacity: 1, scale: 1, y: 0 }}
+                  transition={{ duration: 0.5, ease: "easeOut" }}
+                  viewport={{amount: 0.3 }}
                 >
                   <div className="flex-2 text-content">
                     <ProductDetailCard item={item} />
@@ -150,7 +155,7 @@ export default function ManageProductsPage() {
                       </button>
                     </div>
                   )}
-                </div>
+                </motion.div>
               ))
             ) : (
               <p className="text-content">You do not own any items.</p>

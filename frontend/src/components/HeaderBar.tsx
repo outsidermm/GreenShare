@@ -131,7 +131,7 @@ export default function HeaderBar(HeaderBarProps: HeaderBarProps) {
             }
           }}
           className="absolute bg-main-ascent hover:bg-main-secondary active:bg-main-primary border border-main-primary px-3 py-2 rounded-r-xl text-mono-primary transition-all"
-          style={{ right: "1.04rem"}}
+          style={{ right: "1.04rem" }}
         >
           Search
         </button>

@@ -15,6 +15,7 @@ import { Option } from "@/types/option";
 import FilterBar from "@/components/FilterBar";
 import { ItemFilter } from "@/types/itemFilter";
 import ItemCard from "@/components/ItemCard";
+import { motion } from "framer-motion";
 
 export default function CategoryPage() {
   const { isAuthenticated, refreshAuth } = useAuth();
@@ -100,7 +101,17 @@ export default function CategoryPage() {
         {/* Display a grid of items that match the selected filters */}
         <div className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-6">
           {items.length > 0 ? (
-            items.map((item) => ItemCard({ item }))
+            items.map((item) => (
+              <motion.div
+                key={item.id}
+                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                whileInView={{ opacity: 1, scale: 1, y: 0 }}
+                transition={{ duration: 0.5, ease: "easeOut" }}
+                viewport={{amount: 0.3 }}
+              >
+                <ItemCard item={item} />
+              </motion.div>
+            ))
           ) : (
             // Message shown when no items are found for the current filter
             <div className="col-span-4 text-center text-mono-secondary">

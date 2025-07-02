@@ -19,6 +19,7 @@ import confirmOfferComplete from "@/services/offer/confirmOfferComplete";
 import swal from "sweetalert";
 import { extractErrorMessage } from "@/utils/extractErrorMsg";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa6";
+import { motion } from "framer-motion";
 
 export default function ManageOffersPage() {
   const router = useRouter();
@@ -238,11 +239,15 @@ export default function ManageOffersPage() {
             {/* Dynamic rendering of each offer card */}
             {(toggleOffer ? incomingOffers : outgoingOffers).length > 0 ? (
               (toggleOffer ? incomingOffers : outgoingOffers).map((offer) => (
-                <div
+                <motion.div
                   key={offer.id}
                   role="region"
                   aria-label="Offer Card"
                   className="bg-mono-contrast p-6 mb-6 rounded-lg shadow-xl flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4"
+                  initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                  whileInView={{ opacity: 1, scale: 1, y: 0 }}
+                  transition={{ duration: 0.5, ease: "easeOut" }}
+                  viewport={{amount: 0.3 }}
                 >
                   {/* Items */}
                   <div className="flex-1">
@@ -252,7 +257,9 @@ export default function ManageOffersPage() {
                     <p className="font-semibold text-mono-primary">Incoming</p>
                     <div className="flex items-center text-mono-primary gap-1">
                       <FaArrowRight color="green" />
-                      <p className="break-words whitespace-normal">{toTitleCase(offer.requested_item_name)}</p>
+                      <p className="break-words whitespace-normal">
+                        {toTitleCase(offer.requested_item_name)}
+                      </p>
                     </div>
                     <hr className="my-2 border-mono-secondary" />
                     <p className="font-semibold text-mono-primary">Outgoing</p>
@@ -272,15 +279,21 @@ export default function ManageOffersPage() {
                   {/* Message and Location */}
                   <div className="flex-1 text-mono-primary">
                     <h2 className="font-bold mb-1 text-xl">Message</h2>
-                    <p className="mb-4 break-words whitespace-normal">{toTitleCase(offer.message)}</p>
+                    <p className="mb-4 break-words whitespace-normal">
+                      {toTitleCase(offer.message)}
+                    </p>
                     <h2 className="font-bold mb-1 text-xl">Location</h2>
                     <p className="break-words whitespace-normal">
                       {!toggleOffer && offer.status === "pending"
                         ? `Your offer has not been accepted. Approximate location is ${toTitleCase(
-                            offer.requested_item_location.split(", ").slice(1).join(", ").trim()
+                            offer.requested_item_location
+                              .split(", ")
+                              .slice(1)
+                              .join(", ")
+                              .trim(),
                           )}`
                         : toTitleCase(offer.requested_item_location)}
-                  </p>
+                    </p>
                   </div>
 
                   {/* Stage */}
@@ -335,7 +348,7 @@ export default function ManageOffersPage() {
                       </button>
                     )}
                   </div>
-                </div>
+                </motion.div>
               ))
             ) : (
               <p className="text-mono-primary">

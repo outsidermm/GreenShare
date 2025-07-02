@@ -54,7 +54,10 @@ export default function CredentialsInput(props: CredentialsInputProps) {
           className={`border-mono-secondary text-mono-primary rounded py-2 px-3 w-full ${credentialChanged ? "invalid:border-alert-primary" : ""} border-2`}
         />
         {credentialError != "" && (
-          <div id={inputId + "-error"} className="text-alert-primary text-center pt-2">
+          <div
+            id={inputId + "-error"}
+            className="text-alert-primary text-center pt-2"
+          >
             {credentialError}
           </div>
         )}

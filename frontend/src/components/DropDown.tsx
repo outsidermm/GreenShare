@@ -84,7 +84,9 @@ export default function DropDown(props: DropDownProps) {
               border: "none",
               borderRadius: "0.5rem",
               fontSize: "1rem",
-              boxShadow: state.isFocused ? "0 0 0 2px #22c55e" : "0 0 0 2px #64748b",
+              boxShadow: state.isFocused
+                ? "0 0 0 2px #22c55e"
+                : "0 0 0 2px #64748b",
             }),
             option: (base, { isFocused, isSelected }) => ({
               ...base,

@@ -22,9 +22,7 @@ export default function ItemCard({ item }: { item: Item }) {
         <h4 className="text-mono-primary font-bold">
           {toTitleCase(item.title)}
         </h4>
-        <p className="text-main-primary">
-          {toTitleCase(item.condition)}
-        </p>
+        <p className="text-main-primary">{toTitleCase(item.condition)}</p>
         <p className="text-mono-secondary">{toTitleCase(item.type)}</p>
       </div>
     </Link>

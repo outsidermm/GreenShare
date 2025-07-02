@@ -34,7 +34,7 @@ export default function PasswordInput(props: PasswordInputProps) {
           <input
             id="password-input"
             type={isPwdHidden ? "password" : "text"}
-            placeholder= {props.placeholder || "Enter your password"}
+            placeholder={props.placeholder || "Enter your password"}
             required
             minLength={8}
             maxLength={32}
@@ -55,7 +55,10 @@ export default function PasswordInput(props: PasswordInputProps) {
         </div>
         {/* Display error message if password validation fails */}
         {passwordError != "" && (
-          <div id="password-error" className="text-alert-primary text-center pt-2">
+          <div
+            id="password-error"
+            className="text-alert-primary text-center pt-2"
+          >
             {passwordError}
           </div>
         )}

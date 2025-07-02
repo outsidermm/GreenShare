@@ -56,7 +56,9 @@ export default function NavBar(props: NavBarProps) {
             );
           })}
         </ul>
-        {isAuthenticated && <hr className="my-2 border-t border-mono-secondary mx-4" />}
+        {isAuthenticated && (
+          <hr className="my-2 border-t border-mono-secondary mx-4" />
+        )}
         {isAuthenticated && (
           <h2 className="font-bold my-4">
             <Link
@@ -71,7 +73,9 @@ export default function NavBar(props: NavBarProps) {
             </Link>
           </h2>
         )}
-        {isAuthenticated && <hr className="my-2 border-t border-mono-secondary mx-4" />}
+        {isAuthenticated && (
+          <hr className="my-2 border-t border-mono-secondary mx-4" />
+        )}
         {isAuthenticated && (
           <h2 className="font-bold my-4">
             <Link
