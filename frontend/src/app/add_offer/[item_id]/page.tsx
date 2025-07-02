@@ -314,7 +314,7 @@ export default function AddOfferPage() {
                 })}
               </ul>
             ) : (
-              <p className="text-mono-secondary">You have no items to offer.</p>
+              <p className="text-mono-secondary">You offered no items.</p>
             )}
           </div>
           <div className="shadow-lg p-4 bg-mono-contrast rounded-xl">
@@ -355,7 +355,7 @@ export default function AddOfferPage() {
               <h1 className="text-mono-primary font-bold text-2xl">
                 Your Inventory
               </h1>
-              {offerableItems.length > 0 ? (
+              {offerableItems.filter((item) => item.status === "available").length > 0 ? (
                 <ul className="pl-2 mt-4">
                   {offerableItems
                     .filter((item) => item.status === "available")
@@ -395,7 +395,7 @@ export default function AddOfferPage() {
                 </ul>
               ) : (
                 <p className="text-mono-secondary">
-                  You have no items to offer.
+                  You have no available items to offer.
                 </p>
               )}
             </div>
