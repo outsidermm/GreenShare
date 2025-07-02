@@ -427,9 +427,6 @@ async def delete_item() -> Response:
         csrf_token: str = sanitize_input(request.headers.get("X-CSRF-TOKEN"))
         item_id: str = data["id"]
 
-        if not item_id:
-            return jsonify({"error": "Item ID is required"}), 400
-
         await user_delete_item(
             item_id=item_id,
             session_token=session_token,

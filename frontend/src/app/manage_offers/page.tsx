@@ -40,7 +40,7 @@ export default function ManageOffersPage() {
         console.error("Error fetching requested offers:", error);
         if (error instanceof Error) {
           if (!isAuthenticated) {
-            swal("Please log in to manage your items.", {
+            swal("Please log in to manage your offers.", {
               icon: "warning",
               buttons: ["Cancel", "Login"],
             }).then((willLogin) => {
@@ -88,7 +88,7 @@ export default function ManageOffersPage() {
       }
     } else {
       if (status === "accepted") {
-        return "Complete Offer";
+        return "Mark Offer as Complete";
       }
     }
     return "Await Other Party Action";
@@ -216,7 +216,7 @@ export default function ManageOffersPage() {
               className={`flex-1 px-4 py-2 mb-4 sm:mb-0 rounded-xl sm:rounded-none sm:rounded-l-xl border-2 transition-all ${
                 !toggleOffer
                   ? "bg-mono-primary text-mono-contrast border-mono-primary"
-                  : "bg-mono-contrast-light text-mono-secondary border-mono-primary hover:bg-mono-secondary active:bg-mono-primary"
+                  : "bg-mono-contrast-light text-mono-secondary border-mono-primary hover:bg-mono-light active:bg-mono-primary"
               }`}
               onClick={() => setToggleOffer(false)}
             >
@@ -228,7 +228,7 @@ export default function ManageOffersPage() {
               className={`flex-1 px-4 py-2 rounded-xl sm:rounded-none sm:rounded-r-xl border-2 transition-all ${
                 toggleOffer
                   ? "bg-mono-primary text-mono-contrast border-mono-primary"
-                  : "bg-mono-contrast-light text-mono-secondary border-mono-primary hover:bg-mono-secondary active:bg-mono-primary"
+                  : "bg-mono-contrast-light text-mono-secondary border-mono-primary hover:bg-mono-light active:bg-mono-primary"
               }`}
               onClick={() => setToggleOffer(true)}
             >
@@ -331,14 +331,14 @@ export default function ManageOffersPage() {
                     ) : (
                       <>
                         <button
-                          disabled={offer.status === "cancelled"}
-                          aria-disabled={offer.status === "cancelled"}
+                          disabled={offer.status === "cancelled" || offer.status === "confirmed"}
+                          aria-disabled={offer.status === "cancelled" || offer.status === "confirmed"}
                           onClick={() =>
                             handleCurrentUserOfferAction(offer, toggleOffer)
                           }
                           className={`w-full rounded text-mono-primary font-bold py-2 px-4 border-solid border-2 transition-all
                           ${
-                            offer.status === "cancelled"
+                            (offer.status === "cancelled" || offer.status === "confirmed")
                               ? "bg-alert-light border-alert-primary"
                               : "bg-main-light hover:bg-main-secondary active:bg-main-primary border-main-primary"
                           }

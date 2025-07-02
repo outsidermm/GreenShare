@@ -20,7 +20,7 @@ export default async function deleteItem(
     };
 
     // Perform the DELETE request to the backend endpoint with proper headers and CSRF token
-    const response = await fetch(`${API_BASE}/item/userview`, {
+    const response = await fetch(`${API_BASE}/item/delete`, {
       method: "DELETE",
       credentials: "include",
       headers: {

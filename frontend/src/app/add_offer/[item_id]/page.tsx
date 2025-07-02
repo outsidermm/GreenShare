@@ -36,6 +36,9 @@ export default function AddOfferPage() {
   useEffect(() => {
     const fetchItems = async () => {
       try {
+        const offerable_items_response = await getUserItems();
+        setOfferableItems(offerable_items_response);
+
         const requested_item_response = await getItems({
           item_id: requested_item_id,
         });
@@ -46,17 +49,18 @@ export default function AddOfferPage() {
             "Requested item not found or multiple item returned.",
           );
         }
+
+        if (offerableItems.length > 0 && requestedItem) {
+          if(offerableItems[0].user_id === requestedItem.user_id) {
+            throw new Error("You cannot offer your own item.");
+          }
+        }
+
       } catch (error) {
-        console.error("Error fetching requested item:", error);
-      }
-      try {
-        const offerable_items_response = await getUserItems();
-        setOfferableItems(offerable_items_response);
-      } catch (error) {
-        console.error("Error fetching user offerable item:", error);
+        console.error("Error fetching offer item:", error);
         if (error instanceof Error) {
           if (!isAuthenticated) {
-            swal("Please log in to manage your items.", {
+            swal("Please log in to make an offer.", {
               icon: "warning",
               buttons: ["Cancel", "Login"],
             }).then((willLogin) => {
@@ -74,7 +78,7 @@ export default function AddOfferPage() {
     };
 
     fetchItems();
-  }, [pathname, requested_item_id, isAuthenticated, router]);
+  }, [pathname, requested_item_id, isAuthenticated, router, offerableItems, requestedItem]);
 
   const handleLogin = async () => {
     router.push("/login");
@@ -302,7 +306,7 @@ export default function AddOfferPage() {
               </h1>
               {offerableItems.length > 0 ? (
                 <ul className="pl-2 mt-4">
-                  {offerableItems.map((item) => {
+                  {offerableItems.filter((item) => item.status === "available").map((item) => {
                     const isSelected = outgoingItems.find(
                       (outItem) => outItem.id === item.id,
                     );

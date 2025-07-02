@@ -17,7 +17,7 @@ from backend.config import db
 from backend.classes.item import Item
 
 
-def validate_item_id(item_id: str) -> int:
+def validate_item_id(item_id: str, prefix="") -> int:
     """
     Validates the given item ID string.
 
@@ -31,13 +31,28 @@ def validate_item_id(item_id: str) -> int:
         400: If the item ID is not a positive integer.
         404: If the item ID does not exist in the items dictionary.
     """
-    if not item_id.isdigit() or int(item_id) <= 0:
-        abort(400, "Item ID must be a positive integer.")
     item_id_int: int = int(item_id)
     if item_id_int not in items:
-        abort(404, f"Item with ID {item_id_int} does not exist.")
+        abort(404, f"{prefix} Item with ID {item_id_int} does not exist.")
     return item_id_int
 
+def validate_item_availability(item_id: str, prefix="", isAbort = True) -> int:
+    """
+    Validates if the item is available.
+
+    Args:
+        item_id (str): The item ID as a string.
+
+    Raises:
+        404: If the item ID does not exist or is not available.
+    """
+    item_id_int: int = validate_item_id(item_id, prefix)
+    if items[item_id_int].get_status() != "available":
+        if isAbort:
+            abort(404, f"{prefix} Item with ID {item_id_int} is not available.")
+        else:
+            return -1
+    return item_id_int
 
 def validate_condition(condition: str) -> str:
     """
@@ -306,7 +321,10 @@ async def user_modify_item(
     """
     user_id: int = admin_retrieve_user_id(session_token, csrf_token)
     validate_user_id(user_id)  # Ensure the user ID is valid
-    item_id_int: int = validate_item_id(item_id)
+    item_id_int: int = validate_item_availability(item_id)
+    if item_id_int == -1:
+        abort(404, "Item is not available for modification.")
+    
     # Check permission: only owner can modify
     if items[item_id_int].get_user_id() != user_id:
         abort(403, "You do not have permission to modify this item.")
@@ -361,7 +379,9 @@ async def user_delete_item(
     Raises:
         403: If the user does not own the item.
     """
-    item_id_int: int = validate_item_id(item_id)
+    item_id_int: int = validate_item_availability(item_id)
+    if item_id_int == -1:
+        abort(404, "Item is not available for deletion.")
     # Only allow deletion if valid session/CSRF tokens are provided
     user_id: int = admin_retrieve_user_id(session_token, csrf_token)
     validate_user_id(user_id)  # Ensure the user ID is valid
