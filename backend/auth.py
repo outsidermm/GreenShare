@@ -22,7 +22,7 @@ def generate_reset_token(email:str) -> str:
     serialiser = URLSafeTimedSerializer(app.config["SECRET_KEY"])
     return serialiser.dumps(email, salt="reset-password-salt")
 
-def verify_reset_token(token: str, expiration=600) -> str:
+def verify_reset_token(token: str, expiration=300) -> str:
     serialiser = URLSafeTimedSerializer(app.config["SECRET_KEY"])
     try:
         email = serialiser.loads(token, salt="reset-password-salt", max_age=expiration)
@@ -318,14 +318,13 @@ async def user_auth_forgot_pwd(email: str) -> None:
     email_subject = "GreenShare Password Reset"
     email_password = os.environ.get("EMAIL_PASSWORD")
     email_body = f"""
-    Hi {users[safe_email].get_first_name()} {users[safe_email].get_last_name()},
-    You have requested a password reset for your GreenShare account.
-    Please click the link below to reset your password:
-    <a href="http://localhost:5000/reset_password?token={token}">Reset Password</a>
-    If you did not request this, please ignore this email.
-    
-    
-    Thank you,
+    Dear {users[safe_email].get_first_name()} {users[safe_email].get_last_name()},
+    <br><br>
+    You have requested a password reset for your GreenShare account.<br>
+    Please click the link below to reset your password:<br>
+    <a href="{os.environ.get("NEXT_PUBLIC_URL")}/reset_password?token={token}">Reset Password</a><br><br>
+    If you did not request this, please ignore this email.<br><br>
+    Thank you,<br>
     GreenShare Team
     """
     
@@ -364,4 +363,3 @@ async def user_auth_reset_pwd(token: str, new_pwd: str) -> None:
         abort(400, description="Invalid or expired token")
 
     user.set_password(new_pwd)
-    

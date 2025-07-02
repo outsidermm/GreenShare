@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import forgotPwd from "@/services/user/forgotPwd";
 import { extractErrorMessage } from "@/utils/extractErrorMsg";
 import swal from "sweetalert";
+import Link from "next/link";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -46,11 +47,9 @@ export default function LoginPage() {
       className="bg-mono-light w-screen h-screen flex items-center justify-center align-middle"
     >
       <div className="sm:max-w-xl shadow-xl rounded-2xl p-6 px-10 sm:min-w-md w-11/12 bg-mono-contrast">
-        <h1 className="text-4xl text-center text-mono-primary font-bold">Forgot Password</h1>
-        <p className = "text-center text-mono-primary mt-4">
-          Enter your email address below to receive a password reset link.
-          If you do not receive an email, please check your spam folder.
-          If you still do not receive an email, please contact support.
+        <h1 className="text-4xl text-center text-mono-primary font-bold">Account Recovery</h1>
+        <p className = "text-center text-mono-primary mt-4 px-5">
+          Please enter the email address associated with your account. We will send you a link to reset your password.
         </p>
         <form
           aria-label="Forgot Password Form"
@@ -79,8 +78,17 @@ export default function LoginPage() {
               aria-label="Submit Forget Password Form"
               className="w-full rounded bg-hyperlink-light hover:bg-hyperlink-secondary text-mono-primary font-bold py-2 px-4 border-solid border-2 border-hyperlink-primary transition-all"
             >
-              Continue
+              Request Password Reset
             </button>
+          </div>
+              <div className="pt-2 text-center text-sm">
+              <Link
+                href="/login"
+                className="text-hyperlink-primary hover:text-hyperlink-secondary"
+                prefetch={true}
+              >
+                Back To Login
+              </Link>
           </div>
         </form>
       </div>

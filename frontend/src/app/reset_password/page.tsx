@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * Login page for the GreenShare platform.
+ * Reset Password page for the GreenShare platform.
  */
 
 import { useEffect, useState } from "react";
@@ -20,15 +20,14 @@ export default function ResetPwdPage() {
   const [pwdChanged, setPwdChanged] = useState(false);
 
 
-  // Prefetch post-login pages for improved responsiveness
+  // Prefetch post-reset password pages for improved responsiveness
   useEffect(() => {
     router.prefetch("/login");
     router.prefetch("/register");
   }, [router]);
 
   /**
-   * Handles the login submission process, including authentication,
-   * error handling, and redirecting on success.
+   * Handles the reset password submission process, error handling, and redirecting on success.
    */
   const handleSubmit = async () => {
     try {
@@ -40,9 +39,7 @@ export default function ResetPwdPage() {
       setPassword("");
       setPwdChanged(false);
       swal("Success!", "Your password has been resetted.", "success");
-      setTimeout(() => {
-        router.replace("/login");
-      }, 500);
+      router.replace("/login");
     } catch (error: unknown) {
       if (error instanceof Error) {
           swal("Error", extractErrorMessage(error.message), "error");
@@ -50,7 +47,7 @@ export default function ResetPwdPage() {
     }
   };
 
-  // Main render structure of the login UI
+  // Main render structure of the reset Password UI
   return (
     <main
       role="main"
@@ -58,8 +55,8 @@ export default function ResetPwdPage() {
       className="bg-mono-light w-screen h-screen flex items-center justify-center align-middle"
     >
       <div className="sm:max-w-xl shadow-xl rounded-2xl p-6 px-10 sm:min-w-md w-11/12 bg-mono-contrast">
-        <h1 className="text-4xl text-center text-mono-primary font-bold">Reset Password</h1>
-        <p className = "text-center text-mono-primary">
+        <h1 className="text-4xl text-center text-mono-primary font-bold">Change Password</h1>
+        <p className = "text-center text-mono-primary mt-3">
           Enter your new password below to reset your password.
         </p>
         <form
@@ -68,7 +65,7 @@ export default function ResetPwdPage() {
             e.preventDefault();
             handleSubmit();
           }}
-          className="p-5 mt-5"
+          className="p-5"
         >
           <PasswordInput
             password={password}
@@ -84,7 +81,7 @@ export default function ResetPwdPage() {
               aria-label="Submit New Password"
               className="w-full rounded bg-hyperlink-light hover:bg-hyperlink-secondary text-mono-primary font-bold py-2 px-4 border-solid border-2 border-hyperlink-primary transition-all"
             >
-              Change
+              Save Password
             </button>
           </div>
         </form>
