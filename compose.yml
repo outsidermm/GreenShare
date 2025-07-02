@@ -40,6 +40,7 @@ services:
       - PLACES_API_KEY=${PLACES_API_KEY}
       - IMGUR_CLIENT_ID=${IMGUR_CLIENT_ID}
       - GENAI_API_KEY=${GENAI_API_KEY}
+      - EMAIL_PASSWORD=${EMAIL_PASSWORD}
     command: ["python","-u", "backend/app.py"]
     volumes:
       - ./backend:/app/backend

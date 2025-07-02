@@ -2,15 +2,33 @@
 Authentication utility functions for user registration, login, logout, and token validation.
 """
 
+import os
+from email.message import EmailMessage
 import re
+import smtplib
+import ssl
 from typing import Tuple
 
 from flask import abort
+from itsdangerous import URLSafeTimedSerializer
 
 from backend.classes.user import User
 from backend.data import users
 from backend.utils import sanitize_input, sanitize_email
+from backend.config import app
 
+
+def generate_reset_token(email:str) -> str:
+    serialiser = URLSafeTimedSerializer(app.config["SECRET_KEY"])
+    return serialiser.dumps(email, salt="reset-password-salt")
+
+def verify_reset_token(token: str, expiration=600) -> str:
+    serialiser = URLSafeTimedSerializer(app.config["SECRET_KEY"])
+    try:
+        email = serialiser.loads(token, salt="reset-password-salt", max_age=expiration)
+        return email
+    except Exception as e:
+        abort(400, description=f"Invalid or expired token: {str(e)}")
 
 def name_auth(name: str, err_prefix: str = "User") -> bool:
     """
@@ -274,3 +292,76 @@ def validate_user_id(user_id: int | None = None) -> None:
         abort(
             403, "Invalid credentials. Please log in again."
         )  # Raise an error if no valid user is found
+
+async def user_auth_forgot_pwd(email: str) -> None:
+    """
+    Initiates the password reset process for a user by validating their email.
+
+    Args:
+        email (str): User's email to initiate password reset.
+
+    Raises:
+        400 Error: If the email does not exist in the user database.
+    """
+    # Normalize and validate email
+    safe_email: str = sanitize_email(email)
+    email_auth(safe_email)
+
+    # Sanitize email (no HTML escaping needed for emails)
+
+    # Check if user exists
+    if safe_email not in users:
+        abort(400, description="Email does not exist")
+    
+    token = generate_reset_token(safe_email)
+    email_sender = "greenshare1234@gmail.com"
+    email_subject = "GreenShare Password Reset"
+    email_password = os.environ.get("EMAIL_PASSWORD")
+    email_body = f"""
+    Hi {users[safe_email].get_first_name()} {users[safe_email].get_last_name()},
+    You have requested a password reset for your GreenShare account.
+    Please click the link below to reset your password:
+    <a href="http://localhost:5000/reset_password?token={token}">Reset Password</a>
+    If you did not request this, please ignore this email.
+    
+    
+    Thank you,
+    GreenShare Team
+    """
+    
+    email = EmailMessage()
+    email["From"] = email_sender
+    email["To"] = safe_email
+    email["Subject"] = email_subject
+    email.set_content(email_body, subtype="html")
+    
+    context = ssl.create_default_context()
+    with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
+        server.login(email_sender, email_password)
+        server.sendmail(email_sender, safe_email, email.as_string())
+    
+    
+async def user_auth_reset_pwd(token: str, new_pwd: str) -> None:
+    """
+    Resets the user's password using a valid reset token.
+
+    Args:
+        token (str): Reset token for password reset.
+        new_pwd (str): New password to set.
+
+    Raises:
+        400 Error: If the token is invalid or expired.
+    """
+    # Verify the reset token and get the associated email
+    email = verify_reset_token(token)
+
+    # Validate the new password
+    pwd_auth(new_pwd)
+
+    # Get the user by email and update their password
+    user = users.get(email)
+    if not user:
+        abort(400, description="Invalid or expired token")
+
+    user.set_password(new_pwd)
+    

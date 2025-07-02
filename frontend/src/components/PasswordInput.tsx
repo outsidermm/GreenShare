@@ -9,6 +9,7 @@ interface PasswordInputProps {
   pwdChanged: boolean;
   setPwdChanged: (changed: boolean) => void;
   passwordError: string;
+  placeholder?: string;
 }
 
 // PasswordInput is a reusable component for entering passwords with toggle visibility and error display
@@ -33,7 +34,7 @@ export default function PasswordInput(props: PasswordInputProps) {
           <input
             id="password-input"
             type={isPwdHidden ? "password" : "text"}
-            placeholder="Enter your password"
+            placeholder= {props.placeholder || "Enter your password"}
             required
             minLength={8}
             maxLength={32}

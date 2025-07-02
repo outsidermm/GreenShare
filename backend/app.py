@@ -15,9 +15,11 @@ from backend.config import app, db
 
 # Auth-related imports
 from backend.auth import (
+    user_auth_forgot_pwd,
     user_auth_register,
     user_auth_login,
     user_auth_logout,
+    user_auth_reset_pwd,
     user_auth_validate_session_token,
     user_auth_validate_csrf_token,
 )
@@ -222,6 +224,47 @@ async def validate_token() -> Response:
     except Exception as e:
         # Return error response if tokens are invalid
         return jsonify({"error": str(e)}), 401
+
+@app.route("/auth/forgot_pwd", methods=["POST"])
+async def forgot_pwd() -> Response:
+    """
+    Initiates the password reset process for a user.
+
+    Expects user email in JSON format and returns a success message.
+
+    Returns:
+        Response: Flask response with success or error message.
+    """
+    data: dict = request.json
+    email: str = data["email"]
+
+    try:
+        # Call the user authentication function to initiate password reset
+        await user_auth_forgot_pwd(email)
+        return jsonify({"message": "Password reset link sent to your email."}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+    
+@app.route("/auth/reset_pwd", methods=["POST"])
+async def reset_pwd() -> Response:
+    """
+    Resets the user's password.
+
+    Expects user email and new password in JSON format and returns a success message.
+
+    Returns:
+        Response: Flask response with success or error message.
+    """
+    data: dict = request.json
+    token: str = data["token"]
+    new_password: str = data["newPassword"]
+
+    try:
+        # Call the user authentication function to reset the password
+        await user_auth_reset_pwd(token, new_password)
+        return jsonify({"message": "Password has been successfully reset."}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
 
 
 @app.route("/item/create", methods=["POST"])
