@@ -95,7 +95,6 @@ export default function HeaderBar(HeaderBarProps: HeaderBarProps) {
               } else {
                 swal("Redirecting to home page", {
                   icon: "info",
-                  timer: 750,
                 });
                 setSearchTerm("");
                 router.push("/");
