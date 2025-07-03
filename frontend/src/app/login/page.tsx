@@ -9,11 +9,14 @@ import Link from "next/link";
 import loginUser from "@/services/user/loginUser";
 import PasswordInput from "@/components/PasswordInput";
 import CredentialsInput from "@/components/CredentialsInput";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import swal from "sweetalert";
+import { FcGoogle } from "react-icons/fc";
+import { extractErrorMessage } from "@/utils/extractErrorMsg";
 
 export default function LoginPage() {
   const router = useRouter();
+  const params = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorType, setErrorType] = useState("");
@@ -27,6 +30,34 @@ export default function LoginPage() {
     router.prefetch("/manage_products");
   }, [router]);
 
+  useEffect(() => {
+    const error = params.get("error");
+    if (error) {
+      // Display error message if present in URL parameters
+      setErrorType(error);
+    } else {
+      // Clear error type if no error is present
+      setErrorType("");
+    }
+
+    const csrfToken = params.get("csrfToken");
+    if (csrfToken) {
+      localStorage.setItem("csrfToken", csrfToken);
+      swal({
+        title: "Success!",
+        text: "Login successful!",
+        icon: "success",
+        timer: 700,
+      });
+      setPassword("");
+      setEmail("");
+      setErrorType("");
+      setEmailChanged(false);
+      setPwdChanged(false);
+      router.replace("/");
+    }
+  }, [params, router]);
+
   /**
    * Handles the login submission process, including authentication,
    * error handling, and redirecting on success.
@@ -35,7 +66,12 @@ export default function LoginPage() {
     try {
       const csrf_token = await loginUser(email, password);
       localStorage.setItem("csrfToken", csrf_token);
-      swal("Success!", "Login successful! Redirecting to homepage.", "success");
+      swal({
+        title: "Success!",
+        text: "Login successful!",
+        icon: "success",
+        timer: 700,
+      });
       setPassword("");
       setEmail("");
       setErrorType("");
@@ -51,8 +87,8 @@ export default function LoginPage() {
         } else if (err.message.toLowerCase().includes("password")) {
           setErrorType("password");
         } else {
-          setErrorType(err.message);
-          console.log("Error: ", err.message);
+          setErrorType(extractErrorMessage(err.message));
+          console.error("Error: ", extractErrorMessage(err.message));
         }
       }
     }
@@ -69,10 +105,24 @@ export default function LoginPage() {
         <h1 className="text-4xl text-center text-mono-primary font-bold">
           Login
         </h1>
+        <div className="py-8 px-5">
+          <Link href="http://localhost:4000/auth/google/login">
+            <button
+              aria-label="Sign In With Google"
+              className="w-full rounded bg-mono-contrast hover:bg-mono-contrast-light text-mono-primary font-bold py-2 px-4 border-solid border-2 border-mono-primary transition-all"
+            >
+              <div className="flex items-center justify-center gap-2">
+                <FcGoogle />
+                Continue With Google
+              </div>
+            </button>
+          </Link>
+        </div>
+        <hr className="border-t-1 border-mono-primary mx-5"></hr>
         {!["", "email", "password"].includes(errorType) && (
           <div
             aria-live="polite"
-            className="text-mono-primary text-center mb-2 bg-alert-primary rounded-lg py-2 px-4 mt-5 transition-all"
+            className="mx-5 text-mono-primary text-center mb-2 bg-alert-primary rounded-lg py-2 px-4 mt-5 transition-all"
           >
             {errorType}
           </div>
@@ -83,7 +133,7 @@ export default function LoginPage() {
             e.preventDefault();
             handleSubmit();
           }}
-          className="p-5 mt-5"
+          className="p-5"
         >
           <CredentialsInput
             type="email"
@@ -133,7 +183,7 @@ export default function LoginPage() {
                 className="text-hyperlink-primary hover:text-hyperlink-secondary"
                 prefetch={true}
               >
-                Sign Up
+                Sign Up With Email
               </Link>
             </p>
           </div>

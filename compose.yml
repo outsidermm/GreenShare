@@ -42,6 +42,8 @@ services:
       - GENAI_API_KEY=${GENAI_API_KEY}
       - EMAIL_PASSWORD=${EMAIL_PASSWORD}
       - NEXT_PUBLIC_URL=http://localhost:3000
+      - GOOGLE_OAUTH_CLIENT_ID=${GOOGLE_OAUTH_CLIENT_ID}
+      - GOOGLE_OAUTH_CLIENT_SECRET=${GOOGLE_OAUTH_CLIENT_SECRET}
     command: ["python","-u", "backend/app.py"]
     volumes:
       - ./backend:/app/backend

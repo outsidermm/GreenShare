@@ -26,11 +26,13 @@ class User:
         __session_token (str): Token to manage user's session.
         __csrf_token (str): Token to prevent cross-site request forgery.
         __user_pk (int): Primary key of the user in the database.
+        __is_google_oauth (bool): Flag indicating if the user registered via Google OAuth.
     """
 
     __session_token: str = None
     __csrf_token: str = None
     __user_pk: int = None
+    __is_google_oauth: bool = False
 
     def __init__(
         self,
@@ -38,6 +40,7 @@ class User:
         new_first_name: str,
         new_last_name: str,
         new_pwd_input: str,
+        is_google_oauth: bool = False,
     ):
         """
         Initialises the user with email, name, password, session, and CSRF tokens.
@@ -48,8 +51,18 @@ class User:
             new_last_name (str): User's last name.
             new_pwd_input (str): Plaintext password to be hashed and encrypted.
         """
+        
+        new_user:UserDB = None
+        
         # Create a new user database entry with encrypted password
-        new_user: UserDB = UserDB(
+        if is_google_oauth:
+            new_user: UserDB = UserDB(
+            email=new_email,
+            first_name=new_first_name,
+            last_name=new_last_name,
+            )
+        else:
+            new_user: UserDB = UserDB(
             email=new_email,
             first_name=new_first_name,
             last_name=new_last_name,
@@ -61,6 +74,7 @@ class User:
 
         # Set internal user primary key and generate tokens
         self.set_user_pk(new_user.id)
+        self.set_is_google_oauth(is_google_oauth)
         self.set_session_token(self.generate_session_token())
         self.set_csrf_token(self.generate_csrf_token())
 
@@ -351,3 +365,19 @@ class User:
         """
         db.session.get(UserDB, self.get_user_pk()).email = new_email
         db.session.commit()
+
+    def set_is_google_oauth(self, is_google_oauth: bool) -> None:
+        """
+        Sets the user's Google OAuth registration status.
+
+        Args:
+            is_google_oauth (bool): True if registered via Google OAuth, False otherwise.
+        """
+        self.__is_google_oauth = is_google_oauth
+    
+    def is_google_oauth(self) -> bool:
+        """        Checks if the user registered via Google OAuth.
+        Returns:
+            bool: True if registered via Google OAuth, False otherwise.
+        """
+        return self.__is_google_oauth

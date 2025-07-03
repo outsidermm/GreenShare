@@ -7,14 +7,16 @@ and auxiliary services such as autocomplete and item search.
 """
 
 import requests
-from flask import request, jsonify, make_response, Response
+from urllib.parse import quote
+from flask import redirect, request, jsonify, make_response, Response
 
 # Application config and database
-from backend.config import app, db
+from backend.config import app, db, google_oauth
 
 # Auth-related imports
 from backend.auth import (
     user_auth_forgot_pwd,
+    user_auth_google_oauth,
     user_auth_register,
     user_auth_login,
     user_auth_logout,
@@ -29,7 +31,7 @@ from backend.classes.item import Item
 from backend.classes.exchange_offer import ExchangeOffer
 
 # Data management
-from backend.data import image_upload, users, items, exchange_offers, PLACES_API_KEY
+from backend.data import image_upload, users, items, exchange_offers, PLACES_API_KEY, NEXT_PUBLIC_URL
 
 # Items
 from backend.items import (
@@ -265,6 +267,52 @@ async def reset_pwd() -> Response:
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
+@app.route("/auth/google/login", methods=["GET"])
+def google_auth_login():
+    """
+    Initiates Google OAuth 2.0 login by redirecting the user to Google's auth URL.
+    
+    Returns:
+        Response: Redirect to Google's OAuth 2.0 authorisation page.
+    """
+    redirect_uri = "http://localhost:4000/auth/google/callback"
+    return google_oauth.authorize_redirect(redirect_uri)
+
+@app.route("/auth/google/callback", methods=["GET"])
+async def google_auth_callback() -> Response:
+    """
+    Handles the callback from Google OAuth authentication.
+
+    This route is called after the user has authenticated with Google.
+    It retrieves the user's information and logs them in to the GreenShare platform.
+
+    Returns:
+        Response: Flask response with success or error message.
+    """
+    try:
+        token = google_oauth.authorize_access_token()
+        userinfo_endpoint = google_oauth.server_metadata['userinfo_endpoint']
+        response = google_oauth.get(userinfo_endpoint)
+        user_info = response.json()
+        email: str = user_info["email"]
+        first_name: str = user_info.get("given_name", "")
+        last_name: str = user_info.get("family_name", "")
+        session_token, csrf_token = await user_auth_google_oauth(email, first_name=first_name, last_name=last_name)
+
+        redirect_response = make_response(redirect(f"{NEXT_PUBLIC_URL}/login?csrfToken={quote(csrf_token)}"))
+
+        redirect_response.set_cookie(
+            "session_token",
+            session_token,
+            httponly=True,
+            secure=True,
+            samesite="Strict",
+        )
+
+        return redirect_response
+        
+    except Exception as e:
+        return redirect(f"{NEXT_PUBLIC_URL}/login?error={quote(str(e))}")
 
 @app.route("/item/create", methods=["POST"])
 async def create_item() -> Response:
