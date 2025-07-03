@@ -36,7 +36,12 @@ export default function ResetPwdPage() {
       await resetPwd(token, password);
       setPassword("");
       setPwdChanged(false);
-      swal("Success!", "Your password has been resetted.", "success");
+      swal({
+        title: "Success!",
+        text: "Your password has been reset successfully!",
+        icon: "success",
+        timer: 700,
+      });
       router.replace("/login");
     } catch (error: unknown) {
       if (error instanceof Error) {

@@ -93,9 +93,11 @@ export default function HeaderBar(HeaderBarProps: HeaderBarProps) {
               if (handleTitleFilter) {
                 handleTitleFilter(searchTerm);
               } else {
-                swal("Redirecting to home page", {
-                  icon: "info",
-                });
+              swal({
+                title: "Redirecting to Home Page...",
+                icon: "Info",
+                timer: 500,
+              });
                 setSearchTerm("");
                 router.push("/");
               }

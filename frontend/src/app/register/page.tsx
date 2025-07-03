@@ -7,6 +7,7 @@ import PasswordInput from "@/components/PasswordInput";
 import CredentialsInput from "@/components/CredentialsInput";
 import { useRouter } from "next/navigation";
 import swal from "sweetalert";
+import { extractErrorMessage } from "@/utils/extractErrorMsg";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -39,11 +40,12 @@ export default function RegisterPage() {
         lastName,
       });
       localStorage.setItem("csrfToken", csrf_token);
-      swal(
-        "Success!",
-        "Registration successful! Redirecting to homepage.",
-        "success",
-      );
+      swal({
+        title: "Success!",
+        text: "Registeration successful!",
+        icon: "success",
+        timer: 700,
+      });
 
       setPassword("");
       setEmail("");
@@ -70,8 +72,8 @@ export default function RegisterPage() {
         } else if (err.message.toLowerCase().includes("password")) {
           setErrorType("password");
         } else {
-          setErrorType(err.message);
-          console.log("Error: ", err.message);
+          setErrorType(extractErrorMessage(err.message));
+          console.error("Error: ", extractErrorMessage(err.message));
         }
       }
     }
@@ -99,7 +101,7 @@ export default function RegisterPage() {
         ].includes(errorType) && (
           <div
             aria-live="polite"
-            className="text-mono-primary text-center mb-2 bg-alert-primary rounded-lg py-2 px-4 mt-5 transition-all"
+            className="mx-5 text-mono-primary text-center mb-2 bg-alert-primary rounded-lg py-2 px-4 mt-5 transition-all"
           >
             {errorType}
           </div>
