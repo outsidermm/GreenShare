@@ -13,7 +13,7 @@ export default {
         'mono-secondary': 'var(--mono-secondary)',
         'mono-ascent': 'var(--mono-ascent)',
         'mono-contrast': 'var(--mono-contrast)',
-        'mono-contrast-light': 'var(--mono-contrast-liht))',
+        'mono-contrast-light': 'var(--mono-contrast-light)',
         'mono-light': 'var(--mono-light)',
 
         'main-primary': 'var(--main-primary)',
