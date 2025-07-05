@@ -124,12 +124,3 @@ class ExchangeOffer:
         """
         db.session.get(ExchangeOfferDB, self.get_offer_pk()).message = message
         db.session.commit()
-
-    # Remove the current exchange offer from the database using its primary key
-    def delete(self) -> None:
-        """
-        Deletes the exchange offer from the database.
-        """
-
-        db.session.delete(ExchangeOfferDB, self.__offer_pk)
-        db.session.commit()

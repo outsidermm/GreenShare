@@ -188,7 +188,7 @@ class Item:
         Replaces existing images with new ones and commits the changes.
         """
         # Remove all existing images for this item
-        db.session.delete(ItemImageDB, {"item_id": self.get_item_pk()})
+        db.session.query(ItemImageDB).filter_by(item_id=self.get_item_pk()).delete()
         db.session.commit()
 
         # Add new images

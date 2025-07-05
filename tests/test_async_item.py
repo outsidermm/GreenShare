@@ -13,18 +13,6 @@ from backend.items import (
 from backend.utils import sanitize_input
 
 
-@pytest.fixture(autouse=True)
-def clear_data():
-    users.clear()
-    items.clear()
-    exchange_offers.clear()
-    db.session.delete(OfferedItemDB)
-    db.session.delete(ExchangeOfferDB)
-    db.session.delete(ItemImageDB)
-    db.session.delete(ItemDB)
-    db.session.delete(UserDB)
-    db.session.commit()
-
 
 @pytest.fixture(scope="module", autouse=True)
 def app_context():

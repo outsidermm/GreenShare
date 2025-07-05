@@ -14,30 +14,14 @@ from backend.auth import (
 )
 
 # Import the global users dictionary so we can reset it between tests.
-from backend.data import users, items, exchange_offers
+from backend.data import users
 from backend.config import app, db
-from backend.models import ExchangeOfferDB, UserDB, ItemDB, ItemImageDB, OfferedItemDB
 from backend.utils import sanitize_email, sanitize_input
 
 
 # -----------------------------------------------------------------------------
 # Fixtures
 # -----------------------------------------------------------------------------
-@pytest.fixture(autouse=True)
-def clear_users():
-    """
-    Clears the global users dictionary and related data before each test to ensure test isolation.
-    This prevents state leakage between tests, ensuring each test runs with a clean slate.
-    """
-    users.clear()
-    items.clear()
-    exchange_offers.clear()
-    db.session.delete(OfferedItemDB)
-    db.session.delete(ExchangeOfferDB)
-    db.session.delete(ItemImageDB)
-    db.session.delete(ItemDB)
-    db.session.delete(UserDB)
-    db.session.commit()
 
 
 @pytest.fixture(scope="module", autouse=True)

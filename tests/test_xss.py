@@ -1,26 +1,9 @@
 import pytest
 from backend.auth import user_auth_register
-from backend.data import users, items, exchange_offers
+from backend.data import users
 from backend.classes.user import User
-from backend.config import app, db
+from backend.config import app
 from markupsafe import escape
-from backend.models import UserDB, ItemDB, ItemImageDB, OfferedItemDB, ExchangeOfferDB
-
-
-# -----------------------------------------------------------------------------
-# Fixture: Clear the global users dictionary before each test.
-# -----------------------------------------------------------------------------
-@pytest.fixture(autouse=True)
-def clear_users():
-    users.clear()
-    items.clear()
-    exchange_offers.clear()
-    db.session.delete(OfferedItemDB)
-    db.session.delete(ExchangeOfferDB)
-    db.session.delete(ItemImageDB)
-    db.session.delete(ItemDB)
-    db.session.delete(UserDB)
-    db.session.commit()
 
 
 @pytest.fixture(scope="module", autouse=True)
