@@ -3,5 +3,8 @@
 // This helps in displaying cleaner, user-friendly error messages.
 export function extractErrorMessage(input: string): string {
   const parts = input.split(":");
+  if (parts.length < 2) {
+    return input.trim(); // if no colon, return the original input
+  }
   return parts.slice(1).join(":").trim(); // handles cases with multiple colons
 }

@@ -6,6 +6,8 @@ import registerUser from "@/services/user/registerUser";
 import PasswordInput from "@/components/PasswordInput";
 import CredentialsInput from "@/components/CredentialsInput";
 import { useRouter } from "next/navigation";
+import swal from "sweetalert";
+import { extractErrorMessage } from "@/utils/extractErrorMsg";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -22,7 +24,6 @@ export default function RegisterPage() {
   const [pwdChanged, setPwdChanged] = useState(false);
 
   const [errorType, setErrorType] = useState("");
-  const [showSuccess, setShowSuccess] = useState(false);
 
   // Prefetches pages for smoother post-registration navigation
   useEffect(() => {
@@ -39,6 +40,13 @@ export default function RegisterPage() {
         lastName,
       });
       localStorage.setItem("csrfToken", csrf_token);
+      swal({
+        title: "Success!",
+        text: "Registeration successful!",
+        icon: "success",
+        timer: 700,
+      });
+
       setPassword("");
       setEmail("");
       setFirstName("");
@@ -50,11 +58,7 @@ export default function RegisterPage() {
       setPwdChanged(false);
 
       setErrorType("");
-
-      setShowSuccess(true);
-      setTimeout(() => {
-        router.replace("/");
-      }, 500);
+      router.replace("/");
     } catch (err: unknown) {
       if (err instanceof Error) {
         if (err.message.toLowerCase().includes("exist")) {
@@ -68,8 +72,8 @@ export default function RegisterPage() {
         } else if (err.message.toLowerCase().includes("password")) {
           setErrorType("password");
         } else {
-          setErrorType(err.message);
-          console.log("Error: ", err.message);
+          setErrorType(extractErrorMessage(err.message));
+          console.error("Error: ", extractErrorMessage(err.message));
         }
       }
     }
@@ -77,24 +81,16 @@ export default function RegisterPage() {
 
   return (
     <main
-      className="bg-background w-screen h-screen flex items-center justify-center align-middle"
+      className="bg-mono-light w-screen h-screen flex items-center justify-center align-middle"
       role="main"
       aria-label="Registration Page"
     >
-      <div className="sm:max-w-xl shadow-grey-shadow shadow-xl rounded-2xl p-6 px-10 sm:min-w-md w-11/12 bg-surface">
+      <div className="sm:max-w-xl shadow-xl rounded-2xl p-6 px-10 sm:min-w-md w-11/12 bg-mono-contrast">
         <header>
-          <h1 className="text-4xl text-center text-content font-bold">
+          <h1 className="text-4xl text-center text-mono-primary font-bold">
             Registration
           </h1>
         </header>
-        {showSuccess && (
-          <div
-            aria-live="polite"
-            className="text-surface text-center mb-2 bg-action-primary rounded-lg py-2 px-4 mt-5 transition-all"
-          >
-            Registration successful! Redirecting to homepage...
-          </div>
-        )}
         {![
           "",
           "email",
@@ -105,7 +101,7 @@ export default function RegisterPage() {
         ].includes(errorType) && (
           <div
             aria-live="polite"
-            className="text-surface text-center mb-2 bg-alert rounded-lg py-2 px-4 mt-5 transition-all"
+            className="mx-5 text-mono-primary text-center mb-2 bg-alert-primary rounded-lg py-2 px-4 mt-5 transition-all"
           >
             {errorType}
           </div>
@@ -186,7 +182,7 @@ export default function RegisterPage() {
           <div className="py-5">
             <label
               htmlFor="agreement-box"
-              className="inline-flex items-center text-content"
+              className="inline-flex items-center text-mono-primary"
             >
               <input
                 type="checkbox"
@@ -201,18 +197,18 @@ export default function RegisterPage() {
           <div className="pt-2">
             <button
               type="submit"
-              className="w-full rounded bg-hyperlink hover:bg-hyperlink-hover text-surface font-bold py-2 px-4 border-solid border-2 border-hyperlink transition-all"
+              className="w-full rounded bg-hyperlink-light hover:bg-hyperlink-secondary text-mono-primary font-bold py-2 px-4 border-solid border-2 border-hyperlink-primary transition-all"
             >
               Create an Account
             </button>
           </div>
           {/* Link to the login page for users who already have an account */}
-          <div className="pt-5 text-center text-slate-500">
+          <div className="pt-5 text-center text-mono-secondary">
             <p>
               Already have an account?&nbsp;
               <Link
                 href="/login"
-                className="text-hyperlink hover:text-hyperlink-hover"
+                className="text-hyperlink-primary hover:text-hyperlink-secondary"
                 prefetch={true}
               >
                 Log in

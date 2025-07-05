@@ -1,5 +1,3 @@
-version: '3.8'
-
 volumes:
   pgdata:
 
@@ -15,7 +13,7 @@ services:
       - "3000:3000"
     build:
       context: ./frontend
-      dockerfile: next.dockerfile
+      dockerfile: next.debug.dockerfile
       args:
         NEXT_PUBLIC_API_URL: "http://localhost:4000"
     environment:
@@ -32,17 +30,19 @@ services:
       - app-network
     build:
       context: ./backend
-      dockerfile: flask.dockerfile
+      dockerfile: flask.debug.dockerfile
     ports:
       - 4000:4000
     environment:
       - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
-      - FLASK_ENV=production
-      - USER_FERNET_KEY=${USER_FERNET_KEY}
       - SECRET_KEY=${SECRET_KEY}
       - PLACES_API_KEY=${PLACES_API_KEY}
       - IMGUR_CLIENT_ID=${IMGUR_CLIENT_ID}
       - GENAI_API_KEY=${GENAI_API_KEY}
+      - EMAIL_PASSWORD=${EMAIL_PASSWORD}
+      - NEXT_PUBLIC_URL=http://localhost:3000
+      - GOOGLE_OAUTH_CLIENT_ID=${GOOGLE_OAUTH_CLIENT_ID}
+      - GOOGLE_OAUTH_CLIENT_SECRET=${GOOGLE_OAUTH_CLIENT_SECRET}
     command: ["python","-u", "backend/app.py"]
     volumes:
       - ./backend:/app/backend
@@ -64,6 +64,8 @@ services:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
 
   tests:
+    networks:
+      - app-network
     build:
       context: ./tests
       dockerfile: tests.dockerfile
@@ -71,8 +73,14 @@ services:
       # Ensure absolute imports work by pointing PYTHONPATH to /app (the project root)
       - PYTHONPATH=/app
       - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
-      - USER_FERNET_KEY=${USER_FERNET_KEY}
       - SECRET_KEY=${SECRET_KEY}
+      - PLACES_API_KEY=${PLACES_API_KEY}
+      - IMGUR_CLIENT_ID=${IMGUR_CLIENT_ID}
+      - GENAI_API_KEY=${GENAI_API_KEY}
+      - EMAIL_PASSWORD=${EMAIL_PASSWORD}
+      - NEXT_PUBLIC_URL=http://localhost:3000
+      - GOOGLE_OAUTH_CLIENT_ID=${GOOGLE_OAUTH_CLIENT_ID}
+      - GOOGLE_OAUTH_CLIENT_SECRET=${GOOGLE_OAUTH_CLIENT_SECRET}
     volumes:
       - ./backend:/app/backend
       - ./tests:/app/tests

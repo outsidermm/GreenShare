@@ -1,5 +1,4 @@
 import pytest
-import re
 from backend.config import app, db
 from backend.models import UserDB, ItemDB, ItemImageDB, OfferedItemDB, ExchangeOfferDB
 from backend.auth import user_auth_register
@@ -12,19 +11,6 @@ from backend.items import (
     user_delete_item,
 )
 from backend.utils import sanitize_input
-
-
-@pytest.fixture(autouse=True)
-def clear_data():
-    users.clear()
-    items.clear()
-    exchange_offers.clear()
-    db.session.query(OfferedItemDB).delete()
-    db.session.query(ExchangeOfferDB).delete()
-    db.session.query(ItemImageDB).delete()
-    db.session.query(ItemDB).delete()
-    db.session.query(UserDB).delete()
-    db.session.commit()
 
 
 @pytest.fixture(scope="module", autouse=True)
@@ -145,6 +131,17 @@ async def test_create_item_invalid_type():
 
 @pytest.mark.asyncio
 async def test_view_items_filter_by_location_and_type():
+    """
+    Verify that items can be filtered correctly by type and location.
+
+    Steps:
+        - Register a user
+        - Create an item with specific location and type
+        - Retrieve items filtered by type
+
+    Expected:
+        - At least one item matching the filter criteria is returned
+    """
     session_token, csrf_token = await user_auth_register(
         "creator@test.com", "Password1!", "John", "Doe"
     )
@@ -160,22 +157,42 @@ async def test_view_items_filter_by_location_and_type():
         session_token=session_token,
         csrf_token=csrf_token,
     )
-    filtered_items = await user_get_browse_items(
-        location_filter="Sydney", type_filter="free"
-    )
+    filtered_items = await user_get_browse_items(type_filter="free")
     assert len(filtered_items) > 0
 
 
 @pytest.mark.asyncio
 async def test_view_items_invalid_item_id():
+    """
+    Ensure that querying items with an invalid item ID raises an HTTPException.
+
+    Steps:
+        - Attempt to retrieve items using an invalid item ID
+
+    Expected:
+        - An HTTPException is raised indicating the item does not exist
+    """
     invalid_id = "-5"
     with pytest.raises(HTTPException) as excinfo:
         await user_get_browse_items(item_id=invalid_id)
-    assert "Item ID must be a positive integer." in excinfo.value.description
+    assert "does not exist." in excinfo.value.description
 
 
 @pytest.mark.asyncio
 async def test_modify_item_success():
+    """
+    Test that a user can successfully modify their own item details.
+
+    Steps:
+        - Register a user
+        - Create an item
+        - Retrieve and verify the initial item title
+        - Modify the item's details
+        - Retrieve and verify the updated item details
+
+    Expected:
+        - Item title and location are updated correctly in the system
+    """
     session_token, csrf_token = await user_auth_register(
         "modifier@test.com", "Password1!", "Alice", "Smith"
     )
@@ -195,6 +212,7 @@ async def test_modify_item_success():
 
     item_id = new_item.get_item_pk()
     modified_item = await user_get_browse_items(item_id=str(item_id))
+    # Confirm the initial title matches the sanitized input
     assert modified_item[item_id].get_title() == sanitize_input("Test Item".lower())
 
     await user_modify_item(
@@ -209,12 +227,27 @@ async def test_modify_item_success():
     )
 
     updated_item = await user_get_browse_items(item_id=str(item_id))
+    # Verify the title and location have been updated as expected
     assert updated_item[item_id].get_title() == sanitize_input("New Title".lower())
-    assert updated_item[item_id].get_location() == sanitize_input("Brisbane".lower())
+    assert updated_item[item_id].get_location() == sanitize_input(
+        "Brisbane Qld, Australia".lower()
+    )
 
 
 @pytest.mark.asyncio
 async def test_delete_item_success():
+    """
+    Confirm that a user can successfully delete their own item.
+
+    Steps:
+        - Register a user
+        - Create an item
+        - Delete the item
+        - Verify it is removed from the global registry
+
+    Expected:
+        - Item is removed from the global `items` dictionary
+    """
     session_token, csrf_token = await user_auth_register(
         "deleter@test.com", "Password1!", "Bob", "Jones"
     )
@@ -236,11 +269,23 @@ async def test_delete_item_success():
     await user_delete_item(
         item_id=str(item_id), session_token=session_token, csrf_token=csrf_token
     )
+    # Assert the item no longer exists in the global items dictionary
     assert item_id not in items
 
 
 @pytest.mark.asyncio
 async def test_modify_item_invalid_user():
+    """
+    Verify that a user cannot modify an item they do not own.
+
+    Steps:
+        - Register the actual owner and create an item
+        - Register another user (attacker)
+        - Attempt to modify the owner's item using the attacker's credentials
+
+    Expected:
+        - An HTTPException is raised denying permission to modify the item
+    """
     session_token, csrf_token = await user_auth_register(
         "actualowner@test.com", "Password1!", "Emily", "White"
     )

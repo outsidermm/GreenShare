@@ -7,7 +7,8 @@ and access control for user-submitted exchange offers.
 from typing import Tuple
 
 from flask import abort
-from backend.utils import validate_string_length
+from backend.items import validate_item_availability
+from backend.utils import sanitize_input, validate_string_length
 from backend.auth import validate_user_id
 from backend.data import items, exchange_offers
 from backend.data import admin_retrieve_user_id
@@ -56,13 +57,13 @@ async def user_create_offer(
         500 Error: If there is an internal server error while creating the offer.
     """
     # Authenticate and validate user
-    new_offered_by_id: int = admin_retrieve_user_id(session_token, csrf_token)
+    safe_session_token: str = sanitize_input(session_token)
+    safe_csrf_token: str = sanitize_input(csrf_token)
+    new_offered_by_id: int = admin_retrieve_user_id(safe_session_token, safe_csrf_token)
     validate_user_id(new_offered_by_id)
 
-    # Validate requested item existence
-    requested_item_id = int(requested_item_id)
-    if requested_item_id not in items:
-        abort(404, f"Requested item with ID {requested_item_id} does not exist.")
+    # Validate requested item availability
+    requested_item_id = validate_item_availability(requested_item_id, "Requested")
 
     # Validate offer requirements based on item type
     if items[requested_item_id].get_type() == "exchange" and not offered_item_ids:
@@ -70,15 +71,10 @@ async def user_create_offer(
 
     # Validate each offered item
     for offered_item_id in offered_item_ids:
-        if offered_item_id not in items:
-            abort(404, f"Offered item with ID {offered_item_id} does not exist.")
+        offered_item_id = validate_item_availability(offered_item_id, "Offered")
 
         if offered_item_id == requested_item_id:
             abort(400, "Offered item cannot be the same as the requested item.")
-
-    # Check availability and ownership constraints
-    if items[requested_item_id].get_status() != "available":
-        abort(400, "Requested item is not available for exchange.")
 
     if items[requested_item_id].get_user_id() == new_offered_by_id:
         abort(400, "You cannot exchange your own item.")
@@ -118,7 +114,9 @@ async def user_get_offers(
         - Incoming offers for the user's items.
     """
     # Authenticate and validate user
-    new_user_id: int = admin_retrieve_user_id(session_token, csrf_token)
+    safe_session_token: str = sanitize_input(session_token)
+    safe_csrf_token: str = sanitize_input(csrf_token)
+    new_user_id: int = admin_retrieve_user_id(safe_session_token, safe_csrf_token)
     validate_user_id(new_user_id)
 
     outgoing_offers: list[ExchangeOffer] = []
@@ -156,7 +154,9 @@ async def user_accept_offer(session_token: str, csrf_token: str, offer_id: int) 
         500 Error: If there is an internal server error while accepting the offer.
     """
     # Authenticate and validate user
-    new_user_id: int = admin_retrieve_user_id(session_token, csrf_token)
+    safe_session_token: str = sanitize_input(session_token)
+    safe_csrf_token: str = sanitize_input(csrf_token)
+    new_user_id: int = admin_retrieve_user_id(safe_session_token, safe_csrf_token)
     validate_user_id(new_user_id)
     validate_offer_id(offer_id)
 
@@ -169,15 +169,11 @@ async def user_accept_offer(session_token: str, csrf_token: str, offer_id: int) 
             and existing_offer.get_status() in ["accepted", "confirmed", "completed"]
             and existing_offer.get_offer_pk() != offer.get_offer_pk()
         ):
+            await user_cancel_offer(session_token, csrf_token, offer_id)
             abort(
                 400,
                 "Another offer has already been accepted or confirmed for this item.",
             )
-
-    # Validate requested item existence
-    if offer.get_requested_item_id() not in items:
-        await user_cancel_offer(session_token, csrf_token, offer_id)
-        abort(404, "Requested item does not exist.")
 
     # Verify user authorization to accept the offer
     if items[offer.get_requested_item_id()].get_user_id() != new_user_id:
@@ -187,11 +183,31 @@ async def user_accept_offer(session_token: str, csrf_token: str, offer_id: int) 
     if offer.get_status() != "pending":
         abort(400, "Offer is not in a pending state.")
 
-    # Validate existence of all offered items
+    # Validate requested item availability
+    requested_item_id = validate_item_availability(
+        offer.get_requested_item_id(), "Requested", isAbort=False
+    )
+    if requested_item_id == -1:
+        await user_cancel_offer(
+            session_token,
+            csrf_token,
+            offer_id,
+            message="Offer Cancelled. Requested item is not available.",
+        )
+        abort(404, "Offer Cancelled. Requested item is not available.")
+    else:
+        items[requested_item_id].set_status("exchanged")
+
+    # Validate availability of all offered items
     for offered_item_id in offer.get_offered_items():
-        if offered_item_id not in items:
+        offered_item_id = validate_item_availability(
+            offered_item_id, "Offered", isAbort=False
+        )
+        if offered_item_id == -1:
             await user_cancel_offer(session_token, csrf_token, offer_id)
-            abort(404, f"Offered item with ID {offered_item_id} does not exist.")
+            abort(404, "Offer Cancelled. Offered item does not exist.")
+        else:
+            items[offered_item_id].set_status("exchanged")
 
     # Update offer status to accepted
     offer.set_status("accepted")
@@ -218,15 +234,13 @@ async def user_complete_offer(
         500 Error: If there is an internal server error while completing the offer.
     """
     # Authenticate and validate user
-    new_user_id: int = admin_retrieve_user_id(session_token, csrf_token)
+    safe_session_token: str = sanitize_input(session_token)
+    safe_csrf_token: str = sanitize_input(csrf_token)
+    new_user_id: int = admin_retrieve_user_id(safe_session_token, safe_csrf_token)
     validate_user_id(new_user_id)
     validate_offer_id(offer_id)
 
     offer: ExchangeOffer = exchange_offers[offer_id]
-
-    # Validate requested item existence
-    if offer.get_requested_item_id() not in items:
-        abort(404, "Requested item does not exist.")
 
     # Verify user authorization to complete the offer
     if offer.get_offered_by_id() != new_user_id:
@@ -263,7 +277,9 @@ async def user_confirm_offer(
         500 Error: If there is an internal server error while confirming the offer.
     """
     # Authenticate and validate user
-    new_user_id: int = admin_retrieve_user_id(session_token, csrf_token)
+    safe_session_token: str = sanitize_input(session_token)
+    safe_csrf_token: str = sanitize_input(csrf_token)
+    new_user_id: int = admin_retrieve_user_id(safe_session_token, safe_csrf_token)
     validate_user_id(new_user_id)
     validate_offer_id(offer_id)
 
@@ -281,14 +297,6 @@ async def user_confirm_offer(
 
     # Update offer status to confirmed
     offer.set_status("confirmed")
-
-    # Update status of requested item to 'offer_complete'
-    items[offer.get_requested_item_id()].set_status("exchanged")
-
-    # Update status of all offered items to 'offer_complete'
-    for offered_item_id in offer.get_offered_items():
-        if offered_item_id in items:
-            items[offered_item_id].set_status("exchanged")
 
 
 async def user_get_offer_details(
@@ -352,7 +360,9 @@ async def user_cancel_offer(
     message = validate_string_length(message, "Cancellation Message", 10, 1000)
 
     # Authenticate and validate user
-    new_user_id: int = admin_retrieve_user_id(session_token, csrf_token)
+    safe_session_token: str = sanitize_input(session_token)
+    safe_csrf_token: str = sanitize_input(csrf_token)
+    new_user_id: int = admin_retrieve_user_id(safe_session_token, safe_csrf_token)
     validate_user_id(new_user_id)
     validate_offer_id(offer_id)
 

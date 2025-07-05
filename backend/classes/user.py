@@ -5,17 +5,11 @@ encrypted password management. It interfaces with the UserDB SQLAlchemy model
 to persist user information and provides methods for secure user interaction.
 """
 
-import hashlib
-import os
 import secrets
-from cryptography.fernet import Fernet
+import bcrypt
 from backend.models import UserDB
 from backend.config import db
 from backend.utils import sanitize_input, unsanitize_output
-
-# Initialize Fernet encryption suite with user key from environment variables
-user_key: str = os.getenv("USER_FERNET_KEY")
-user_cipher_suite: Fernet = Fernet(user_key)
 
 
 class User:
@@ -26,11 +20,13 @@ class User:
         __session_token (str): Token to manage user's session.
         __csrf_token (str): Token to prevent cross-site request forgery.
         __user_pk (int): Primary key of the user in the database.
+        __is_google_oauth (bool): Flag indicating if the user registered via Google OAuth.
     """
 
     __session_token: str = None
     __csrf_token: str = None
     __user_pk: int = None
+    __is_google_oauth: bool = False
 
     def __init__(
         self,
@@ -38,6 +34,7 @@ class User:
         new_first_name: str,
         new_last_name: str,
         new_pwd_input: str,
+        is_google_oauth: bool = False,
     ):
         """
         Initialises the user with email, name, password, session, and CSRF tokens.
@@ -46,21 +43,32 @@ class User:
             new_email (str): User's email address.
             new_first_name (str): User's first name.
             new_last_name (str): User's last name.
-            new_pwd_input (str): Plaintext password to be hashed and encrypted.
+            new_pwd_input (str): Plaintext password to be hashed.
         """
-        # Create a new user database entry with encrypted password
-        new_user: UserDB = UserDB(
-            email=new_email,
-            first_name=new_first_name,
-            last_name=new_last_name,
-            password=self.encrypt_pwd(self.hash_pwd(new_pwd_input)),
-        )
+
+        new_user: UserDB = None
+
+        # Create a new user database entry with hashed password
+        if is_google_oauth:
+            new_user: UserDB = UserDB(
+                email=new_email,
+                first_name=new_first_name,
+                last_name=new_last_name,
+            )
+        else:
+            new_user: UserDB = UserDB(
+                email=new_email,
+                first_name=new_first_name,
+                last_name=new_last_name,
+                password=self.hash_pwd(new_pwd_input),
+            )
 
         db.session.add(new_user)
         db.session.commit()
 
         # Set internal user primary key and generate tokens
         self.set_user_pk(new_user.id)
+        self.set_is_google_oauth(is_google_oauth)
         self.set_session_token(self.generate_session_token())
         self.set_csrf_token(self.generate_csrf_token())
 
@@ -72,7 +80,7 @@ class User:
         Returns:
             dict[str, User]: Dictionary mapping user emails to User instances.
         """
-        user_record: list[UserDB] = UserDB.query.all()
+        user_record = db.session.get(UserDB, {}).all()
         if not user_record:
             return {}
 
@@ -151,48 +159,21 @@ class User:
         """
         self.set_csrf_token(None)
 
-    def hash_pwd(self, unhashed_pwd: str) -> str:
+    def hash_pwd(self, unhashed_pwd: str) -> bytes:
         """
-        Hashes the provided password using SHA-256.
+        Hashes the provided password using bcrypt.
 
         Args:
             unhashed_pwd (str): Plaintext password.
 
         Returns:
-            str: SHA-256 hash of the password.
+            str: bcrypt hash of the password.
         """
-        # Return SHA-256 hash hex digest of password string
-        return hashlib.sha256(unhashed_pwd.encode()).hexdigest()
-
-    def encrypt_pwd(self, pwd: str) -> str:
-        """
-        Encrypts the hashed password using Fernet encryption.
-
-        Args:
-            pwd (str): Hashed password.
-
-        Returns:
-            str: Encrypted password.
-        """
-        # Encrypt password bytes and return as bytes
-        return user_cipher_suite.encrypt(pwd.encode())
-
-    def decrypt_pwd(self, encrypted_pwd: str) -> str:
-        """
-        Decrypts the encrypted password.
-
-        Args:
-            encrypted_pwd (str): Encrypted password.
-
-        Returns:
-            str: Decrypted password.
-        """
-        # Decrypt encrypted password bytes and decode to string
-        return user_cipher_suite.decrypt(encrypted_pwd).decode()
+        return bcrypt.hashpw(unhashed_pwd.encode("utf-8"), bcrypt.gensalt())
 
     def verify_pwd(self, pwd_input: str) -> bool:
         """
-        Verifies if the input password matches the stored password.
+        Verifies if the input password matches the stored encrypted hash using bcrypt.
 
         Args:
             pwd_input (str): Plaintext password to verify.
@@ -200,11 +181,8 @@ class User:
         Returns:
             bool: True if passwords match, False otherwise.
         """
-        # Retrieve encrypted password from DB and compare after decryption and hashing
-        encrypted_pwd: str = (
-            UserDB.query.filter_by(id=self.get_user_pk()).first().password
-        )
-        return self.decrypt_pwd(encrypted_pwd) == self.hash_pwd(pwd_input)
+        encrypted_pwd: bytes = db.session.get(UserDB, self.get_user_pk()).password
+        return bcrypt.checkpw(pwd_input.encode("utf-8"), encrypted_pwd)
 
     def user_data(self) -> dict:
         """
@@ -214,7 +192,7 @@ class User:
             dict: User data including email, first name, last name, and encrypted password.
         """
         # Return JSON representation of user from DB
-        return UserDB.query.filter_by(id=self.get_user_pk()).first().to_json()
+        return db.session.get(UserDB, self.get_user_pk()).to_json()
 
     # Getters and Setters for encapsulated fields
 
@@ -301,51 +279,28 @@ class User:
         """
         return db.session.get(UserDB, self.get_user_pk()).email
 
-    def get_password(self) -> str:
-        """
-        Returns the user's password.
-
-        Returns:
-            str: User's encrypted password.
-        """
-        return db.session.get(UserDB, self.get_user_pk()).password
-
     def set_password(self, new_pwd: str) -> None:
         """
         Sets the user's password.
 
         Args:
-            new_pwd (str): New encrypted password to set.
+            new_pwd (str): New hashed password to set.
         """
-        db.session.get(UserDB, self.get_user_pk()).password = new_pwd
+        db.session.get(UserDB, self.get_user_pk()).password = self.hash_pwd(new_pwd)
         db.session.commit()
 
-    def set_first_name(self, new_first_name: str) -> None:
+    def set_is_google_oauth(self, is_google_oauth: bool) -> None:
         """
-        Sets the user's first name.
+        Sets the user's Google OAuth registration status.
 
         Args:
-            new_first_name (str): New first name to set.
+            is_google_oauth (bool): True if registered via Google OAuth, False otherwise.
         """
-        db.session.get(UserDB, self.get_user_pk()).first_name = new_first_name
-        db.session.commit()
+        self.__is_google_oauth = is_google_oauth
 
-    def set_last_name(self, new_last_name: str) -> None:
+    def is_google_oauth(self) -> bool:
+        """Checks if the user registered via Google OAuth.
+        Returns:
+            bool: True if registered via Google OAuth, False otherwise.
         """
-        Sets the user's last name.
-
-        Args:
-            new_last_name (str): New last name to set.
-        """
-        db.session.get(UserDB, self.get_user_pk()).last_name = new_last_name
-        db.session.commit()
-
-    def set_email(self, new_email: str) -> None:
-        """
-        Sets the user's email.
-
-        Args:
-            new_email (str): New email to set.
-        """
-        db.session.get(UserDB, self.get_user_pk()).email = new_email
-        db.session.commit()
+        return self.__is_google_oauth

@@ -6,14 +6,13 @@ import NavBar from "@/components/NavBar";
 import HeaderBar from "@/components/HeaderBar";
 import { useEffect, useState } from "react";
 import getItems from "@/services/item/getItems";
-import Image from "next/image";
 import { FaChevronLeft } from "react-icons/fa6";
 import "swiper/css";
-import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import swal from "sweetalert";
 import { Item } from "@/types/item";
-import { toTitleCase } from "@/utils/titleCase";
+import ProductDetailCard from "@/components/ProductDetailCard";
+import ProductCarousel from "@/components/ProductCarousel";
 
 export default function ViewProductPage() {
   // Extract authentication state and refresh function from custom hook
@@ -69,16 +68,16 @@ export default function ViewProductPage() {
     <main
       role="main"
       aria-label="Product Detail Page"
-      className="bg-background w-screen min-h-screen pt-16"
+      className="bg-mono-light w-screen min-h-screen pt-16"
     >
-      <div className="fixed top-0 left-0 w-full bg-contrast shadow z-50 px-6 py-4 flex items-center justify-between gap-4 sm:gap-10">
+      <div className="fixed top-0 left-0 w-full bg-mono-contrast shadow z-50 px-6 py-4 flex items-center justify-between gap-4 sm:gap-10">
         <HeaderBar
           isAuthenticated={isAuthenticated}
           handleLogin={handleLogin}
         />
       </div>
 
-      <div className="z-49 fixed top-16 left-0 sm:w-60 w-full sm:h-[calc(100vh-4rem)] bg-contrast text-surface px-6 py-6 shadow-grey-shadow shadow-xl flex flex-col items-center sm:items-start sm:justify-between">
+      <div className="z-49 fixed top-16 left-0 sm:w-60 w-full sm:h-[calc(100vh-4rem)] bg-mono-contrast text-mono-primary px-2 py-6 shadow-grey-shadow shadow-xl flex flex-col items-center sm:items-start sm:justify-between">
         <NavBar
           handleLogout={handleLogout}
           pathname="/"
@@ -87,96 +86,45 @@ export default function ViewProductPage() {
       </div>
 
       <div
-        className={`sm:ml-60 sm:mt-0 p-6 ${isAuthenticated ? "mt-96 pt-20" : "mt-64"}`}
+        className={`sm:ml-60 sm:pt-6 sm:mt-0 p-6 ${isAuthenticated ? "mt-96 pt-20" : "mt-64"}`}
       >
-        <div className="p-2 mb-4">
-          <div
+        <div className="mb-4 flex flex-row items-center gap-4">
+          <button
             onClick={() => router.back()}
-            className="cursor-pointer w-fit p-1 hover:bg-border rounded"
+            className="cursor-pointer w-fit p-2 hover:bg-mono-ascent rounded-full transition-all"
             aria-label="Back to previous page"
           >
             <FaChevronLeft color="contrast" size={16} />
-          </div>
+          </button>
+          <p className="font-bold">Product Information</p>
         </div>
-        <div className="flex flex-col sm:flex-row gap-6">
-          <div className="flex-1 flex justify-center items-center">
-            {/* Carousel displaying images of the selected item */}
-            <Carousel
-              showArrows={true}
-              showIndicators={true}
-              infiniteLoop={true}
-              dynamicHeight={false}
-              showThumbs={false}
-              className="w-full rounded-xl shadow-xl"
+        {item ? (
+          <div className="flex flex-col sm:flex-row gap-6">
+            <div className="flex-1 flex justify-center items-center">
+              {/* Carousel displaying images of the selected item */}
+              <ProductCarousel item={item} aspectRatio="4/3" />
+            </div>
+            <div
+              className="flex-1 flex flex-col gap-4 justify-center"
+              aria-live="polite"
             >
-              {item &&
-                item.images.map((image, index) => (
-                  <div
-                    key={index}
-                    className="relative w-full aspect-[4/3] bg-surface overflow-hidden rounded"
-                  >
-                    <Image
-                      src={image}
-                      alt={item.title}
-                      fill
-                      sizes="(min-width: 1024px) 50vw, 100vw"
-                      className="object-contain"
-                      priority={true}
-                    />
-                  </div>
-                ))}
-            </Carousel>
-          </div>
-          <div className="flex-1" aria-live="polite">
-            {item ? (
-              <>
-                <header>
-                  <h1 className="text-2xl font-bold text-contrast mb-4">
-                    {toTitleCase(item.title)}
-                  </h1>
-                </header>
-                <div className="text-lg leading-relaxed space-y-2 text-content">
-                  <p>
-                    <strong>Description:</strong>{" "}
-                    {toTitleCase(item.description)}
-                  </p>
-                  <p>
-                    <strong>Condition:</strong> {toTitleCase(item.condition)}
-                  </p>
-                  <p>
-                    <strong>Type:</strong> {toTitleCase(item.type)}
-                  </p>
-                  <p>
-                    <strong>Approximate Location:</strong>{" "}
-                    {toTitleCase(item.location)
-                      .split(", ")
-                      .slice(1)
-                      .join(", ")
-                      .trim()}
-                  </p>
-                  <p>
-                    <strong>Last Updated:</strong>{" "}
-                    {new Date(item.updated_at).toLocaleDateString()}
-                  </p>
-                </div>
-              </>
-            ) : (
-              <div className="text-center text-muted">
-                <p>Item not found.</p>
+              {/* Product detail card displaying item information */}
+              <ProductDetailCard item={item} approximate_loc={true} />
+              <div className="pt-10 p-6">
+                {/* Button to initiate offer; redirects based on authentication status */}
+                <button
+                  onClick={handleOffer}
+                  className="w-full rounded bg-main-light hover:bg-main-secondary text-mono-primary font-bold py-2 px-4 border-solid border-2 border-main-primary transition-all"
+                  aria-label="Make an offer on this item"
+                >
+                  Make an Offer
+                </button>
               </div>
-            )}
-            <div className="pt-10 p-6">
-              {/* Button to initiate offer; redirects based on authentication status */}
-              <button
-                onClick={handleOffer}
-                className="w-full rounded bg-action-primary hover:bg-action-secondary text-contrast font-bold py-2 px-4 border-solid border-2 border-action-primary transition-all"
-                aria-label="Make an offer on this item"
-              >
-                Make an Offer
-              </button>
             </div>
           </div>
-        </div>
+        ) : (
+          <p>Item not found.</p>
+        )}
       </div>
     </main>
   );

@@ -46,7 +46,7 @@ class ExchangeOffer:
         """
         Loads all exchange offers and returns them as a dictionary of ExchangeOffer instances.
         """
-        offer_records = ExchangeOfferDB.query.all()
+        offer_records = db.session.get(ExchangeOfferDB, {}).all()
         if not offer_records:
             return {}
 
@@ -123,14 +123,4 @@ class ExchangeOffer:
         Sets the message for the exchange offer.
         """
         db.session.get(ExchangeOfferDB, self.get_offer_pk()).message = message
-        db.session.commit()
-
-    # Remove the current exchange offer from the database using its primary key
-    def delete(self) -> None:
-        """
-        Deletes the exchange offer from the database.
-        """
-
-        offer_record = db.session.get(ExchangeOfferDB, self.__offer_pk)
-        db.session.delete(offer_record)
         db.session.commit()

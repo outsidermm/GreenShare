@@ -21,7 +21,7 @@ export default function FilterBar(FilterBarProps: FilterBarProps) {
 
   return (
     <section
-      className="flex flex-col items-center gap-4 py-8 lg:flex-row lg:gap-10"
+      className="flex flex-col items-center gap-4 pt-6 py-8 lg:flex-row lg:gap-10"
       role="region"
       aria-label="Item filters for condition and type"
     >
@@ -32,6 +32,7 @@ export default function FilterBar(FilterBarProps: FilterBarProps) {
         selectedOption={conditionFilter}
         setSelectedOption={(option) => handleConditionFilter(option)}
         isClearable={true}
+        width="16rem"
       />
       <DropDown
         label_text="Filtered Type:"
@@ -40,6 +41,7 @@ export default function FilterBar(FilterBarProps: FilterBarProps) {
         options={typeOptions}
         setSelectedOption={(option) => handleTypeFilter(option)}
         isClearable={true}
+        width="16rem"
       />
     </section>
   );

@@ -2,14 +2,33 @@
 Authentication utility functions for user registration, login, logout, and token validation.
 """
 
+from email.message import EmailMessage
 import re
+import smtplib
+import ssl
 from typing import Tuple
 
 from flask import abort
+from itsdangerous import URLSafeTimedSerializer
 
 from backend.classes.user import User
-from backend.data import users
+from backend.data import EMAIL_PASSWORD, NEXT_PUBLIC_URL, users
 from backend.utils import sanitize_input, sanitize_email
+from backend.config import app
+
+
+def generate_reset_token(email: str) -> str:
+    serialiser = URLSafeTimedSerializer(app.config["SECRET_KEY"])
+    return serialiser.dumps(email, salt="reset-password-salt")
+
+
+def verify_reset_token(token: str, expiration=300) -> str:
+    serialiser = URLSafeTimedSerializer(app.config["SECRET_KEY"])
+    try:
+        email = serialiser.loads(token, salt="reset-password-salt", max_age=expiration)
+        return email
+    except Exception as e:
+        abort(400, description=f"Invalid or expired token: {str(e)}")
 
 
 def name_auth(name: str, err_prefix: str = "User") -> bool:
@@ -94,7 +113,7 @@ def email_auth(email: str) -> bool:
 
 
 async def user_auth_register(
-    email: str, pwd: str, first_name: str, last_name: str
+    email: str, pwd: str, first_name: str, last_name: str, is_google_oauth: bool = False
 ) -> Tuple[str, str]:
     """
     Registers a new user by validating credentials and creating a user instance.
@@ -122,7 +141,9 @@ async def user_auth_register(
 
     # Validate each input
     email_auth(email)
-    pwd_auth(pwd)
+    (
+        pwd_auth(pwd) if not is_google_oauth else None
+    )  # Password validation only if not using Google OAuth
     name_auth(first_name, "First")
     name_auth(last_name, "Last")
 
@@ -131,21 +152,26 @@ async def user_auth_register(
     safe_first_name: str = sanitize_input(first_name)  # HTML escape for display
     safe_last_name: str = sanitize_input(last_name)  # HTML escape for display
     # Passwords should not be escaped as they're hashed, not displayed
-    safe_pwd: str = pwd
+    safe_pwd: str = pwd if not is_google_oauth else None
 
     # Check if user exists using sanitized email
     if safe_email in users:
         abort(409, description="Email already exists")
 
     # Create new user with sanitized data
-    new_user: User = User(safe_email, safe_first_name, safe_last_name, safe_pwd)
+    print(f"Creating new user: {safe_email}, Google OAuth: {is_google_oauth}")
+    new_user: User = User(
+        safe_email, safe_first_name, safe_last_name, safe_pwd, is_google_oauth
+    )
     users[safe_email] = new_user  # Store the user object by email
 
     # Return session and csrf tokens for the new user
     return new_user.get_session_token(), new_user.get_csrf_token()
 
 
-async def user_auth_login(email: str, pwd_input: str) -> Tuple[str, str]:
+async def user_auth_login(
+    email: str, pwd_input: str, is_google_oauth: bool = False
+) -> Tuple[str, str]:
     """
     Authenticates an existing user with email and password, generating new session tokens.
 
@@ -163,22 +189,26 @@ async def user_auth_login(email: str, pwd_input: str) -> Tuple[str, str]:
     email = email.lower()  # Normalise the email to lowercase
 
     email_auth(email)
-    pwd_auth(pwd_input)
+    (
+        pwd_auth(pwd_input) if not is_google_oauth else None
+    )  # Password validation only if not using Google OAuth
 
     # Sanitize email (no HTML escaping needed for emails)
     safe_email: str = sanitize_email(email)
     # Passwords are hashed, not displayed, so no escaping needed
-    safe_pwd: str = pwd_input
+    safe_pwd: str = pwd_input if not is_google_oauth else None
 
     # Check if user exists
     if safe_email not in users:
         abort(401, description="Email does not exist")
-
     user: User = users[safe_email]
-
-    # Verify password correctness
-    if not user.verify_pwd(safe_pwd):
-        abort(401, description="Invalid password")
+    if user.is_google_oauth() != is_google_oauth:
+        abort(401, description="Registration method mismatch")
+    print(f"User is Google OAuth: {user.is_google_oauth()}")
+    if not is_google_oauth:
+        # Verify password correctness
+        if not user.verify_pwd(safe_pwd):
+            abort(401, description="Invalid password")
 
     # Generate new session and CSRF tokens and update the user's token attributes
     user.set_session_token(user.generate_session_token())
@@ -274,3 +304,107 @@ def validate_user_id(user_id: int | None = None) -> None:
         abort(
             403, "Invalid credentials. Please log in again."
         )  # Raise an error if no valid user is found
+
+
+async def user_auth_forgot_pwd(email: str) -> None:
+    """
+    Initiates the password reset process for a user by validating their email.
+
+    Args:
+        email (str): User's email to initiate password reset.
+
+    Raises:
+        400 Error: If the email does not exist in the user database.
+    """
+    # Normalize and validate email
+    safe_email: str = sanitize_email(email)
+    email_auth(safe_email)
+
+    # Sanitize email (no HTML escaping needed for emails)
+
+    # Check if user exists
+    if safe_email not in users:
+        abort(400, description="Email does not exist")
+
+    if users[safe_email].is_google_oauth():
+        abort(400, description="Google OAuth users cannot reset passwords")
+    token = generate_reset_token(safe_email)
+    email_sender = "greenshare1234@gmail.com"
+    email_subject = "GreenShare Password Reset"
+    email_password = EMAIL_PASSWORD
+    email_body = f"""
+    Dear {users[safe_email].get_first_name()} {users[safe_email].get_last_name()},
+    <br><br>
+    You have requested a password reset for your GreenShare account.<br>
+    Please click the link below to reset your password:<br>
+    <a href="{NEXT_PUBLIC_URL}/reset_password?token={token}">Reset Password</a><br><br>
+    If you did not request this, please ignore this email.<br><br>
+    Thank you,<br>
+    GreenShare Team
+    """
+
+    email = EmailMessage()
+    email["From"] = email_sender
+    email["To"] = safe_email
+    email["Subject"] = email_subject
+    email.set_content(email_body, subtype="html")
+
+    context = ssl.create_default_context()
+    with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
+        server.login(email_sender, email_password)
+        server.sendmail(email_sender, safe_email, email.as_string())
+
+
+async def user_auth_reset_pwd(token: str, new_pwd: str) -> None:
+    """
+    Resets the user's password using a valid reset token.
+
+    Args:
+        token (str): Reset token for password reset.
+        new_pwd (str): New password to set.
+
+    Raises:
+        400 Error: If the token is invalid or expired.
+    """
+    # Verify the reset token and get the associated email
+    email = verify_reset_token(token)
+
+    # Validate the new password
+    pwd_auth(new_pwd)
+
+    # Get the user by email and update their password
+    user = users.get(email)
+    if not user:
+        abort(400, description="Invalid or expired token")
+
+    user.set_password(new_pwd)
+
+
+async def user_auth_google_oauth(
+    email: str, first_name: str, last_name: str
+) -> Tuple[str, str]:
+    """
+    Registers or logs in a user using Google OAuth credentials.
+
+    Args:
+        email (str): User's email from Google OAuth.
+        first_name (str): User's first name from Google OAuth.
+        last_name (str): User's last name from Google OAuth.
+
+    Returns:
+        Tuple[str, str]: New session token and CSRF token for the user.
+    """
+    # Normalize and validate inputs
+    safe_email = sanitize_input(email.lower())  # Normalise the email to lowercase
+    email_auth(safe_email)
+
+    if safe_email in users:
+        session_token, csrf_token = await user_auth_login(
+            email, "", is_google_oauth=True
+        )
+    else:
+        session_token, csrf_token = await user_auth_register(
+            email, "", first_name=first_name, last_name=last_name, is_google_oauth=True
+        )
+
+    return session_token, csrf_token

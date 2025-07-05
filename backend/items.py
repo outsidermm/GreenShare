@@ -4,6 +4,7 @@ including item validation, creation, viewing, filtering, modification, and delet
 """
 
 from difflib import SequenceMatcher
+import requests
 from sqlalchemy import select, func, desc
 from flask import abort
 from backend.utils import (
@@ -11,13 +12,18 @@ from backend.utils import (
     sanitize_input,
 )
 from backend.auth import validate_user_id
-from backend.data import admin_retrieve_user_id, item_categorisation, items
+from backend.data import (
+    PLACES_API_KEY,
+    admin_retrieve_user_id,
+    item_categorisation,
+    items,
+)
 from backend.models import ItemDB
 from backend.config import db
 from backend.classes.item import Item
 
 
-def validate_item_id(item_id: str) -> int:
+def validate_item_id(item_id: str, prefix="") -> int:
     """
     Validates the given item ID string.
 
@@ -31,11 +37,28 @@ def validate_item_id(item_id: str) -> int:
         400: If the item ID is not a positive integer.
         404: If the item ID does not exist in the items dictionary.
     """
-    if not item_id.isdigit() or int(item_id) <= 0:
-        abort(400, "Item ID must be a positive integer.")
     item_id_int: int = int(item_id)
     if item_id_int not in items:
-        abort(404, f"Item with ID {item_id_int} does not exist.")
+        abort(404, f"{prefix} Item with ID {item_id_int} does not exist.")
+    return item_id_int
+
+
+def validate_item_availability(item_id: str, prefix="", isAbort=True) -> int:
+    """
+    Validates if the item is available.
+
+    Args:
+        item_id (str): The item ID as a string.
+
+    Raises:
+        404: If the item ID does not exist or is not available.
+    """
+    item_id_int: int = validate_item_id(item_id, prefix)
+    if items[item_id_int].get_status() != "available":
+        if isAbort:
+            abort(404, f"{prefix} Item with ID {item_id_int} is not available.")
+        else:
+            return -1
     return item_id_int
 
 
@@ -104,7 +127,38 @@ def validate_category(category: str) -> str:
     return sanitize_input(category_lc)
 
 
-def title_matches(user_input: str, item_title: str, threshold: float = 0.4) -> bool:
+async def validate_location(location: str) -> str:
+    """Validates the location of an item using Google Maps Address Validation API.
+    Args:
+        location (str): The location string to validate.
+    Returns:
+        str: Sanitized, validated location string.
+    Raises:
+        400: If the location is invalid or cannot be validated.
+    """
+    response = requests.post(
+        "https://addressvalidation.googleapis.com/v1:validateAddress?key="
+        + PLACES_API_KEY,
+        json={"address": {"addressLines": [location]}},
+        timeout=3000,
+    ).json()
+
+    result = response["result"]
+    verdict = result["verdict"]
+    formatted_address = result["address"]["formattedAddress"]
+
+    # Check if address is likely bad or incomplete
+    if (
+        verdict.get("hasUnresolvedTokens")
+        or verdict.get("hasUnconfirmedComponents")
+        or not formatted_address
+    ):
+        abort(400, "Invalid or unconfirmed address. Please check your input.")
+
+    return sanitize_input(formatted_address.lower())
+
+
+def title_matches(user_input: str, item_title: str, threshold: float = 0.3) -> bool:
     """
     Determines if the user input matches the item title by substring or similarity.
 
@@ -166,8 +220,8 @@ async def user_create_item(
     new_category_raw: str = await item_categorisation(safe_title, safe_description)
     new_category: str = validate_category(new_category_raw)
     safe_condition: str = validate_condition(new_condition)
-    safe_location: str = sanitize_input(new_location.lower())
     safe_type: str = validate_type(new_type)
+    safe_location: str = await validate_location(new_location)
     try:
         # Create Item instance and store in global items dictionary
         new_item: Item = Item(
@@ -197,7 +251,9 @@ async def user_view_item(session_token: str, csrf_token: str) -> list[Item]:
     Returns:
         list[Item]: List of Item objects owned by the user and available.
     """
-    user_id: int = admin_retrieve_user_id(session_token, csrf_token)
+    safe_session_token: str = sanitize_input(session_token)
+    safe_csrf_token: str = sanitize_input(csrf_token)
+    user_id: int = admin_retrieve_user_id(safe_session_token, safe_csrf_token)
     owned_items: list[Item] = []
     # Iterate through all items and collect those that are available and owned by the user
     for item in items.values():
@@ -232,46 +288,43 @@ async def user_get_browse_items(
         item: Item = items[item_id_int]
         if item.get_status() == "available":
             return {item_id_int: item}
-    # Otherwise, build a filtered dictionary of available items
+
+    # Otherwise, build a filtered dictionary of available items in one pass
+    safe_title_filter: str | None = None
+    safe_category_filter: str | None = None
+    safe_condition_filter: str | None = None
+    safe_type_filter: str | None = None
+
+    if title_filter is not None:
+        safe_title_filter = validate_string_length(title_filter, "Title filter", 3, 100)
+    if category_filter is not None:
+        safe_category_filter = validate_category(category_filter)
+    if condition_filter is not None:
+        safe_condition_filter = validate_condition(condition_filter)
+    if type_filter is not None:
+        safe_type_filter = validate_type(type_filter)
 
     filtered_items: dict[int, Item] = {}
     for item_key, item in items.items():
-        if item.get_status() == "available":
-            filtered_items[item_key] = item
-
-    # Filter by title if provided
-    filtered_items_copy = filtered_items.copy()
-    if title_filter is not None:
-        safe_title_filter: str = validate_string_length(
-            title_filter, "Title filter", 3, 100
-        )
-        for item_key, item in filtered_items_copy.items():
-            if not title_matches(safe_title_filter, item.get_title()):
-                del filtered_items[item_key]
-
-    # Filter by category if provided
-    filtered_items_copy = filtered_items.copy()
-    if category_filter is not None:
-        safe_category_filter: str = validate_category(category_filter)
-        for item_key, item in filtered_items_copy.items():
-            if item.get_category() != safe_category_filter:
-                del filtered_items[item_key]
-
-    # Filter by condition if provided
-    filtered_items_copy = filtered_items.copy()
-    if condition_filter is not None:
-        safe_condition_filter: str = validate_condition(condition_filter)
-        for item_key, item in filtered_items_copy.items():
-            if item.get_condition() != safe_condition_filter:
-                del filtered_items[item_key]
-
-    # Filter by type if provided
-    filtered_items_copy = filtered_items.copy()
-    if type_filter is not None:
-        safe_type_filter: str = validate_type(type_filter)
-        for item_key, item in filtered_items_copy.items():
-            if item.get_type() != safe_type_filter:
-                del filtered_items[item_key]
+        if item.get_status() != "available":
+            continue
+        if safe_title_filter is not None and not title_matches(
+            safe_title_filter, item.get_title()
+        ):
+            continue
+        if (
+            safe_category_filter is not None
+            and item.get_category() != safe_category_filter
+        ):
+            continue
+        if (
+            safe_condition_filter is not None
+            and item.get_condition() != safe_condition_filter
+        ):
+            continue
+        if safe_type_filter is not None and item.get_type() != safe_type_filter:
+            continue
+        filtered_items[item_key] = item
     return filtered_items
 
 
@@ -309,31 +362,35 @@ async def user_modify_item(
     """
     user_id: int = admin_retrieve_user_id(session_token, csrf_token)
     validate_user_id(user_id)  # Ensure the user ID is valid
-    item_id_int: int = validate_item_id(item_id)
+    item_id_int: int = validate_item_availability(item_id)
+    if item_id_int == -1:
+        abort(404, "Item is not available for modification.")
+
     # Check permission: only owner can modify
     if items[item_id_int].get_user_id() != user_id:
         abort(403, "You do not have permission to modify this item.")
     # Update fields if provided, validating and sanitizing as needed
     if new_title is not None:
         safe_title: str = validate_string_length(new_title, "Title", 3, 100)
-        items[item_id_int].set_title(sanitize_input(safe_title.lower()))
+        items[item_id_int].set_title(safe_title)
 
     if new_description is not None:
         safe_description: str = validate_string_length(
             new_description, "Description", 10, 1000
         )
-        items[item_id_int].set_description(sanitize_input(safe_description.lower()))
+        items[item_id_int].set_description(safe_description)
 
     if new_condition is not None:
         safe_condition: str = validate_condition(new_condition)
-        items[item_id_int].set_condition(sanitize_input(safe_condition.lower()))
+        items[item_id_int].set_condition(safe_condition)
 
     if new_location is not None:
-        items[item_id_int].set_location(sanitize_input(new_location.lower()))
+        new_location = await validate_location(new_location)  # Validate location format
+        items[item_id_int].set_location(new_location)
 
     if new_type is not None:
         safe_type: str = validate_type(new_type)
-        items[item_id_int].set_type(sanitize_input(safe_type.lower()))
+        items[item_id_int].set_type(safe_type)
 
     if new_images is not None:
         if not isinstance(new_images, list):
@@ -364,19 +421,21 @@ async def user_delete_item(
     Raises:
         403: If the user does not own the item.
     """
-    item_id_int: int = validate_item_id(item_id)
+    item_id_int: int = validate_item_availability(item_id)
+
     # Only allow deletion if valid session/CSRF tokens are provided
-    if session_token and csrf_token:
-        user_id: int = admin_retrieve_user_id(session_token, csrf_token)
-        validate_user_id(user_id)  # Ensure the user ID is valid
-        if items[item_id_int].get_user_id() != user_id:
-            abort(403, "You do not have permission to delete this item.")
+    safe_session_token: str = sanitize_input(session_token)
+    safe_csrf_token: str = sanitize_input(csrf_token)
+    user_id: int = admin_retrieve_user_id(safe_session_token, safe_csrf_token)
+    validate_user_id(user_id)  # Ensure the user ID is valid
+    if items[item_id_int].get_user_id() != user_id:
+        abort(403, "You do not have permission to delete this item.")
     # Remove the item from the global items dictionary
     del items[item_id_int]
 
 
 async def search_item_similarity_pg(
-    search_query: str, threshold: float = 0.4, limit: int = 6
+    search_query: str, threshold: float = 0.3, limit: int = 6
 ) -> list[str]:
     """
     Search items using PostgreSQL trigram similarity.
@@ -390,7 +449,7 @@ async def search_item_similarity_pg(
         list[str]: Sorted list of item titles with similarity above the threshold.
     """
     # Return empty list for invalid queries
-    if not search_query or len(search_query) < 3:
+    if not search_query or len(search_query) < 2:
         return []
     # Prepare SQL statement using trigram similarity
     stmt = (

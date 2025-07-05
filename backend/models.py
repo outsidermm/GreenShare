@@ -21,7 +21,7 @@ class UserDB(db.Model):
     first_name: str = db.Column(db.String(100), nullable=False)
     last_name: str = db.Column(db.String(100), nullable=False)
     email: str = db.Column(db.String(512), nullable=False)
-    password: bytes = db.Column(db.LargeBinary(2048), nullable=False)
+    password: bytes = db.Column(db.LargeBinary(2048), nullable=True)
 
     def to_json(self) -> Dict[str, Any]:
         """Serialize UserDB instance to JSON-compatible dictionary.
@@ -141,9 +141,9 @@ class ExchangeOfferDB(db.Model):
         Returns:
             dict: A dictionary containing offer details, including involved items and status.
         """
-        requested_item: ItemDB = ItemDB.query.get(self.requested_item_id)
+        requested_item: ItemDB = db.session.get(ItemDB, self.requested_item_id)
         offered_items: List[ItemDB] = [
-            ItemDB.query.get(item.item_id) for item in self.offered_items
+            db.session.get(ItemDB, item.item_id) for item in self.offered_items
         ]
 
         return {

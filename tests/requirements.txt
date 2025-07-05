@@ -5,3 +5,9 @@ Flask-CORS
 cryptography
 asgiref
 pytest-asyncio
+requests
+markupsafe
+google-genai
+Authlib
+bcrypt
+Flask-Limiter

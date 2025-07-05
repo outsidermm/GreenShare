@@ -18,6 +18,8 @@ import completeOffer from "@/services/offer/completeOffer";
 import confirmOfferComplete from "@/services/offer/confirmOfferComplete";
 import swal from "sweetalert";
 import { extractErrorMessage } from "@/utils/extractErrorMsg";
+import { FaArrowLeft, FaArrowRight } from "react-icons/fa6";
+import { motion } from "framer-motion";
 
 export default function ManageOffersPage() {
   const router = useRouter();
@@ -38,7 +40,7 @@ export default function ManageOffersPage() {
         console.error("Error fetching requested offers:", error);
         if (error instanceof Error) {
           if (!isAuthenticated) {
-            swal("Please log in to manage your items.", {
+            swal("Please log in to manage your offers.", {
               icon: "warning",
               buttons: ["Cancel", "Login"],
             }).then((willLogin) => {
@@ -86,7 +88,7 @@ export default function ManageOffersPage() {
       }
     } else {
       if (status === "accepted") {
-        return "Complete Offer";
+        return "Mark Offer as Complete";
       }
     }
     return "Await Other Party Action";
@@ -147,7 +149,7 @@ export default function ManageOffersPage() {
             placeholder: "Reason for cancelling...",
             type: "text",
             className:
-              "border-slate-500 rounded-lg py-2 px-3 w-full border-2 text-slate-500 focus:outline-action-secondary",
+              "border-mono-secondary rounded-lg py-2 px-3 w-full border-2 text-mono-secondary focus:outline-action-secondary",
           },
         },
         buttons: ["No", "Yes"],
@@ -177,120 +179,213 @@ export default function ManageOffersPage() {
 
   return (
     <main
-      className="bg-background w-screen min-h-screen pt-16"
+      className="bg-mono-contrast-light w-screen min-h-screen pt-16"
       role="main"
       aria-label="Manage Offers Page"
     >
-      <div className="fixed top-0 left-0 w-full bg-contrast shadow z-50 px-6 py-4 flex items-center justify-between gap-4 sm:gap-10">
+      <div className="fixed top-0 left-0 w-full bg-mono-contrast shadow z-50 px-6 py-4 flex items-center justify-between gap-4 sm:gap-10">
         <HeaderBar
           isAuthenticated={isAuthenticated}
           handleLogin={handleLogin}
         />
       </div>
+      <div>
+        <div className="z-40 fixed top-16 left-0 sm:w-60 w-full sm:h-[calc(100vh-4rem)] bg-mono-contrast text-mono-light px-2 py-6 shadow-xl flex flex-col items-center sm:items-start sm:justify-between">
+          <NavBar
+            handleLogout={handleLogout}
+            pathname={pathname}
+            isAuthenticated={isAuthenticated}
+          />
+        </div>
 
-      <div className="z-40 fixed top-16 left-0 sm:w-60 w-full sm:h-[calc(100vh-4rem)] bg-contrast text-surface px-6 py-6 shadow-grey-shadow shadow-xl flex flex-col items-center sm:items-start sm:justify-between">
-        <NavBar
-          handleLogout={handleLogout}
-          pathname={pathname}
-          isAuthenticated={isAuthenticated}
-        />
-      </div>
-
-      <section
-        aria-labelledby="view-offers-heading"
-        className={`sm:ml-60 sm:mt-0 p-6 ${isAuthenticated ? "mt-96 pt-20" : "mt-64"}`}
-      >
-        <h1
-          id="view-offers-heading"
-          className="text-2xl font-bold mb-4 text-content px-4"
+        <section
+          aria-labelledby="view-offers-heading"
+          className="sm:ml-60 sm:mt-0 p-6 mt-96 pt-8"
         >
-          View Offers
-        </h1>
+          <h1
+            id="view-offers-heading"
+            className="text-2xl font-bold mb-4 text-mono-primary px-4"
+          >
+            View Offers
+          </h1>
 
-        <div className="p-4 flex flex-col sm:flex-row">
-          <button
-            aria-label="Show Outgoing Offers"
-            aria-disabled={!toggleOffer}
-            className={`flex-1 px-4 py-2 mb-4 sm:mb-0 rounded-xl sm:rounded-none sm:rounded-l-xl text-content border-2 border-grey-shadow transition-all ${!toggleOffer ? "bg-grey-shadow" : "bg-background"}`}
-            onClick={() => setToggleOffer(false)}
-          >
-            Outgoing Offers
-          </button>
-          <button
-            aria-label="Show Incoming Offers"
-            aria-disabled={toggleOffer}
-            className={`flex-1 px-4 py-2 rounded-xl sm:rounded-none sm:rounded-r-xl text-content border-2 border-grey-shadow transition-all ${toggleOffer ? "bg-grey-shadow" : "bg-background"}`}
-            onClick={() => setToggleOffer(true)}
-          >
-            Incoming Offers
-          </button>
-        </div>
-        <div className="p-4">
-          {/* Dynamic rendering of each offer card */}
-          {(toggleOffer ? incomingOffers : outgoingOffers).length > 0 ? (
-            (toggleOffer ? incomingOffers : outgoingOffers).map((offer) => (
-              <div
-                key={offer.id}
-                role="region"
-                aria-label="Offer Card"
-                className="bg-surface p-4 mb-4 rounded-lg shadow flex justify-between gap-8 flex-col sm:flex-row"
-              >
-                <div className="flex-2 text-content">
-                  <p>
-                    <strong>Offered To:</strong>{" "}
-                    {toTitleCase(offer.requested_item_name)}
-                  </p>
-                  <p>
-                    <strong>Offered Items:</strong>{" "}
-                    {toTitleCase(offer.offered_item_names.join(", "))}
-                  </p>
-                  <p>
-                    <strong>Message:</strong> {toTitleCase(offer.message)}
-                  </p>
-                  <p>
-                    <strong>Status:</strong> {toTitleCase(offer.status)}
-                  </p>
-                  {offer.status !== "pending" &&
-                    offer.status !== "cancelled" && (
-                      <p>
-                        <strong>Requested Item Location:</strong>{" "}
-                        {toTitleCase(offer.requested_item_location)}
+          <div className="p-4 flex flex-col sm:flex-row">
+            <button
+              aria-label="Show Outgoing Offers"
+              aria-disabled={!toggleOffer}
+              className={`flex-1 px-4 py-2 mb-4 sm:mb-0 rounded-xl sm:rounded-none sm:rounded-l-xl border-2 transition-all ${
+                !toggleOffer
+                  ? "bg-mono-primary text-mono-contrast border-mono-primary"
+                  : "bg-mono-contrast-light text-mono-secondary border-mono-primary hover:bg-mono-light active:bg-mono-primary"
+              }`}
+              onClick={() => setToggleOffer(false)}
+            >
+              Outgoing Offers
+            </button>
+            <button
+              aria-label="Show Incoming Offers"
+              aria-disabled={toggleOffer}
+              className={`flex-1 px-4 py-2 rounded-xl sm:rounded-none sm:rounded-r-xl border-2 transition-all ${
+                toggleOffer
+                  ? "bg-mono-primary text-mono-contrast border-mono-primary"
+                  : "bg-mono-contrast-light text-mono-secondary border-mono-primary hover:bg-mono-light active:bg-mono-primary"
+              }`}
+              onClick={() => setToggleOffer(true)}
+            >
+              Incoming Offers
+            </button>
+          </div>
+          <div className="p-4">
+            {/* Dynamic rendering of each offer card */}
+            {(toggleOffer ? incomingOffers : outgoingOffers).length > 0 ? (
+              (toggleOffer ? incomingOffers : outgoingOffers).map((offer) => (
+                <motion.div
+                  key={offer.id}
+                  role="region"
+                  aria-label="Offer Card"
+                  className="bg-mono-contrast p-6 mb-6 rounded-lg shadow-xl flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4"
+                  initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                  whileInView={{ opacity: 1, scale: 1, y: 0 }}
+                  transition={{ duration: 0.5, ease: "easeOut" }}
+                  viewport={{ amount: 0.3 }}
+                >
+                  {/* Items */}
+                  <div className="flex-1">
+                    <h2 className="font-bold mb-2 text-mono-primary text-xl">
+                      Items
+                    </h2>
+                    <p className="font-semibold text-mono-primary">Incoming</p>
+                    <div className="flex items-center text-mono-primary gap-1">
+                      <FaArrowRight color="green" />
+                      <p className="break-words whitespace-normal">
+                        {toTitleCase(offer.requested_item_name)}
                       </p>
+                    </div>
+                    <hr className="my-2 border-mono-secondary" />
+                    <p className="font-semibold text-mono-primary">Outgoing</p>
+                    <div className="flex items-center text-mono-primary gap-1">
+                      <FaArrowLeft color="red" />
+                      {offer.offered_item_names.map((item, index) => (
+                        <p
+                          key={index}
+                          className="text-mono-primary flex items-center gap-1 break-words whitespace-normal"
+                        >
+                          {toTitleCase(item)}
+                        </p>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Message and Location */}
+                  <div className="flex-1 text-mono-primary">
+                    <h2 className="font-bold mb-1 text-xl">Message</h2>
+                    <p className="mb-4 break-words whitespace-normal">
+                      {toTitleCase(offer.message)}
+                    </p>
+                    <h2 className="font-bold mb-1 text-xl">Location</h2>
+                    <p className="break-words whitespace-normal">
+                      {!toggleOffer && offer.status === "pending"
+                        ? `Your offer has not been accepted. Approximate location is ${toTitleCase(
+                            offer.requested_item_location
+                              .split(", ")
+                              .slice(1)
+                              .join(", ")
+                              .trim(),
+                          )}`
+                        : toTitleCase(offer.requested_item_location)}
+                    </p>
+                  </div>
+
+                  {/* Stage */}
+                  <div className="flex-1">
+                    <h2 className="font-bold mb-2 text-mono-primary text-xl">
+                      Stage
+                    </h2>
+                    {offer.status === "cancelled" ? (
+                      <p
+                        key="cancelled"
+                        className="flex items-center font-bold text-alert-primary"
+                      >
+                        <span className="inline-block w-3 h-3 rounded-full bg-alert-primary mr-2" />
+                        Offer Cancelled
+                      </p>
+                    ) : (
+                      ["confirmed", "completed", "accepted", "pending"].map(
+                        (stage) => (
+                          <p
+                            key={stage}
+                            className={`flex items-center ${offer.status === stage ? "font-bold text-main-primary" : "text-mono-secondary"}`}
+                          >
+                            {offer.status === stage ? (
+                              <span className="inline-block w-3 h-3 rounded-full bg-main-primary mr-2" />
+                            ) : (
+                              <span className="inline-block w-2 h-2 mr-2 rounded-full bg-mono-secondary" />
+                            )}
+                            {toTitleCase(stage)}
+                          </p>
+                        ),
+                      )
                     )}
-                  <p>
-                    <strong>Created At:</strong>{" "}
-                    {new Date(offer.created_at).toLocaleDateString()}
-                  </p>
-                </div>
-                <div className="flex-2">
-                  <button
-                    disabled={offer.status === "cancelled"}
-                    aria-disabled={offer.status === "cancelled"}
-                    onClick={() =>
-                      handleCurrentUserOfferAction(offer, toggleOffer)
-                    }
-                    className={`w-full rounded  text-contrast ${offer.status === "cancelled" ? "bg-alert-hover border-alert-hover" : "bg-action-primary hover:bg-action-secondary border-action-primary"} font-bold py-2 px-4 border-solid border-2 transition-all mt-4`}
-                  >
-                    {getOfferActionLabel(toggleOffer, offer.status)}
-                  </button>
-                  {offer.status === "pending" && (
-                    <button
-                      className="w-full rounded bg-alert-hover hover:bg-alert text-contrast font-bold py-2 px-2 border-solid border-2 border-alert-hover transition-all mt-4"
-                      onClick={() => handleCancel(offer.id)}
-                    >
-                      Cancel
-                    </button>
-                  )}
-                </div>
-              </div>
-            ))
-          ) : (
-            <p className="text-content">
-              No {toggleOffer ? "incoming" : "outgoing"} offers found.
-            </p>
-          )}
-        </div>
-      </section>
+                  </div>
+
+                  {/* Next Action */}
+                  <div className="flex-1">
+                    {offer.status !== "cancelled" &&
+                      offer.status !== "confirmed" && (
+                        <h2 className="font-bold mb-2 text-mono-primary text-xl">
+                          Next Action
+                        </h2>
+                      )}
+                    {getOfferActionLabel(toggleOffer, offer.status) ===
+                    "Await Other Party Action" ? (
+                      <p className="text-mono-secondary">
+                        Awaiting action from the other party.
+                      </p>
+                    ) : (
+                      <>
+                        {offer.status === "cancelled" ||
+                        offer.status === "confirmed" ? (
+                          <div
+                            className={`w-full rounded font-bold py-2 px-4 text-center border-2 transition-all text-mono-primary
+                            ${
+                              offer.status === "cancelled"
+                                ? "bg-alert-light border-alert-primary"
+                                : "bg-main-light border-main-secondary"
+                            }`}
+                          >
+                            {getOfferActionLabel(toggleOffer, offer.status)}
+                          </div>
+                        ) : (
+                          <button
+                            onClick={() =>
+                              handleCurrentUserOfferAction(offer, toggleOffer)
+                            }
+                            className="w-full rounded bg-main-light hover:bg-main-secondary active:bg-main-primary text-mono-primary font-bold py-2 px-4 border-solid border-2 border-main-primary transition-all"
+                          >
+                            {getOfferActionLabel(toggleOffer, offer.status)}
+                          </button>
+                        )}
+                        {offer.status === "pending" && (
+                          <button
+                            className="w-full rounded bg-alert-light hover:bg-alert-secondary active:bg-alert-primary text-mono-primary font-bold py-2 px-2 border-solid border-2 border-alert-primary transition-all mt-4"
+                            onClick={() => handleCancel(offer.id)}
+                          >
+                            Cancel
+                          </button>
+                        )}
+                      </>
+                    )}
+                  </div>
+                </motion.div>
+              ))
+            ) : (
+              <p className="text-mono-primary">
+                No {toggleOffer ? "incoming" : "outgoing"} offers found.
+              </p>
+            )}
+          </div>
+        </section>
+      </div>
     </main>
   );
 }

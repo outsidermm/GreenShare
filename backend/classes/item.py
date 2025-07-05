@@ -70,7 +70,7 @@ class Item:
         """
         Loads all items from the database and returns a dictionary of Item instances keyed by item ID.
         """
-        item_records = ItemDB.query.all()
+        item_records = db.session.get(ItemDB, {}).all()
         if not item_records:
             return {}
 
@@ -82,12 +82,6 @@ class Item:
             item_dict[item.id] = item_obj
 
         return item_dict
-
-    def item_data(self) -> dict:
-        """
-        Returns item data from the database.
-        """
-        return ItemDB.query.filter_by(id=self.get_item_pk()).first().to_json()
 
     # Accessor/Mutator for item_pk
     def get_item_pk(self) -> int:
@@ -194,7 +188,7 @@ class Item:
         Replaces existing images with new ones and commits the changes.
         """
         # Remove all existing images for this item
-        ItemImageDB.query.filter_by(item_id=self.get_item_pk()).delete()
+        db.session.query(ItemImageDB).filter_by(item_id=self.get_item_pk()).delete()
         db.session.commit()
 
         # Add new images
@@ -228,5 +222,4 @@ class Item:
         """
         Returns a dictionary representation of the item.
         """
-        item = ItemDB.query.filter_by(id=self.get_item_pk()).first()
-        return item.to_json()
+        return db.session.get(ItemDB, self.get_item_pk()).to_json()

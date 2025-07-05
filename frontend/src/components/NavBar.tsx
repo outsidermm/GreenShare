@@ -28,10 +28,10 @@ export default function NavBar(props: NavBarProps) {
         <h2 className="font-bold mb-2">
           <Link
             href="/"
-            className={`block px-4 py-1 rounded transition-all ${
+            className={`block ml-2 px-2 py-1 rounded transition-all ${
               pathname === "/"
-                ? "bg-content border-l-4 border-action-secondary text-action-secondary font-semibold"
-                : "hover:text-action-secondary"
+                ? "bg-mono-contrast-light border-l-4 border-main-primary text-main-secondary font-semibold hover:text-main-primary"
+                : "text-mono-primary hover:text-main-secondary"
             }`}
           >
             Categories
@@ -44,10 +44,10 @@ export default function NavBar(props: NavBarProps) {
               <li key={path}>
                 <Link
                   href={path}
-                  className={`block px-4 py-1 rounded transition-all ${
+                  className={`block ml-2 px-2 py-1 rounded transition-all ${
                     isActive
-                      ? "bg-content border-l-4 border-action-secondary text-action-secondary font-semibold"
-                      : "hover:text-action-secondary"
+                      ? "bg-mono-contrast-light border-l-4 border-main-primary text-main-secondary font-semibold hover:text-main-primary"
+                      : "text-mono-primary hover:text-main-secondary"
                   }`}
                 >
                   {label}
@@ -57,13 +57,16 @@ export default function NavBar(props: NavBarProps) {
           })}
         </ul>
         {isAuthenticated && (
-          <h2 className="font-bold mb-2 mt-6">
+          <hr className="my-2 border-t border-mono-secondary mx-4" />
+        )}
+        {isAuthenticated && (
+          <h2 className="font-bold my-4">
             <Link
               href="/manage_products"
-              className={`block px-4 py-1 rounded transition-all ${
+              className={`block ml-2 px-2 py-1 rounded transition-all ${
                 pathname === "/manage_products"
-                  ? "bg-content border-l-4 border-action-secondary text-action-secondary font-semibold"
-                  : "hover:text-action-secondary"
+                  ? "bg-mono-contrast-light border-l-4 border-main-primary text-main-secondary font-semibold hover:text-main-primary"
+                  : "text-mono-primary hover:text-main-secondary"
               }`}
             >
               Manage your Products
@@ -71,13 +74,16 @@ export default function NavBar(props: NavBarProps) {
           </h2>
         )}
         {isAuthenticated && (
-          <h2 className="font-bold mb-2 mt-6">
+          <hr className="my-2 border-t border-mono-secondary mx-4" />
+        )}
+        {isAuthenticated && (
+          <h2 className="font-bold my-4">
             <Link
               href="/manage_offers"
-              className={`block px-4 py-1 rounded transition-all ${
+              className={`block ml-2 px-2 py-1 rounded transition-all ${
                 pathname === "/manage_offers"
-                  ? "bg-content border-l-4 border-action-secondary text-action-secondary font-semibold"
-                  : "hover:text-action-secondary"
+                  ? "bg-mono-contrast-light border-l-4 border-main-primary text-main-secondary font-semibold hover:text-main-primary"
+                  : "text-mono-primary hover:text-main-secondary"
               }`}
             >
               Manage your Offers
@@ -87,10 +93,10 @@ export default function NavBar(props: NavBarProps) {
       </nav>
       {/* Render logout button and icon for authenticated users */}
       {isAuthenticated && (
-        <div className="flex flex-row transition-all cursor-pointer py-4">
+        <div className="flex flex-row items-center transition-all cursor-pointer text-mono-primary hover:text-main-secondary py-4 ml-3">
           <MdLogout onClick={handleLogout} className="mr-2" />
           <button
-            className="font-bold text-surface"
+            className="font-bold text-mono-primary hover:text-main-secondary"
             onClick={handleLogout}
             aria-label="Log out of GreenShare"
           >

@@ -24,6 +24,7 @@ interface DropDownProps {
   loadingMessage?: () => string;
   onInputChange?: (inputValue: string) => void;
   isLoading?: boolean;
+  width?: string;
 }
 
 // Default prop values to control behaviour of dropdown
@@ -79,10 +80,13 @@ export default function DropDown(props: DropDownProps) {
           props.styles || {
             control: (base, state) => ({
               ...base,
-              border: state.isFocused ? "none" : "2px solid #64748b", // slate-400
+              ...(props.width ? { width: props.width } : {}),
+              border: "none",
               borderRadius: "0.5rem",
               fontSize: "1rem",
-              boxShadow: state.isFocused ? "0 0 0 2px #22c55e" : "none", // green-400 outline ring
+              boxShadow: state.isFocused
+                ? "0 0 0 2px #22c55e"
+                : "0 0 0 2px #64748b",
             }),
             option: (base, { isFocused, isSelected }) => ({
               ...base,
@@ -97,9 +101,10 @@ export default function DropDown(props: DropDownProps) {
             }),
             menu: (base) => ({
               ...base,
+              ...(props.width ? { width: props.width } : {}),
               borderRadius: "0.5rem",
               overflow: "hidden",
-              boxShadow: "0 0 0 1px #94a3b8",
+              boxShadow: "0 0 0 2px #94a3b8",
             }),
             placeholder: (base) => ({
               ...base,

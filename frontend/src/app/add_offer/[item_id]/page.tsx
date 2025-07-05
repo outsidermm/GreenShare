@@ -12,6 +12,10 @@ import { toTitleCase } from "@/utils/titleCase";
 import swal from "sweetalert";
 import createOffer from "@/services/offer/createOffer";
 import { extractErrorMessage } from "@/utils/extractErrorMsg";
+import ProductDetailCard from "@/components/ProductDetailCard";
+import { FaChevronLeft, FaMinus } from "react-icons/fa6";
+import { ImCross } from "react-icons/im";
+import ProductCarousel from "@/components/ProductCarousel";
 
 export default function AddOfferPage() {
   const router = useRouter();
@@ -25,32 +29,42 @@ export default function AddOfferPage() {
   const [outgoingItems, setOutgoingItems] = useState<Item[]>([]);
   const [offerableItems, setOfferableItems] = useState<Item[]>([]);
   const [requestedItem, setRequestedItem] = useState<Item>();
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Fetch requested item and user's offerable items on component mount or when dependencies change
   useEffect(() => {
     const fetchItems = async () => {
       try {
+        const offerable_items_response = await getUserItems();
         const requested_item_response = await getItems({
           item_id: requested_item_id,
         });
+
+        if (
+          offerable_items_response.length > 0 &&
+          requested_item_response.length === 1 &&
+          offerable_items_response[0].user_id ===
+            requested_item_response[0].user_id
+        ) {
+          router.push("/");
+          throw new Error("You cannot offer your own item.");
+        }
+
+        setOfferableItems(offerable_items_response);
+
         if (requested_item_response.length === 1) {
           setRequestedItem(requested_item_response[0]);
         } else {
+          router.push("/");
           throw new Error(
             "Requested item not found or multiple item returned.",
           );
         }
       } catch (error) {
-        console.error("Error fetching requested item:", error);
-      }
-      try {
-        const offerable_items_response = await getUserItems();
-        setOfferableItems(offerable_items_response);
-      } catch (error) {
-        console.error("Error fetching user offerable item:", error);
+        console.error("Error fetching offer item:", error);
         if (error instanceof Error) {
           if (!isAuthenticated) {
-            swal("Please log in to manage your items.", {
+            swal("Please log in to make an offer.", {
               icon: "warning",
               buttons: ["Cancel", "Login"],
             }).then((willLogin) => {
@@ -133,9 +147,9 @@ export default function AddOfferPage() {
   };
 
   return (
-    <main className="bg-background w-screen min-h-screen pt-16" role="main">
+    <main className="bg-mono-light w-screen min-h-screen pt-16" role="main">
       {/* Top fixed header containing authentication and site branding */}
-      <div className="fixed top-0 left-0 w-full bg-contrast shadow z-50 px-6 py-4 flex items-center justify-between gap-4 sm:gap-10">
+      <div className="fixed top-0 left-0 w-full bg-mono-contrast shadow z-50 px-6 py-4 flex items-center justify-between gap-4 sm:gap-10">
         <HeaderBar
           isAuthenticated={isAuthenticated}
           handleLogin={handleLogin}
@@ -143,7 +157,7 @@ export default function AddOfferPage() {
       </div>
 
       <nav
-        className="z-40 fixed top-16 left-0 sm:w-60 w-full sm:h-[calc(100vh-4rem)] bg-contrast text-surface px-6 py-6 shadow-grey-shadow shadow-xl flex flex-col items-center sm:items-start sm:justify-between"
+        className="z-40 fixed top-16 left-0 sm:w-60 w-full sm:h-[calc(100vh-4rem)] bg-mono-contrast text-mono-primary px-2 py-6 shadow-xl flex flex-col items-center sm:items-start sm:justify-between"
         aria-label="Main navigation"
       >
         <NavBar
@@ -155,161 +169,169 @@ export default function AddOfferPage() {
 
       {/* Main content area showing inventory, message input, and requested item information */}
       <div
-        className={`sm:ml-60 sm:mt-0 p-6 ${isAuthenticated ? "mt-96 pt-20" : "mt-64"}`}
+        className={`sm:ml-60 sm:pt-6 sm:mt-0 p-6 ${isAuthenticated ? "mt-96 pt-20" : "mt-64"}`}
       >
-        <div className="flex flex-col sm:flex-row gap-6 items-start">
-          <div className="flex-1">
-            <div className="shadow-lg p-4 mb-4">
-              <h1 className="text-content font-bold">Your inventory</h1>
-              {offerableItems.length > 0 ? (
-                <ul className="list-disc pl-5">
-                  {offerableItems.map((item) => {
-                    const isSelected = outgoingItems.find(
-                      (outItem) => outItem.id === item.id,
-                    );
-                    return (
-                      <li key={item.id} className="mb-2">
-                        <button
-                          type="button"
-                          aria-pressed={!!isSelected} // Indicates selection state for accessibility
-                          onClick={() => {
-                            if (!isSelected)
-                              setOutgoingItems([...outgoingItems, item]);
-                            else
-                              setOutgoingItems((prev) =>
-                                prev.filter(
-                                  (outItem) => outItem.id !== item.id,
-                                ),
-                              );
-                          }}
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter") {
-                              if (!isSelected)
-                                setOutgoingItems([...outgoingItems, item]);
-                              else
-                                setOutgoingItems((prev) =>
-                                  prev.filter(
-                                    (outItem) => outItem.id !== item.id,
-                                  ),
-                                );
-                            }
-                          }}
-                          className={`w-full text-left p-2 text-content cursor-pointer rounded ${
-                            isSelected
-                              ? "bg-selected-highlight"
-                              : "hover:bg-unselected-highlight"
-                          }`}
-                          aria-label={`${
-                            isSelected ? "Deselect" : "Select"
-                          } item ${toTitleCase(item.title)} - ${toTitleCase(item.description)}`}
-                        >
-                          {toTitleCase(item.title)} -{" "}
-                          {toTitleCase(item.description)}
-                        </button>
-                      </li>
-                    );
-                  })}
-                </ul>
-              ) : (
-                <p className="text-muted">You have no items to offer.</p>
-              )}
+        <div className="mb-4 flex flex-row items-center gap-4">
+          <button
+            onClick={() => router.back()}
+            className="cursor-pointer w-fit p-2 hover:bg-mono-ascent rounded-full transition-all"
+            aria-label="Back to previous page"
+          >
+            <FaChevronLeft color="contrast" size={16} />
+          </button>
+          <p className="font-bold">Make an Offer</p>
+        </div>
+        {requestedItem ? (
+          <div className="flex flex-col sm:flex-row gap-6">
+            <div className="flex-1 flex justify-center items-center">
+              {/* Carousel displaying images of the selected item */}
+              <ProductCarousel item={requestedItem} aspectRatio="5/3" />
             </div>
-            <div className="shadow-lg p-4 mb-4">
-              <h1 className="text-content font-bold">
-                Enter a message with your offer:
-              </h1>
-              <textarea
-                aria-label="Offer message" // Describes the purpose of the textarea for screen readers
-                className="w-full h-32 p-2 border border-border rounded text-slate-600"
-                placeholder="Type your message here..."
-                minLength={10}
-                maxLength={2000}
-                required
-                onChange={(e) => setOfferMessage(e.target.value)}
-              ></textarea>
+            <div
+              className="flex-1 justify-center flex-col flex"
+              aria-live="polite"
+            >
+              {/* Product detail card displaying item information */}
+              <ProductDetailCard item={requestedItem} approximate_loc={true} />
             </div>
           </div>
-          <section
-            className="flex-1 shadow-lg text-content w-full"
-            aria-labelledby="requested-item-heading"
-          >
-            <div className="p-4">
-              <h1
-                id="requested-item-heading"
-                className="text-content font-bold"
-              >
-                Requested Item Information:
+        ) : (
+          <p>Item not found.</p>
+        )}
+        <div className="flex flex-col gap-8 mt-10">
+          <div className="shadow-lg p-4 bg-mono-contrast relative rounded-xl">
+            <div className="flex flex-col sm:flex-row justify-between items-center">
+              <h1 className="text-mono-primary font-bold text-2xl">
+                Offered Item
               </h1>
-              {requestedItem && (
-                <>
-                  <p className="font-bold mb-2">
-                    {toTitleCase(requestedItem.title)}
-                  </p>
-                  <div className="leading-relaxed space-y-1 mb-4 text-content">
-                    <p>
-                      <strong>Description:</strong>{" "}
-                      {toTitleCase(requestedItem.description)}
-                    </p>
-                    <p>
-                      <strong>Condition:</strong>{" "}
-                      {toTitleCase(requestedItem.condition)}
-                    </p>
-                    <p>
-                      <strong>Type:</strong> {toTitleCase(requestedItem.type)}
-                    </p>
-                    <p>
-                      <strong>Approximate Location:</strong>{" "}
-                      {toTitleCase(requestedItem.location)
-                        .split(", ")
-                        .slice(1)
-                        .join(", ")
-                        .trim()}
-                    </p>
-                  </div>
-                </>
-              )}
-              <h1 className="text-content font-bold">Offered Item:</h1>
-              {outgoingItems.length > 0 ? (
-                <ul className="list-disc pl-5">
-                  {outgoingItems.map((item) => (
+              <button
+                onClick={() => {
+                  setIsModalOpen(true);
+                }}
+                className="bg-main-light hover:bg-main-secondary text-mono-primary font-bold py-2 px-4 border-solid border-2 border-main-primary transition-all rounded-full"
+                aria-label="Add Items to Offer"
+              >
+                Add Items to Offer
+              </button>
+            </div>
+            {outgoingItems.length > 0 ? (
+              <ul className="list-disc pl-5 mt-4">
+                {outgoingItems.map((item) => {
+                  return (
                     <li key={item.id} className="mb-2">
-                      <button
-                        type="button"
-                        aria-pressed="true" // Indicates this item is currently selected/offered
-                        onClick={() => {
-                          setOutgoingItems((prev) =>
-                            prev.filter((outItem) => outItem.id !== item.id),
-                          );
-                        }}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") {
+                      <div className="flex flex-col sm:flex-row justify-between items-center">
+                        <p className="text-mono-primary">
+                          {toTitleCase(item.title)} -{" "}
+                          {toTitleCase(item.description)}
+                        </p>
+                        <button
+                          type="button"
+                          onClick={() => {
                             setOutgoingItems((prev) =>
                               prev.filter((outItem) => outItem.id !== item.id),
                             );
+                          }}
+                          className={
+                            "text-left p-2 text-mono-primary cursor-pointer rounded hover:bg-alert transition-all"
                           }
-                        }}
-                        className="w-full text-left p-2 rounded text-content cursor-pointer hover:bg-unselected-highlight"
-                        aria-label={`Remove offered item ${toTitleCase(item.title)} - ${toTitleCase(item.description)}`}
-                      >
-                        {toTitleCase(item.title)} -{" "}
-                        {toTitleCase(item.description)}
-                      </button>
+                          aria-label={`{Deselect item ${toTitleCase(item.title)} - ${toTitleCase(item.description)}`}
+                        >
+                          <FaMinus />
+                        </button>
+                      </div>
                     </li>
-                  ))}
+                  );
+                })}
+              </ul>
+            ) : (
+              <p className="text-mono-secondary">You offered no items.</p>
+            )}
+          </div>
+          <div className="shadow-lg p-4 bg-mono-contrast rounded-xl">
+            <h1 className="text-mono-primary font-bold text-2xl">
+              Offer Message
+            </h1>
+            <h1 className="text-mono-primary mt-2">
+              Enter a message with your offer:
+            </h1>
+            <textarea
+              aria-label="Offer message" // Describes the purpose of the textarea for screen readers
+              className="w-full h-32 p-2 border border-mono-secondary rounded text-mono-primary"
+              placeholder="Type your message here..."
+              minLength={10}
+              maxLength={2000}
+              required
+              onChange={(e) => setOfferMessage(e.target.value)}
+            ></textarea>
+          </div>
+          <button
+            aria-label="Submit offer" // Clarifies button action for screen readers
+            onClick={() => handleOfferSubmit()}
+            className="w-full rounded-xl bg-main-light hover:bg-main-secondary text-mono-primary font-bold py-2 px-4 border-solid border-2 border-main-primary transition-all mt-2 shadow-lg"
+          >
+            Make an Offer
+          </button>
+        </div>
+        {isModalOpen && (
+          <div className="fixed top-0 left-0 w-full h-full z-50 flex items-center justify-center backdrop-blur-sm bg-mono-contrast/40 transition-all">
+            <div className="bg-mono-contrast p-12 rounded-xl shadow-xl w-full max-w-3xl relative max-h-[80vh] overflow-y-auto">
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="absolute top-4 right-4 hover:bg-alert-light font-bold rounded-full p-2 transition-all"
+                aria-label="Close edit modal"
+              >
+                <ImCross />
+              </button>
+              <h1 className="text-mono-primary font-bold text-2xl">
+                Your Inventory
+              </h1>
+              {offerableItems.filter((item) => item.status === "available")
+                .length > 0 ? (
+                <ul className="pl-2 mt-4">
+                  {offerableItems
+                    .filter((item) => item.status === "available")
+                    .map((item) => {
+                      const isSelected = outgoingItems.find(
+                        (outItem) => outItem.id === item.id,
+                      );
+                      return (
+                        <li key={item.id} className="mb-2">
+                          <label className="flex items-center gap-4 cursor-pointer p-2 rounded w-full transition-all hover:bg-main-ascent">
+                            <input
+                              type="checkbox"
+                              checked={!!isSelected}
+                              onChange={() => {
+                                if (!isSelected)
+                                  setOutgoingItems([...outgoingItems, item]);
+                                else
+                                  setOutgoingItems((prev) =>
+                                    prev.filter(
+                                      (outItem) => outItem.id !== item.id,
+                                    ),
+                                  );
+                              }}
+                              className="accent-main-primary"
+                              aria-label={`${
+                                isSelected ? "Deselect" : "Select"
+                              } item ${toTitleCase(item.title)} - ${toTitleCase(item.description)}`}
+                            />
+                            <span className="text-mono-primary leading-tight">
+                              {toTitleCase(item.title)} -{" "}
+                              {toTitleCase(item.description)}
+                            </span>
+                          </label>
+                        </li>
+                      );
+                    })}
                 </ul>
               ) : (
-                <p className="text-content">You offered no items.</p>
+                <p className="text-mono-secondary">
+                  You have no available items to offer.
+                </p>
               )}
-              <button
-                aria-label="Submit offer" // Clarifies button action for screen readers
-                onClick={() => handleOfferSubmit()}
-                className="w-full rounded bg-action-primary hover:bg-action-secondary text-contrast font-bold py-2 px-4 border-solid border-2 border-action-primary transition-all mt-4"
-              >
-                Make an Offer
-              </button>
             </div>
-          </section>
-        </div>
+          </div>
+        )}
       </div>
     </main>
   );

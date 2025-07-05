@@ -6,18 +6,21 @@ It includes endpoints for user authentication, item management, exchange offers,
 and auxiliary services such as autocomplete and item search.
 """
 
-import os
 import requests
-from flask import request, jsonify, make_response, Response
+from urllib.parse import quote
+from flask import redirect, request, jsonify, make_response, Response
 
 # Application config and database
-from backend.config import app, db
+from backend.config import app, db, google_oauth, limiter
 
 # Auth-related imports
 from backend.auth import (
+    user_auth_forgot_pwd,
+    user_auth_google_oauth,
     user_auth_register,
     user_auth_login,
     user_auth_logout,
+    user_auth_reset_pwd,
     user_auth_validate_session_token,
     user_auth_validate_csrf_token,
 )
@@ -28,7 +31,14 @@ from backend.classes.item import Item
 from backend.classes.exchange_offer import ExchangeOffer
 
 # Data management
-from backend.data import image_upload, users, items, exchange_offers
+from backend.data import (
+    image_upload,
+    users,
+    items,
+    exchange_offers,
+    PLACES_API_KEY,
+    NEXT_PUBLIC_URL,
+)
 
 # Items
 from backend.items import (
@@ -48,12 +58,11 @@ from backend.offers import (
     user_confirm_offer,
     user_create_offer,
     user_get_offers,
+    validate_offer_id,
 )
 
 # Utils
 from backend.utils import sanitize_input
-
-PLACES_API_KEY = os.getenv("PLACES_API_KEY")
 
 
 @app.route("/")
@@ -165,8 +174,8 @@ async def login_user() -> Response:
         return jsonify({"error": str(e)}), 401
 
 
-# DELETE API for user logout
 @app.route("/auth/logout", methods=["DELETE"])
+@limiter.limit("100 per minute;1000 per hour")
 async def logout_user() -> Response:
     """
     Logs out the user by invalidating session and CSRF tokens.
@@ -197,8 +206,8 @@ async def logout_user() -> Response:
         return jsonify({"error": str(e)}), 401
 
 
-# POST API to validate tokens for active session verification
 @app.route("/auth/validate", methods=["POST"])
+@limiter.limit("100 per minute;1000 per hour")
 async def validate_token() -> Response:
     """
     Validates both session and CSRF tokens to verify if a user session is active.
@@ -224,7 +233,107 @@ async def validate_token() -> Response:
         return jsonify({"error": str(e)}), 401
 
 
+@app.route("/auth/forgot_pwd", methods=["POST"])
+async def forgot_pwd() -> Response:
+    """
+    Initiates the password reset process for a user.
+
+    Expects user email in JSON format and returns a success message.
+
+    Returns:
+        Response: Flask response with success or error message.
+    """
+    data: dict = request.json
+    email: str = data["email"]
+
+    try:
+        # Call the user authentication function to initiate password reset
+        await user_auth_forgot_pwd(email)
+        return jsonify({"message": "Password reset link sent to your email."}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+
+
+@app.route("/auth/reset_pwd", methods=["POST"])
+@limiter.limit("100 per minute;1000 per hour")
+async def reset_pwd() -> Response:
+    """
+    Resets the user's password.
+
+    Expects user email and new password in JSON format and returns a success message.
+
+    Returns:
+        Response: Flask response with success or error message.
+    """
+    data: dict = request.json
+    token: str = data["token"]
+    new_password: str = data["newPassword"]
+
+    try:
+        # Call the user authentication function to reset the password
+        await user_auth_reset_pwd(token, new_password)
+        return jsonify({"message": "Password has been successfully reset."}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+
+
+@app.route("/auth/google/login", methods=["GET"])
+@limiter.limit("100 per minute;1000 per hour")
+def google_auth_login():
+    """
+    Initiates Google OAuth 2.0 login by redirecting the user to Google's auth URL.
+
+    Returns:
+        Response: Redirect to Google's OAuth 2.0 authorisation page.
+    """
+    redirect_uri = "http://localhost:4000/auth/google/callback"
+    return google_oauth.authorize_redirect(redirect_uri)
+
+
+@app.route("/auth/google/callback", methods=["GET"])
+@limiter.limit("100 per minute;1000 per hour")
+async def google_auth_callback() -> Response:
+    """
+    Handles the callback from Google OAuth authentication.
+
+    This route is called after the user has authenticated with Google.
+    It retrieves the user's information and logs them in to the GreenShare platform.
+
+    Returns:
+        Response: Flask response with success or error message.
+    """
+    try:
+        token = google_oauth.authorize_access_token()
+        userinfo_endpoint = google_oauth.server_metadata["userinfo_endpoint"]
+        response = google_oauth.get(userinfo_endpoint)
+        user_info = response.json()
+        email: str = user_info["email"]
+        first_name: str = user_info.get("given_name", "")
+        last_name: str = user_info.get("family_name", "")
+        session_token, csrf_token = await user_auth_google_oauth(
+            email, first_name=first_name, last_name=last_name
+        )
+
+        redirect_response = make_response(
+            redirect(f"{NEXT_PUBLIC_URL}/login?csrfToken={quote(csrf_token)}")
+        )
+
+        redirect_response.set_cookie(
+            "session_token",
+            session_token,
+            httponly=True,
+            secure=True,
+            samesite="Strict",
+        )
+
+        return redirect_response
+
+    except Exception as e:
+        return redirect(f"{NEXT_PUBLIC_URL}/login?error={quote(str(e))}")
+
+
 @app.route("/item/create", methods=["POST"])
+@limiter.limit("100 per minute;1000 per hour")
 async def create_item() -> Response:
     """
     Creates a new item with the provided details.
@@ -273,8 +382,8 @@ async def create_item() -> Response:
         return jsonify({"error": str(e)}), 400
 
 
-# Unified GET /item route with optional filters
 @app.route("/item", methods=["GET"])
+@limiter.limit("100 per minute;1000 per hour")
 async def get_browse_items() -> Response:
     """
     Retrieves items from the database with optional filters:
@@ -304,6 +413,7 @@ async def get_browse_items() -> Response:
 
 
 @app.route("/item/userview", methods=["GET"])
+@limiter.limit("100 per minute;1000 per hour")
 async def get_user_items() -> Response:
     """
     Retrieves all items created by the user.
@@ -311,20 +421,19 @@ async def get_user_items() -> Response:
     Returns:
         Response: List of items created by the user.
     """
-    # Retrieve session and CSRF tokens and sanitize
-    session_token: str = sanitize_input(request.cookies.get("session_token"))
-    csrf_token: str = sanitize_input(request.headers.get("X-CSRF-TOKEN"))
+    # Retrieve session and CSRF tokens and sanitise
+    session_token: str = request.cookies.get("session_token")
+    csrf_token: str = request.headers.get("X-CSRF-TOKEN")
 
     try:
-        user_items: list = await user_view_item(
-            session_token=session_token, csrf_token=csrf_token
-        )
+        user_items: list = await user_view_item(session_token, csrf_token)
         return jsonify([item.to_dict() for item in user_items]), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
 
 @app.route("/item/edit", methods=["POST"])
+@limiter.limit("100 per minute;1000 per hour")
 async def edit_item() -> Response:
     """
     Edits an existing item with the provided details.
@@ -370,6 +479,7 @@ async def edit_item() -> Response:
 
 
 @app.route("/item/delete", methods=["DELETE"])
+@limiter.limit("100 per minute;1000 per hour")
 async def delete_item() -> Response:
     """
     Deletes an existing item based on the provided item ID.
@@ -381,12 +491,9 @@ async def delete_item() -> Response:
     """
     try:
         data: dict = request.json
-        session_token: str = sanitize_input(request.cookies.get("session_token"))
-        csrf_token: str = sanitize_input(request.headers.get("X-CSRF-TOKEN"))
+        session_token: str = request.cookies.get("session_token")
+        csrf_token: str = request.headers.get("X-CSRF-TOKEN")
         item_id: str = data["id"]
-
-        if not item_id:
-            return jsonify({"error": "Item ID is required"}), 400
 
         await user_delete_item(
             item_id=item_id,
@@ -399,6 +506,7 @@ async def delete_item() -> Response:
 
 
 @app.route("/offer/create", methods=["POST"])
+@limiter.limit("100 per minute;1000 per hour")
 async def create_exchange_offer() -> Response:
     """
     Creates a new exchange offer with the provided details.
@@ -410,18 +518,18 @@ async def create_exchange_offer() -> Response:
     """
     try:
         data: dict = request.json
-        session_token: str = sanitize_input(request.cookies.get("session_token"))
-        csrf_token: str = sanitize_input(request.headers.get("X-CSRF-TOKEN"))
+        session_token: str = request.cookies.get("session_token")
+        csrf_token: str = request.headers.get("X-CSRF-TOKEN")
         offered_item_ids: list = data["offeredItemIds"]
         requested_item_id: str = data["requestedItemId"]
         message: str = data["message"]
 
         await user_create_offer(
-            session_token=session_token,
-            csrf_token=csrf_token,
-            offered_item_ids=offered_item_ids,
-            requested_item_id=requested_item_id,
-            message=message,
+            session_token,
+            csrf_token,
+            offered_item_ids,
+            requested_item_id,
+            message,
         )
         return (
             jsonify({"message": "Exchange offer has been successfully created."}),
@@ -432,6 +540,7 @@ async def create_exchange_offer() -> Response:
 
 
 @app.route("/offer/userview", methods=["GET"])
+@limiter.limit("100 per minute;1000 per hour")
 async def view_exchange_offers() -> Response:
     """
     Retrieves all exchange offers from the database for the user.
@@ -439,12 +548,12 @@ async def view_exchange_offers() -> Response:
     Returns:
         Response: List of exchange offers.
     """
-    session_token: str = sanitize_input(request.cookies.get("session_token"))
-    csrf_token: str = sanitize_input(request.headers.get("X-CSRF-TOKEN"))
+    session_token: str = request.cookies.get("session_token")
+    csrf_token: str = request.headers.get("X-CSRF-TOKEN")
 
     try:
         outgoing_offers, incoming_offers = await user_get_offers(
-            session_token=session_token, csrf_token=csrf_token
+            session_token, csrf_token
         )
         outgoing_offers_dict: list = [offer.to_json() for offer in outgoing_offers]
         incoming_offers_dict: list = [offer.to_json() for offer in incoming_offers]
@@ -462,6 +571,7 @@ async def view_exchange_offers() -> Response:
 
 
 @app.route("/offer/accept", methods=["POST"])
+@limiter.limit("100 per minute;1000 per hour")
 async def accept_exchange_offer() -> Response:
     """
     Accepts an exchange offer based on the provided offer ID.
@@ -472,15 +582,15 @@ async def accept_exchange_offer() -> Response:
         Response: Flask response with success or error message.
     """
     data: dict = request.json
-    offer_id: str = data["offerId"]
-    session_token: str = sanitize_input(request.cookies.get("session_token"))
-    csrf_token: str = sanitize_input(request.headers.get("X-CSRF-TOKEN"))
+    offer_id: int = data["offerId"]
+    session_token: str = request.cookies.get("session_token")
+    csrf_token: str = request.headers.get("X-CSRF-TOKEN")
 
     try:
         await user_accept_offer(
-            session_token=session_token,
-            csrf_token=csrf_token,
-            offer_id=offer_id,
+            session_token,
+            csrf_token,
+            offer_id,
         )
         return jsonify({"message": "Offer accepted successfully."}), 200
     except Exception as e:
@@ -488,6 +598,7 @@ async def accept_exchange_offer() -> Response:
 
 
 @app.route("/offer/exchange_complete", methods=["POST"])
+@limiter.limit("100 per minute;1000 per hour")
 async def complete_exchange_offer() -> Response:
     """
     Completes an exchange offer based on the provided offer ID.
@@ -498,15 +609,15 @@ async def complete_exchange_offer() -> Response:
         Response: Flask response with success or error message.
     """
     data: dict = request.json
-    offer_id: str = data["offerId"]
-    session_token: str = sanitize_input(request.cookies.get("session_token"))
-    csrf_token: str = sanitize_input(request.headers.get("X-CSRF-TOKEN"))
+    offer_id: int = data["offerId"]
+    session_token: str = request.cookies.get("session_token")
+    csrf_token: str = request.headers.get("X-CSRF-TOKEN")
 
     try:
         await user_complete_offer(
-            session_token=session_token,
-            csrf_token=csrf_token,
-            offer_id=offer_id,
+            session_token,
+            csrf_token,
+            offer_id,
         )
         return jsonify({"message": "Offer completed successfully."}), 200
     except Exception as e:
@@ -514,6 +625,7 @@ async def complete_exchange_offer() -> Response:
 
 
 @app.route("/offer/exchange_confirmed", methods=["POST"])
+@limiter.limit("100 per minute;1000 per hour")
 async def confirm_exchange_offer() -> Response:
     """
     Confirms an exchange offer based on the provided offer ID.
@@ -524,15 +636,15 @@ async def confirm_exchange_offer() -> Response:
         Response: Flask response with success or error message.
     """
     data: dict = request.json
-    offer_id: str = data["offerId"]
-    session_token: str = sanitize_input(request.cookies.get("session_token"))
-    csrf_token: str = sanitize_input(request.headers.get("X-CSRF-TOKEN"))
+    offer_id: int = data["offerId"]
+    session_token: str = request.cookies.get("session_token")
+    csrf_token: str = request.headers.get("X-CSRF-TOKEN")
 
     try:
         await user_confirm_offer(
-            session_token=session_token,
-            csrf_token=csrf_token,
-            offer_id=offer_id,
+            session_token,
+            csrf_token,
+            offer_id,
         )
         return jsonify({"message": "Offer completion confirmed successfully."}), 200
     except Exception as e:
@@ -540,6 +652,7 @@ async def confirm_exchange_offer() -> Response:
 
 
 @app.route("/offer/details", methods=["GET"])
+@limiter.limit("100 per minute;1000 per hour")
 async def get_offer_details() -> Response:
     """
     Retrieves details of a specific exchange offer based on the provided offer ID.
@@ -559,11 +672,7 @@ async def get_offer_details() -> Response:
             raise ValueError("Offer ID must be an integer.")
         offer_id_int: int = int(offer_id)
 
-        if offer_id_int not in exchange_offers:
-            return (
-                jsonify({"error": f"Offer with ID {offer_id_int} does not exist."}),
-                404,
-            )
+        validate_offer_id(offer_id_int)
 
         offer = exchange_offers[offer_id_int]
         return jsonify(offer.to_json()), 200
@@ -572,6 +681,7 @@ async def get_offer_details() -> Response:
 
 
 @app.route("/offer/cancel", methods=["POST"])
+@limiter.limit("100 per minute;1000 per hour")
 async def cancel_exchange_offer() -> Response:
     """
     Cancels an exchange offer based on the provided offer ID.
@@ -582,17 +692,17 @@ async def cancel_exchange_offer() -> Response:
         Response: Flask response with success or error message.
     """
     data: dict = request.json
-    session_token: str = sanitize_input(request.cookies.get("session_token"))
-    csrf_token: str = sanitize_input(request.headers.get("X-CSRF-TOKEN"))
+    session_token: str = request.cookies.get("session_token")
+    csrf_token: str = request.headers.get("X-CSRF-TOKEN")
     message: str = data["message"]
     offer_id: str = data["offerId"]
 
     try:
         await user_cancel_offer(
-            session_token=session_token,
-            csrf_token=csrf_token,
-            offer_id=offer_id,
-            message=message,
+            session_token,
+            csrf_token,
+            offer_id,
+            message,
         )
         return jsonify({"message": "Offer cancelled successfully"}), 200
     except Exception as e:
@@ -625,6 +735,7 @@ async def address_autocomplete() -> Response:
 
 
 @app.route("/api/item_search", methods=["POST"])
+@limiter.limit("100 per minute;1000 per hour")
 async def search_items() -> Response:
     """
     Searches for items based on the provided search term.
@@ -657,4 +768,4 @@ if __name__ == "__main__":
         exchange_offers.update(ExchangeOffer.backup())
 
     # Run Flask server in production mode on port 4000 for local testing
-    app.run(host="0.0.0.0", port=4000)
+    app.run(host="0.0.0.0", port=4000, debug=True)

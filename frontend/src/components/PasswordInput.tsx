@@ -9,6 +9,7 @@ interface PasswordInputProps {
   pwdChanged: boolean;
   setPwdChanged: (changed: boolean) => void;
   passwordError: string;
+  placeholder?: string;
 }
 
 // PasswordInput is a reusable component for entering passwords with toggle visibility and error display
@@ -24,7 +25,7 @@ export default function PasswordInput(props: PasswordInputProps) {
         <label
           id="password-label"
           htmlFor="password-input"
-          className="block mb-2 text-content"
+          className="block mb-2 text-mono-primary"
         >
           Password
         </label>
@@ -33,20 +34,20 @@ export default function PasswordInput(props: PasswordInputProps) {
           <input
             id="password-input"
             type={isPwdHidden ? "password" : "text"}
-            placeholder="Enter your password"
+            placeholder={props.placeholder || "Enter your password"}
             required
             minLength={8}
             maxLength={32}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             onFocus={() => setPwdChanged(true)}
-            className={`border-muted text-slate-800 rounded py-2 px-3 w-full ${pwdChanged ? "invalid:border-alert" : ""} border-2`}
+            className={`border-mono-secondary text-mono-primary rounded py-2 px-3 w-full ${pwdChanged ? "invalid:border-alert-primary" : ""} border-2`}
             aria-describedby="password-error"
           />
           <button
             type="button"
             onClick={() => setIsPwdHidden(!isPwdHidden)}
-            className="text-sm text-slate-800 hover:underline mt-2 absolute top-1.5 right-3"
+            className="text-sm text-mono-primary hover:underline mt-2 absolute top-1.5 right-3"
             aria-label="Toggle password visibility"
           >
             {isPwdHidden ? <RiEyeOffFill /> : <RiEyeFill />}
@@ -54,7 +55,10 @@ export default function PasswordInput(props: PasswordInputProps) {
         </div>
         {/* Display error message if password validation fails */}
         {passwordError != "" && (
-          <div id="password-error" className="text-alert text-center pt-2">
+          <div
+            id="password-error"
+            className="text-alert-primary text-center pt-2"
+          >
             {passwordError}
           </div>
         )}
