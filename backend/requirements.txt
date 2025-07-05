@@ -10,3 +10,4 @@ markupsafe
 google-genai
 Authlib
 bcrypt
+Flask-Limiter

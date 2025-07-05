@@ -11,7 +11,7 @@ from urllib.parse import quote
 from flask import redirect, request, jsonify, make_response, Response
 
 # Application config and database
-from backend.config import app, db, google_oauth
+from backend.config import app, db, google_oauth, limiter
 
 # Auth-related imports
 from backend.auth import (
@@ -166,8 +166,8 @@ async def login_user() -> Response:
         return jsonify({"error": str(e)}), 401
 
 
-# DELETE API for user logout
 @app.route("/auth/logout", methods=["DELETE"])
+@limiter.limit("100 per minute;1000 per hour")
 async def logout_user() -> Response:
     """
     Logs out the user by invalidating session and CSRF tokens.
@@ -198,8 +198,8 @@ async def logout_user() -> Response:
         return jsonify({"error": str(e)}), 401
 
 
-# POST API to validate tokens for active session verification
 @app.route("/auth/validate", methods=["POST"])
+@limiter.limit("100 per minute;1000 per hour")
 async def validate_token() -> Response:
     """
     Validates both session and CSRF tokens to verify if a user session is active.
@@ -247,6 +247,7 @@ async def forgot_pwd() -> Response:
 
 
 @app.route("/auth/reset_pwd", methods=["POST"])
+@limiter.limit("100 per minute;1000 per hour")
 async def reset_pwd() -> Response:
     """
     Resets the user's password.
@@ -268,6 +269,7 @@ async def reset_pwd() -> Response:
         return jsonify({"error": str(e)}), 400
 
 @app.route("/auth/google/login", methods=["GET"])
+@limiter.limit("100 per minute;1000 per hour")
 def google_auth_login():
     """
     Initiates Google OAuth 2.0 login by redirecting the user to Google's auth URL.
@@ -279,6 +281,7 @@ def google_auth_login():
     return google_oauth.authorize_redirect(redirect_uri)
 
 @app.route("/auth/google/callback", methods=["GET"])
+@limiter.limit("100 per minute;1000 per hour")
 async def google_auth_callback() -> Response:
     """
     Handles the callback from Google OAuth authentication.
@@ -315,6 +318,7 @@ async def google_auth_callback() -> Response:
         return redirect(f"{NEXT_PUBLIC_URL}/login?error={quote(str(e))}")
 
 @app.route("/item/create", methods=["POST"])
+@limiter.limit("100 per minute;1000 per hour")
 async def create_item() -> Response:
     """
     Creates a new item with the provided details.
@@ -363,8 +367,8 @@ async def create_item() -> Response:
         return jsonify({"error": str(e)}), 400
 
 
-# Unified GET /item route with optional filters
 @app.route("/item", methods=["GET"])
+@limiter.limit("100 per minute;1000 per hour")
 async def get_browse_items() -> Response:
     """
     Retrieves items from the database with optional filters:
@@ -394,6 +398,7 @@ async def get_browse_items() -> Response:
 
 
 @app.route("/item/userview", methods=["GET"])
+@limiter.limit("100 per minute;1000 per hour")
 async def get_user_items() -> Response:
     """
     Retrieves all items created by the user.
@@ -415,6 +420,7 @@ async def get_user_items() -> Response:
 
 
 @app.route("/item/edit", methods=["POST"])
+@limiter.limit("100 per minute;1000 per hour")
 async def edit_item() -> Response:
     """
     Edits an existing item with the provided details.
@@ -460,6 +466,7 @@ async def edit_item() -> Response:
 
 
 @app.route("/item/delete", methods=["DELETE"])
+@limiter.limit("100 per minute;1000 per hour")
 async def delete_item() -> Response:
     """
     Deletes an existing item based on the provided item ID.
@@ -486,6 +493,7 @@ async def delete_item() -> Response:
 
 
 @app.route("/offer/create", methods=["POST"])
+@limiter.limit("100 per minute;1000 per hour")
 async def create_exchange_offer() -> Response:
     """
     Creates a new exchange offer with the provided details.
@@ -519,6 +527,7 @@ async def create_exchange_offer() -> Response:
 
 
 @app.route("/offer/userview", methods=["GET"])
+@limiter.limit("100 per minute;1000 per hour")
 async def view_exchange_offers() -> Response:
     """
     Retrieves all exchange offers from the database for the user.
@@ -549,6 +558,7 @@ async def view_exchange_offers() -> Response:
 
 
 @app.route("/offer/accept", methods=["POST"])
+@limiter.limit("100 per minute;1000 per hour")
 async def accept_exchange_offer() -> Response:
     """
     Accepts an exchange offer based on the provided offer ID.
@@ -575,6 +585,7 @@ async def accept_exchange_offer() -> Response:
 
 
 @app.route("/offer/exchange_complete", methods=["POST"])
+@limiter.limit("100 per minute;1000 per hour")
 async def complete_exchange_offer() -> Response:
     """
     Completes an exchange offer based on the provided offer ID.
@@ -601,6 +612,7 @@ async def complete_exchange_offer() -> Response:
 
 
 @app.route("/offer/exchange_confirmed", methods=["POST"])
+@limiter.limit("100 per minute;1000 per hour")
 async def confirm_exchange_offer() -> Response:
     """
     Confirms an exchange offer based on the provided offer ID.
@@ -627,6 +639,7 @@ async def confirm_exchange_offer() -> Response:
 
 
 @app.route("/offer/details", methods=["GET"])
+@limiter.limit("100 per minute;1000 per hour")
 async def get_offer_details() -> Response:
     """
     Retrieves details of a specific exchange offer based on the provided offer ID.
@@ -659,6 +672,7 @@ async def get_offer_details() -> Response:
 
 
 @app.route("/offer/cancel", methods=["POST"])
+@limiter.limit("100 per minute;1000 per hour")
 async def cancel_exchange_offer() -> Response:
     """
     Cancels an exchange offer based on the provided offer ID.
@@ -712,6 +726,7 @@ async def address_autocomplete() -> Response:
 
 
 @app.route("/api/item_search", methods=["POST"])
+@limiter.limit("100 per minute;1000 per hour")
 async def search_items() -> Response:
     """
     Searches for items based on the provided search term.

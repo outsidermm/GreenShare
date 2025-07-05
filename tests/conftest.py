@@ -1,7 +1,7 @@
 import pytest
 from backend.models import ExchangeOfferDB, ItemDB, ItemImageDB, OfferedItemDB, UserDB
 from backend.data import users, items, exchange_offers
-from backend.config import app, db
+from backend.config import db
 
 
 @pytest.fixture(scope ="function", autouse=True)

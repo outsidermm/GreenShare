@@ -8,8 +8,16 @@ from flask import Flask
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from authlib.integrations.flask_client import OAuth
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
 app = Flask(__name__)
+
+limiter = Limiter(
+    get_remote_address,
+    app=app,
+    default_limits=["1000 per day", "200 per hour"]
+)
 
 app.config["SQLALCHEMY_DATABASE_URI"] = environ.get("DATABASE_URL")
 # Set secret key for secure sessions and CSRF protection, fetched from environment variables

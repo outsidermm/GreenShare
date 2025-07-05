@@ -158,7 +158,7 @@ class User:
         """
         self.set_csrf_token(None)
 
-    def hash_pwd(self, unhashed_pwd: str) -> str:
+    def hash_pwd(self, unhashed_pwd: str) -> bytes:
         """
         Hashes the provided password using bcrypt.
 
@@ -168,7 +168,7 @@ class User:
         Returns:
             str: bcrypt hash of the password.
         """
-        return bcrypt.hashpw(unhashed_pwd.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+        return bcrypt.hashpw(unhashed_pwd.encode('utf-8'), bcrypt.gensalt())
 
     def verify_pwd(self, pwd_input: str) -> bool:
         """
@@ -180,8 +180,8 @@ class User:
         Returns:
             bool: True if passwords match, False otherwise.
         """
-        encrypted_pwd: str = db.session.get(UserDB, self.get_user_pk()).password
-        return bcrypt.checkpw(pwd_input.encode('utf-8'), encrypted_pwd.encode('utf-8'))
+        encrypted_pwd: bytes = db.session.get(UserDB, self.get_user_pk()).password
+        return bcrypt.checkpw(pwd_input.encode('utf-8'), encrypted_pwd)
 
     def user_data(self) -> dict:
         """
