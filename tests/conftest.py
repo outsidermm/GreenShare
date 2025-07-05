@@ -4,7 +4,7 @@ from backend.data import users, items, exchange_offers
 from backend.config import db
 
 
-@pytest.fixture(scope ="function", autouse=True)
+@pytest.fixture(scope="function", autouse=True)
 def clear_users():
     """
     Clears the global users dictionary and related data before each test to ensure test isolation.

@@ -86,9 +86,9 @@ async def test_offer_cancellation_by_offer_maker():
 
     # Maker cancels the offer
     await user_cancel_offer(
-        offer_id=offer_key,
-        session_token=maker_token,
-        csrf_token=maker_csrf,
+        maker_token,
+        maker_csrf,
+        offer_key,
     )
     # Offer should now be cancelled
     assert exchange_offers[offer_key].get_status() == "cancelled"
@@ -165,9 +165,9 @@ async def test_unauthorised_offer_acceptance():
     # Attacker tries to accept the offer, which should fail
     with pytest.raises(HTTPException) as excinfo:
         await user_accept_offer(
-            offer_id=(offer_key),
-            session_token=attacker_token,
-            csrf_token=attacker_csrf,
+            attacker_token,
+            attacker_csrf,
+            offer_key,
         )
     assert "not authorised to accept" in excinfo.value.description
     # Offer should remain pending
@@ -238,17 +238,17 @@ async def test_cancel_after_accept_fails():
 
     # Owner accepts the offer
     await user_accept_offer(
-        offer_id=key,
-        session_token=owner_token,
-        csrf_token=owner_csrf,
+        owner_token,
+        owner_csrf,
+        key,
     )
 
     # Maker tries to cancel after acceptance, which should fail
     with pytest.raises(HTTPException) as excinfo:
         await user_cancel_offer(
-            offer_id=key,
-            session_token=maker_token,
-            csrf_token=maker_csrf,
+            maker_token,
+            maker_csrf,
+            key,
         )
     assert "cannot be cancelled" in excinfo.value.description
 
@@ -319,25 +319,25 @@ async def test_full_offer_flow():
 
     # Owner accepts the offer
     await user_accept_offer(
-        offer_id=offer_id,
-        session_token=owner_token,
-        csrf_token=owner_csrf,
+        owner_token,
+        owner_csrf,
+        offer_id,
     )
     assert exchange_offers[offer_id].get_status() == "accepted"
 
     # Offerer marks the offer as completed
     await user_complete_offer(
-        offer_id=offer_id,
-        session_token=offerer_token,
-        csrf_token=offerer_csrf,
+        offerer_token,
+        offerer_csrf,
+        offer_id,
     )
     assert exchange_offers[offer_id].get_status() == "completed"
 
     # Owner confirms the completion
     await user_confirm_offer(
-        offer_id=offer_id,
-        session_token=owner_token,
-        csrf_token=owner_csrf,
+        owner_token,
+        owner_csrf,
+        offer_id,
     )
     assert exchange_offers[offer_id].get_status() == "confirmed"
 
@@ -434,18 +434,18 @@ async def test_multiple_offers_conflict():
 
     # Owner accepts the first offer
     await user_accept_offer(
-        offer_id=(offer1_id),
-        session_token=owner_token,
-        csrf_token=owner_csrf,
+        owner_token,
+        owner_csrf,
+        offer1_id,
     )
     assert exchange_offers[offer1_id].get_status() == "accepted"
 
     # Owner tries to accept the second offer, which should fail
     with pytest.raises(HTTPException) as excinfo:
         await user_accept_offer(
-            offer_id=(offer2_id),
-            session_token=owner_token,
-            csrf_token=owner_csrf,
+            owner_token,
+            owner_csrf,
+            offer2_id,
         )
     assert "already been accepted or confirmed" in excinfo.value.description
 
@@ -515,16 +515,16 @@ async def test_unauthorised_offer_confirmation():
     offer_key = offer.get_offer_pk()
 
     await user_accept_offer(
-        session_token=owner_token,
-        csrf_token=owner_csrf,
-        offer_id=(offer_key),
+        owner_token,
+        owner_csrf,
+        offer_key,
     )
 
     with pytest.raises(HTTPException) as excinfo:
         await user_confirm_offer(
-            session_token=stranger_token,
-            csrf_token=stranger_csrf,
-            offer_id=(offer_key),
+            stranger_token,
+            stranger_csrf,
+            offer_key,
         )
     assert "not authorised to confirm" in excinfo.value.description
     assert exchange_offers[offer_key].get_status() == "accepted"
@@ -590,16 +590,16 @@ async def test_offer_confirmation_before_completion():
     offer_key = offer.get_offer_pk()
 
     await user_accept_offer(
-        session_token=owner_token,
-        csrf_token=owner_csrf,
-        offer_id=(offer_key),
+        owner_token,
+        owner_csrf,
+        offer_key,
     )
 
     with pytest.raises(HTTPException) as excinfo:
         await user_confirm_offer(
-            session_token=owner_token,
-            csrf_token=owner_csrf,
-            offer_id=(offer_key),
+            owner_token,
+            owner_csrf,
+            offer_key,
         )
     assert "not in a completed state" in excinfo.value.description
     assert exchange_offers[offer_key].get_status() == "accepted"

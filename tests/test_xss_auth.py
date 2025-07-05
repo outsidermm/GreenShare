@@ -18,7 +18,7 @@ def bypass_validations(monkeypatch):
     monkeypatch.setattr("backend.auth.pwd_auth", lambda pwd: True)
     monkeypatch.setattr("backend.auth.email_auth", lambda email: True)
     monkeypatch.setattr("backend.auth.name_auth", lambda name, err_prefix: True)
-    monkeypatch.setattr("backend.utils.unsanitize_output", lambda x: x)
+    monkeypatch.setattr("backend.classes.user.unsanitize_output", lambda x: x)
 
 
 # -----------------------------------------------------------------------------
@@ -56,10 +56,10 @@ async def test_xss_escaping_all_fields():
 
     # Register the user with malicious inputs; auth.py handles validation, normalisation, and sanitisation.
     tokens = await user_auth_register(
-        email=malicious_email,
-        pwd=malicious_password,
-        first_name=malicious_first_name,
-        last_name=malicious_last_name,
+        malicious_email,
+        malicious_password,
+        malicious_first_name,
+        malicious_last_name,
     )
 
     # Assert that the sanitised email is used as the key in the global users dictionary.
@@ -74,7 +74,7 @@ async def test_xss_escaping_all_fields():
     assert (
         user.get_email() == expected_email
     ), "User email should be normalized (lowercased)."
-    
+
     assert (
         user.get_first_name() == expected_first_name
     ), "User first name should be capitalized and HTML escaped."
@@ -84,4 +84,3 @@ async def test_xss_escaping_all_fields():
     assert (
         user.verify_pwd(expected_password) is True
     ), "User password should verify correctly (not escaped)."
-

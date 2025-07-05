@@ -210,6 +210,7 @@ async def test_user_auth_logout_invalid_tokens():
         await user_auth_logout("invalid_session", "invalid_csrf")
     assert "Matching tokens do not exist" in excinfo.value.description
 
+
 @pytest.mark.asyncio
 async def test_user_password_reset_token():
     """
@@ -232,12 +233,12 @@ async def test_user_password_reset_token():
         first_name="Frank",
         last_name="Miller",
     )
-    
+
     reset_token = generate_reset_token("pwdreset@domain.com".lower().strip())
     email = verify_reset_token(reset_token)
-    
+
     assert email == "pwdreset@domain.com"
-    
+
     await user_auth_reset_pwd(reset_token, "NewPassword1!")
     assert users[email].verify_pwd("NewPassword1!") == True
 

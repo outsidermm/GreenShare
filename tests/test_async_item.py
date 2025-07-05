@@ -13,7 +13,6 @@ from backend.items import (
 from backend.utils import sanitize_input
 
 
-
 @pytest.fixture(scope="module", autouse=True)
 def app_context():
     with app.app_context():
@@ -158,9 +157,7 @@ async def test_view_items_filter_by_location_and_type():
         session_token=session_token,
         csrf_token=csrf_token,
     )
-    filtered_items = await user_get_browse_items(
-        type_filter="free"
-    )
+    filtered_items = await user_get_browse_items(type_filter="free")
     assert len(filtered_items) > 0
 
 
@@ -232,20 +229,22 @@ async def test_modify_item_success():
     updated_item = await user_get_browse_items(item_id=str(item_id))
     # Verify the title and location have been updated as expected
     assert updated_item[item_id].get_title() == sanitize_input("New Title".lower())
-    assert updated_item[item_id].get_location() == sanitize_input("Brisbane Qld, Australia".lower())
+    assert updated_item[item_id].get_location() == sanitize_input(
+        "Brisbane Qld, Australia".lower()
+    )
 
 
 @pytest.mark.asyncio
 async def test_delete_item_success():
     """
     Confirm that a user can successfully delete their own item.
-    
+
     Steps:
         - Register a user
         - Create an item
         - Delete the item
         - Verify it is removed from the global registry
-    
+
     Expected:
         - Item is removed from the global `items` dictionary
     """

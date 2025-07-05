@@ -1,8 +1,8 @@
 import pytest
 from backend.auth import user_auth_register
 from backend.items import user_create_item
-from backend.offers import user_create_offer
-from backend.config import app, db
+from backend.offers import user_create_offer, user_cancel_offer
+from backend.config import app
 from markupsafe import escape
 
 
@@ -18,7 +18,9 @@ def bypass_validations(monkeypatch):
     monkeypatch.setattr("backend.auth.pwd_auth", lambda pwd: True)
     monkeypatch.setattr("backend.auth.email_auth", lambda email: True)
     monkeypatch.setattr("backend.auth.name_auth", lambda name, err_prefix: True)
-    monkeypatch.setattr("backend.utils.unsanitize_output", lambda x: x)
+    monkeypatch.setattr("backend.classes.item.unsanitize_output", lambda x: x)
+    monkeypatch.setattr("backend.classes.user.unsanitize_output", lambda x: x)
+    monkeypatch.setattr("backend.classes.exchange_offer.unsanitize_output", lambda x: x)
 
 
 @pytest.mark.asyncio
@@ -28,19 +30,19 @@ async def test_xss_prevention_in_offer_messages():
     """
     # Create two users
     session_a, csrf_a = await user_auth_register(
-        email="user_a@example.com",
-        pwd="Password123!",
-        first_name="User",
-        last_name="Abb",
+        "user_a@example.com",
+        "Password123!",
+        "User",
+        "Abb",
     )
-    
+
     session_b, csrf_b = await user_auth_register(
-        email="user_b@example.com",
-        pwd="Password123!",
-        first_name="User",
-        last_name="Bbbb",
+        "user_b@example.com",
+        "Password123!",
+        "User",
+        "Bbbb",
     )
-    
+
     # User A creates an item
     item_a = await user_create_item(
         session_token=session_a,
@@ -52,10 +54,10 @@ async def test_xss_prevention_in_offer_messages():
         new_images=["https://example.com/image1.jpg"],
         new_location="Sydney, Australia",
     )
-    
+
     # User B creates an offer with XSS payload in message
     malicious_message = "<script>alert('XSS')</script>This is a malicious offer!"
-    
+
     offer = await user_create_offer(
         session_token=session_b,
         csrf_token=csrf_b,
@@ -63,20 +65,19 @@ async def test_xss_prevention_in_offer_messages():
         requested_item_id=item_a.get_item_pk(),
         message=malicious_message,
     )
-    
+
     # The message should be sanitized and lowercased
     expected_message = str(escape(malicious_message.lower()))
-    
+
     # Verify the offer message is properly sanitized
     assert offer.get_message() == expected_message, (
         f"Offer message should be sanitized. Got: {offer.get_message()}, "
         f"Expected: {expected_message}"
     )
-    
+
     # Verify the sanitized message doesn't contain script tags
     assert "<script>" not in offer.get_message()
-    assert "alert(" not in offer.get_message()
-    
+
     # Verify HTML entities are used instead
     assert "&lt;script&gt;" in offer.get_message()
     assert "&#39;" in offer.get_message()  # Single quote escaped
@@ -89,19 +90,19 @@ async def test_xss_prevention_in_cancel_message():
     """
     # Create two users
     session_a, csrf_a = await user_auth_register(
-        email="user_a@example.com",
-        pwd="Password123!",
-        first_name="User",
-        last_name="Abb",
+        "user_a@example.com",
+        "Password123!",
+        "User",
+        "Abb",
     )
-    
+
     session_b, csrf_b = await user_auth_register(
-        email="user_b@example.com",
-        pwd="Password123!",
-        first_name="User",
-        last_name="Bbb",
+        "user_b@example.com",
+        "Password123!",
+        "User",
+        "Bbb",
     )
-    
+
     # User A creates an item
     item_a = await user_create_item(
         session_token=session_a,
@@ -113,7 +114,7 @@ async def test_xss_prevention_in_cancel_message():
         new_images=["https://example.com/image1.jpg"],
         new_location="Sydney, Australia",
     )
-    
+
     # User B creates a normal offer
     offer = await user_create_offer(
         session_token=session_b,
@@ -122,30 +123,24 @@ async def test_xss_prevention_in_cancel_message():
         requested_item_id=item_a.get_item_pk(),
         message="This is a normal offer message",
     )
-    
-    # Import the cancel function
-    from backend.offers import user_cancel_offer
-    
+
     # Cancel with XSS payload
     malicious_cancel_message = "<img src=x onerror=alert('XSS')>Cancelled with XSS"
-    
+
     await user_cancel_offer(
-        session_token=session_b,
-        csrf_token=csrf_b,
-        offer_id=offer.get_offer_pk(),
-        message=malicious_cancel_message,
+        session_b,
+        csrf_b,
+        offer.get_offer_pk(),
+        malicious_cancel_message,
     )
-    
+
     # The cancel message should be sanitized and lowercased
     expected_cancel_message = str(escape(malicious_cancel_message.lower()))
-    
+
     # Verify the offer's message is updated with sanitized cancel message
     assert offer.get_message() == expected_cancel_message, (
         f"Cancel message should be sanitized. Got: {offer.get_message()}, "
         f"Expected: {expected_cancel_message}"
     )
-    
-    # Verify no raw HTML/JS in the message
+
     assert "<img" not in offer.get_message()
-    assert "onerror=" not in offer.get_message()
-    assert "alert(" not in offer.get_message()
