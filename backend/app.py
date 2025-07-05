@@ -31,7 +31,14 @@ from backend.classes.item import Item
 from backend.classes.exchange_offer import ExchangeOffer
 
 # Data management
-from backend.data import image_upload, users, items, exchange_offers, PLACES_API_KEY, NEXT_PUBLIC_URL
+from backend.data import (
+    image_upload,
+    users,
+    items,
+    exchange_offers,
+    PLACES_API_KEY,
+    NEXT_PUBLIC_URL,
+)
 
 # Items
 from backend.items import (
@@ -51,6 +58,7 @@ from backend.offers import (
     user_confirm_offer,
     user_create_offer,
     user_get_offers,
+    validate_offer_id,
 )
 
 # Utils
@@ -268,17 +276,19 @@ async def reset_pwd() -> Response:
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
+
 @app.route("/auth/google/login", methods=["GET"])
 @limiter.limit("100 per minute;1000 per hour")
 def google_auth_login():
     """
     Initiates Google OAuth 2.0 login by redirecting the user to Google's auth URL.
-    
+
     Returns:
         Response: Redirect to Google's OAuth 2.0 authorisation page.
     """
     redirect_uri = "http://localhost:4000/auth/google/callback"
     return google_oauth.authorize_redirect(redirect_uri)
+
 
 @app.route("/auth/google/callback", methods=["GET"])
 @limiter.limit("100 per minute;1000 per hour")
@@ -294,15 +304,19 @@ async def google_auth_callback() -> Response:
     """
     try:
         token = google_oauth.authorize_access_token()
-        userinfo_endpoint = google_oauth.server_metadata['userinfo_endpoint']
+        userinfo_endpoint = google_oauth.server_metadata["userinfo_endpoint"]
         response = google_oauth.get(userinfo_endpoint)
         user_info = response.json()
         email: str = user_info["email"]
         first_name: str = user_info.get("given_name", "")
         last_name: str = user_info.get("family_name", "")
-        session_token, csrf_token = await user_auth_google_oauth(email, first_name=first_name, last_name=last_name)
+        session_token, csrf_token = await user_auth_google_oauth(
+            email, first_name=first_name, last_name=last_name
+        )
 
-        redirect_response = make_response(redirect(f"{NEXT_PUBLIC_URL}/login?csrfToken={quote(csrf_token)}"))
+        redirect_response = make_response(
+            redirect(f"{NEXT_PUBLIC_URL}/login?csrfToken={quote(csrf_token)}")
+        )
 
         redirect_response.set_cookie(
             "session_token",
@@ -313,9 +327,10 @@ async def google_auth_callback() -> Response:
         )
 
         return redirect_response
-        
+
     except Exception as e:
         return redirect(f"{NEXT_PUBLIC_URL}/login?error={quote(str(e))}")
+
 
 @app.route("/item/create", methods=["POST"])
 @limiter.limit("100 per minute;1000 per hour")
@@ -406,14 +421,12 @@ async def get_user_items() -> Response:
     Returns:
         Response: List of items created by the user.
     """
-    # Retrieve session and CSRF tokens and sanitize
-    session_token: str = sanitize_input(request.cookies.get("session_token"))
-    csrf_token: str = sanitize_input(request.headers.get("X-CSRF-TOKEN"))
+    # Retrieve session and CSRF tokens and sanitise
+    session_token: str = request.cookies.get("session_token")
+    csrf_token: str = request.headers.get("X-CSRF-TOKEN")
 
     try:
-        user_items: list = await user_view_item(
-            session_token=session_token, csrf_token=csrf_token
-        )
+        user_items: list = await user_view_item(session_token, csrf_token)
         return jsonify([item.to_dict() for item in user_items]), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -478,8 +491,8 @@ async def delete_item() -> Response:
     """
     try:
         data: dict = request.json
-        session_token: str = sanitize_input(request.cookies.get("session_token"))
-        csrf_token: str = sanitize_input(request.headers.get("X-CSRF-TOKEN"))
+        session_token: str = request.cookies.get("session_token")
+        csrf_token: str = request.headers.get("X-CSRF-TOKEN")
         item_id: str = data["id"]
 
         await user_delete_item(
@@ -505,18 +518,18 @@ async def create_exchange_offer() -> Response:
     """
     try:
         data: dict = request.json
-        session_token: str = sanitize_input(request.cookies.get("session_token"))
-        csrf_token: str = sanitize_input(request.headers.get("X-CSRF-TOKEN"))
+        session_token: str = request.cookies.get("session_token")
+        csrf_token: str = request.headers.get("X-CSRF-TOKEN")
         offered_item_ids: list = data["offeredItemIds"]
         requested_item_id: str = data["requestedItemId"]
         message: str = data["message"]
 
         await user_create_offer(
-            session_token=session_token,
-            csrf_token=csrf_token,
-            offered_item_ids=offered_item_ids,
-            requested_item_id=requested_item_id,
-            message=message,
+            session_token,
+            csrf_token,
+            offered_item_ids,
+            requested_item_id,
+            message,
         )
         return (
             jsonify({"message": "Exchange offer has been successfully created."}),
@@ -535,12 +548,12 @@ async def view_exchange_offers() -> Response:
     Returns:
         Response: List of exchange offers.
     """
-    session_token: str = sanitize_input(request.cookies.get("session_token"))
-    csrf_token: str = sanitize_input(request.headers.get("X-CSRF-TOKEN"))
+    session_token: str = request.cookies.get("session_token")
+    csrf_token: str = request.headers.get("X-CSRF-TOKEN")
 
     try:
         outgoing_offers, incoming_offers = await user_get_offers(
-            session_token=session_token, csrf_token=csrf_token
+            session_token, csrf_token
         )
         outgoing_offers_dict: list = [offer.to_json() for offer in outgoing_offers]
         incoming_offers_dict: list = [offer.to_json() for offer in incoming_offers]
@@ -569,15 +582,15 @@ async def accept_exchange_offer() -> Response:
         Response: Flask response with success or error message.
     """
     data: dict = request.json
-    offer_id: str = data["offerId"]
-    session_token: str = sanitize_input(request.cookies.get("session_token"))
-    csrf_token: str = sanitize_input(request.headers.get("X-CSRF-TOKEN"))
+    offer_id: int = data["offerId"]
+    session_token: str = request.cookies.get("session_token")
+    csrf_token: str = request.headers.get("X-CSRF-TOKEN")
 
     try:
         await user_accept_offer(
-            session_token=session_token,
-            csrf_token=csrf_token,
-            offer_id=offer_id,
+            session_token,
+            csrf_token,
+            offer_id,
         )
         return jsonify({"message": "Offer accepted successfully."}), 200
     except Exception as e:
@@ -596,15 +609,15 @@ async def complete_exchange_offer() -> Response:
         Response: Flask response with success or error message.
     """
     data: dict = request.json
-    offer_id: str = data["offerId"]
-    session_token: str = sanitize_input(request.cookies.get("session_token"))
-    csrf_token: str = sanitize_input(request.headers.get("X-CSRF-TOKEN"))
+    offer_id: int = data["offerId"]
+    session_token: str = request.cookies.get("session_token")
+    csrf_token: str = request.headers.get("X-CSRF-TOKEN")
 
     try:
         await user_complete_offer(
-            session_token=session_token,
-            csrf_token=csrf_token,
-            offer_id=offer_id,
+            session_token,
+            csrf_token,
+            offer_id,
         )
         return jsonify({"message": "Offer completed successfully."}), 200
     except Exception as e:
@@ -623,15 +636,15 @@ async def confirm_exchange_offer() -> Response:
         Response: Flask response with success or error message.
     """
     data: dict = request.json
-    offer_id: str = data["offerId"]
-    session_token: str = sanitize_input(request.cookies.get("session_token"))
-    csrf_token: str = sanitize_input(request.headers.get("X-CSRF-TOKEN"))
+    offer_id: int = data["offerId"]
+    session_token: str = request.cookies.get("session_token")
+    csrf_token: str = request.headers.get("X-CSRF-TOKEN")
 
     try:
         await user_confirm_offer(
-            session_token=session_token,
-            csrf_token=csrf_token,
-            offer_id=offer_id,
+            session_token,
+            csrf_token,
+            offer_id,
         )
         return jsonify({"message": "Offer completion confirmed successfully."}), 200
     except Exception as e:
@@ -659,11 +672,7 @@ async def get_offer_details() -> Response:
             raise ValueError("Offer ID must be an integer.")
         offer_id_int: int = int(offer_id)
 
-        if offer_id_int not in exchange_offers:
-            return (
-                jsonify({"error": f"Offer with ID {offer_id_int} does not exist."}),
-                404,
-            )
+        validate_offer_id(offer_id_int)
 
         offer = exchange_offers[offer_id_int]
         return jsonify(offer.to_json()), 200
@@ -683,17 +692,17 @@ async def cancel_exchange_offer() -> Response:
         Response: Flask response with success or error message.
     """
     data: dict = request.json
-    session_token: str = sanitize_input(request.cookies.get("session_token"))
-    csrf_token: str = sanitize_input(request.headers.get("X-CSRF-TOKEN"))
+    session_token: str = request.cookies.get("session_token")
+    csrf_token: str = request.headers.get("X-CSRF-TOKEN")
     message: str = data["message"]
     offer_id: str = data["offerId"]
 
     try:
         await user_cancel_offer(
-            session_token=session_token,
-            csrf_token=csrf_token,
-            offer_id=offer_id,
-            message=message,
+            session_token,
+            csrf_token,
+            offer_id,
+            message,
         )
         return jsonify({"message": "Offer cancelled successfully"}), 200
     except Exception as e:

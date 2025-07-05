@@ -141,8 +141,10 @@ class ExchangeOfferDB(db.Model):
         Returns:
             dict: A dictionary containing offer details, including involved items and status.
         """
-        requested_item: ItemDB= db.session.get(ItemDB, self.requested_item_id)
-        offered_items: List[ItemDB] = [db.session.get(ItemDB, item.item_id) for item in self.offered_items]
+        requested_item: ItemDB = db.session.get(ItemDB, self.requested_item_id)
+        offered_items: List[ItemDB] = [
+            db.session.get(ItemDB, item.item_id) for item in self.offered_items
+        ]
 
         return {
             "id": self.id,

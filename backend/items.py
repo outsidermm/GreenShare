@@ -12,7 +12,12 @@ from backend.utils import (
     sanitize_input,
 )
 from backend.auth import validate_user_id
-from backend.data import PLACES_API_KEY, admin_retrieve_user_id, item_categorisation, items
+from backend.data import (
+    PLACES_API_KEY,
+    admin_retrieve_user_id,
+    item_categorisation,
+    items,
+)
 from backend.models import ItemDB
 from backend.config import db
 from backend.classes.item import Item
@@ -37,7 +42,8 @@ def validate_item_id(item_id: str, prefix="") -> int:
         abort(404, f"{prefix} Item with ID {item_id_int} does not exist.")
     return item_id_int
 
-def validate_item_availability(item_id: str, prefix="", isAbort = True) -> int:
+
+def validate_item_availability(item_id: str, prefix="", isAbort=True) -> int:
     """
     Validates if the item is available.
 
@@ -54,6 +60,7 @@ def validate_item_availability(item_id: str, prefix="", isAbort = True) -> int:
         else:
             return -1
     return item_id_int
+
 
 def validate_condition(condition: str) -> str:
     """
@@ -119,8 +126,9 @@ def validate_category(category: str) -> str:
         category_lc = "essentials"  # Default category if invalid
     return sanitize_input(category_lc)
 
+
 async def validate_location(location: str) -> str:
-    """ Validates the location of an item using Google Maps Address Validation API.
+    """Validates the location of an item using Google Maps Address Validation API.
     Args:
         location (str): The location string to validate.
     Returns:
@@ -129,9 +137,10 @@ async def validate_location(location: str) -> str:
         400: If the location is invalid or cannot be validated.
     """
     response = requests.post(
-        'https://addressvalidation.googleapis.com/v1:validateAddress?key=' + PLACES_API_KEY,
+        "https://addressvalidation.googleapis.com/v1:validateAddress?key="
+        + PLACES_API_KEY,
         json={"address": {"addressLines": [location]}},
-        timeout=3000
+        timeout=3000,
     ).json()
 
     result = response["result"]
@@ -139,10 +148,15 @@ async def validate_location(location: str) -> str:
     formatted_address = result["address"]["formattedAddress"]
 
     # Check if address is likely bad or incomplete
-    if verdict.get("hasUnresolvedTokens") or verdict.get("hasUnconfirmedComponents") or not formatted_address:
+    if (
+        verdict.get("hasUnresolvedTokens")
+        or verdict.get("hasUnconfirmedComponents")
+        or not formatted_address
+    ):
         abort(400, "Invalid or unconfirmed address. Please check your input.")
 
     return sanitize_input(formatted_address.lower())
+
 
 def title_matches(user_input: str, item_title: str, threshold: float = 0.3) -> bool:
     """
@@ -237,7 +251,9 @@ async def user_view_item(session_token: str, csrf_token: str) -> list[Item]:
     Returns:
         list[Item]: List of Item objects owned by the user and available.
     """
-    user_id: int = admin_retrieve_user_id(session_token, csrf_token)
+    safe_session_token: str = sanitize_input(session_token)
+    safe_csrf_token: str = sanitize_input(csrf_token)
+    user_id: int = admin_retrieve_user_id(safe_session_token, safe_csrf_token)
     owned_items: list[Item] = []
     # Iterate through all items and collect those that are available and owned by the user
     for item in items.values():
@@ -349,7 +365,7 @@ async def user_modify_item(
     item_id_int: int = validate_item_availability(item_id)
     if item_id_int == -1:
         abort(404, "Item is not available for modification.")
-    
+
     # Check permission: only owner can modify
     if items[item_id_int].get_user_id() != user_id:
         abort(403, "You do not have permission to modify this item.")
@@ -406,10 +422,11 @@ async def user_delete_item(
         403: If the user does not own the item.
     """
     item_id_int: int = validate_item_availability(item_id)
-    if item_id_int == -1:
-        abort(404, "Item is not available for deletion.")
+
     # Only allow deletion if valid session/CSRF tokens are provided
-    user_id: int = admin_retrieve_user_id(session_token, csrf_token)
+    safe_session_token: str = sanitize_input(session_token)
+    safe_csrf_token: str = sanitize_input(csrf_token)
+    user_id: int = admin_retrieve_user_id(safe_session_token, safe_csrf_token)
     validate_user_id(user_id)  # Ensure the user ID is valid
     if items[item_id_int].get_user_id() != user_id:
         abort(403, "You do not have permission to delete this item.")

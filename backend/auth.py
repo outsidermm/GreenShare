@@ -113,7 +113,7 @@ def email_auth(email: str) -> bool:
 
 
 async def user_auth_register(
-    email: str, pwd: str, first_name: str, last_name: str, is_google_oauth : bool = False
+    email: str, pwd: str, first_name: str, last_name: str, is_google_oauth: bool = False
 ) -> Tuple[str, str]:
     """
     Registers a new user by validating credentials and creating a user instance.
@@ -141,7 +141,9 @@ async def user_auth_register(
 
     # Validate each input
     email_auth(email)
-    pwd_auth(pwd) if not is_google_oauth else None  # Password validation only if not using Google OAuth
+    (
+        pwd_auth(pwd) if not is_google_oauth else None
+    )  # Password validation only if not using Google OAuth
     name_auth(first_name, "First")
     name_auth(last_name, "Last")
 
@@ -158,14 +160,18 @@ async def user_auth_register(
 
     # Create new user with sanitized data
     print(f"Creating new user: {safe_email}, Google OAuth: {is_google_oauth}")
-    new_user: User = User(safe_email, safe_first_name, safe_last_name, safe_pwd, is_google_oauth)
+    new_user: User = User(
+        safe_email, safe_first_name, safe_last_name, safe_pwd, is_google_oauth
+    )
     users[safe_email] = new_user  # Store the user object by email
 
     # Return session and csrf tokens for the new user
     return new_user.get_session_token(), new_user.get_csrf_token()
 
 
-async def user_auth_login(email: str, pwd_input: str, is_google_oauth : bool = False) -> Tuple[str, str]:
+async def user_auth_login(
+    email: str, pwd_input: str, is_google_oauth: bool = False
+) -> Tuple[str, str]:
     """
     Authenticates an existing user with email and password, generating new session tokens.
 
@@ -183,7 +189,9 @@ async def user_auth_login(email: str, pwd_input: str, is_google_oauth : bool = F
     email = email.lower()  # Normalise the email to lowercase
 
     email_auth(email)
-    pwd_auth(pwd_input) if not is_google_oauth else None  # Password validation only if not using Google OAuth
+    (
+        pwd_auth(pwd_input) if not is_google_oauth else None
+    )  # Password validation only if not using Google OAuth
 
     # Sanitize email (no HTML escaping needed for emails)
     safe_email: str = sanitize_email(email)
@@ -371,7 +379,10 @@ async def user_auth_reset_pwd(token: str, new_pwd: str) -> None:
 
     user.set_password(new_pwd)
 
-async def user_auth_google_oauth(email: str, first_name: str, last_name: str) -> Tuple[str, str]:
+
+async def user_auth_google_oauth(
+    email: str, first_name: str, last_name: str
+) -> Tuple[str, str]:
     """
     Registers or logs in a user using Google OAuth credentials.
 
@@ -386,10 +397,14 @@ async def user_auth_google_oauth(email: str, first_name: str, last_name: str) ->
     # Normalize and validate inputs
     safe_email = sanitize_input(email.lower())  # Normalise the email to lowercase
     email_auth(safe_email)
-    
+
     if safe_email in users:
-        session_token, csrf_token = await user_auth_login(email, "", is_google_oauth=True)
+        session_token, csrf_token = await user_auth_login(
+            email, "", is_google_oauth=True
+        )
     else:
-        session_token, csrf_token = await user_auth_register(email,"",first_name=first_name, last_name=last_name, is_google_oauth=True)
-    
+        session_token, csrf_token = await user_auth_register(
+            email, "", first_name=first_name, last_name=last_name, is_google_oauth=True
+        )
+
     return session_token, csrf_token

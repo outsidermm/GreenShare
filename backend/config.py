@@ -14,9 +14,7 @@ from flask_limiter.util import get_remote_address
 app = Flask(__name__)
 
 limiter = Limiter(
-    get_remote_address,
-    app=app,
-    default_limits=["1000 per day", "200 per hour"]
+    get_remote_address, app=app, default_limits=["1000 per day", "200 per hour"]
 )
 
 app.config["SQLALCHEMY_DATABASE_URI"] = environ.get("DATABASE_URL")
@@ -27,9 +25,7 @@ app.config["SESSION_COOKIE_SECURE"] = False  # Ensures cookie is sent only over 
 app.config["SESSION_COOKIE_HTTPONLY"] = (
     True  # Restricts access to cookies from JavaScript
 )
-app.config["SESSION_COOKIE_SAMESITE"] = (
-    "Lax" 
-)
+app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 
 # Set up Cross-Origin Resource Sharing (CORS) to allow requests from a specific front-end origin
 CORS(

@@ -11,6 +11,7 @@ from backend.models import UserDB
 from backend.config import db
 from backend.utils import sanitize_input, unsanitize_output
 
+
 class User:
     """
     Represents a user with attributes for email, name, password, and session management.
@@ -44,23 +45,23 @@ class User:
             new_last_name (str): User's last name.
             new_pwd_input (str): Plaintext password to be hashed.
         """
-        
-        new_user:UserDB = None
-        
+
+        new_user: UserDB = None
+
         # Create a new user database entry with hashed password
         if is_google_oauth:
             new_user: UserDB = UserDB(
-            email=new_email,
-            first_name=new_first_name,
-            last_name=new_last_name,
+                email=new_email,
+                first_name=new_first_name,
+                last_name=new_last_name,
             )
         else:
             new_user: UserDB = UserDB(
-            email=new_email,
-            first_name=new_first_name,
-            last_name=new_last_name,
-            password=self.hash_pwd(new_pwd_input),
-        )
+                email=new_email,
+                first_name=new_first_name,
+                last_name=new_last_name,
+                password=self.hash_pwd(new_pwd_input),
+            )
 
         db.session.add(new_user)
         db.session.commit()
@@ -168,7 +169,7 @@ class User:
         Returns:
             str: bcrypt hash of the password.
         """
-        return bcrypt.hashpw(unhashed_pwd.encode('utf-8'), bcrypt.gensalt())
+        return bcrypt.hashpw(unhashed_pwd.encode("utf-8"), bcrypt.gensalt())
 
     def verify_pwd(self, pwd_input: str) -> bool:
         """
@@ -181,7 +182,7 @@ class User:
             bool: True if passwords match, False otherwise.
         """
         encrypted_pwd: bytes = db.session.get(UserDB, self.get_user_pk()).password
-        return bcrypt.checkpw(pwd_input.encode('utf-8'), encrypted_pwd)
+        return bcrypt.checkpw(pwd_input.encode("utf-8"), encrypted_pwd)
 
     def user_data(self) -> dict:
         """
@@ -296,9 +297,9 @@ class User:
             is_google_oauth (bool): True if registered via Google OAuth, False otherwise.
         """
         self.__is_google_oauth = is_google_oauth
-    
+
     def is_google_oauth(self) -> bool:
-        """        Checks if the user registered via Google OAuth.
+        """Checks if the user registered via Google OAuth.
         Returns:
             bool: True if registered via Google OAuth, False otherwise.
         """

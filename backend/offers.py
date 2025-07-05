@@ -8,7 +8,7 @@ from typing import Tuple
 
 from flask import abort
 from backend.items import validate_item_availability
-from backend.utils import validate_string_length
+from backend.utils import sanitize_input, validate_string_length
 from backend.auth import validate_user_id
 from backend.data import items, exchange_offers
 from backend.data import admin_retrieve_user_id
@@ -57,7 +57,9 @@ async def user_create_offer(
         500 Error: If there is an internal server error while creating the offer.
     """
     # Authenticate and validate user
-    new_offered_by_id: int = admin_retrieve_user_id(session_token, csrf_token)
+    safe_session_token: str = sanitize_input(session_token)
+    safe_csrf_token: str = sanitize_input(csrf_token)
+    new_offered_by_id: int = admin_retrieve_user_id(safe_session_token, safe_csrf_token)
     validate_user_id(new_offered_by_id)
 
     # Validate requested item availability
@@ -112,7 +114,9 @@ async def user_get_offers(
         - Incoming offers for the user's items.
     """
     # Authenticate and validate user
-    new_user_id: int = admin_retrieve_user_id(session_token, csrf_token)
+    safe_session_token: str = sanitize_input(session_token)
+    safe_csrf_token: str = sanitize_input(csrf_token)
+    new_user_id: int = admin_retrieve_user_id(safe_session_token, safe_csrf_token)
     validate_user_id(new_user_id)
 
     outgoing_offers: list[ExchangeOffer] = []
@@ -150,7 +154,9 @@ async def user_accept_offer(session_token: str, csrf_token: str, offer_id: int) 
         500 Error: If there is an internal server error while accepting the offer.
     """
     # Authenticate and validate user
-    new_user_id: int = admin_retrieve_user_id(session_token, csrf_token)
+    safe_session_token: str = sanitize_input(session_token)
+    safe_csrf_token: str = sanitize_input(csrf_token)
+    new_user_id: int = admin_retrieve_user_id(safe_session_token, safe_csrf_token)
     validate_user_id(new_user_id)
     validate_offer_id(offer_id)
 
@@ -182,7 +188,12 @@ async def user_accept_offer(session_token: str, csrf_token: str, offer_id: int) 
         offer.get_requested_item_id(), "Requested", isAbort=False
     )
     if requested_item_id == -1:
-        await user_cancel_offer(session_token, csrf_token, offer_id, message="Offer Cancelled. Requested item is not available.")
+        await user_cancel_offer(
+            session_token,
+            csrf_token,
+            offer_id,
+            message="Offer Cancelled. Requested item is not available.",
+        )
         abort(404, "Offer Cancelled. Requested item is not available.")
     else:
         items[requested_item_id].set_status("exchanged")
@@ -223,7 +234,9 @@ async def user_complete_offer(
         500 Error: If there is an internal server error while completing the offer.
     """
     # Authenticate and validate user
-    new_user_id: int = admin_retrieve_user_id(session_token, csrf_token)
+    safe_session_token: str = sanitize_input(session_token)
+    safe_csrf_token: str = sanitize_input(csrf_token)
+    new_user_id: int = admin_retrieve_user_id(safe_session_token, safe_csrf_token)
     validate_user_id(new_user_id)
     validate_offer_id(offer_id)
 
@@ -264,7 +277,9 @@ async def user_confirm_offer(
         500 Error: If there is an internal server error while confirming the offer.
     """
     # Authenticate and validate user
-    new_user_id: int = admin_retrieve_user_id(session_token, csrf_token)
+    safe_session_token: str = sanitize_input(session_token)
+    safe_csrf_token: str = sanitize_input(csrf_token)
+    new_user_id: int = admin_retrieve_user_id(safe_session_token, safe_csrf_token)
     validate_user_id(new_user_id)
     validate_offer_id(offer_id)
 
@@ -345,7 +360,9 @@ async def user_cancel_offer(
     message = validate_string_length(message, "Cancellation Message", 10, 1000)
 
     # Authenticate and validate user
-    new_user_id: int = admin_retrieve_user_id(session_token, csrf_token)
+    safe_session_token: str = sanitize_input(session_token)
+    safe_csrf_token: str = sanitize_input(csrf_token)
+    new_user_id: int = admin_retrieve_user_id(safe_session_token, safe_csrf_token)
     validate_user_id(new_user_id)
     validate_offer_id(offer_id)
 
