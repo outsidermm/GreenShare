@@ -10,6 +10,6 @@ export const mockItem: Item = {
     updated_at: '2024/01/01',
     user_id: 1,
     category: 'home',
-    location: 'NSW',
+    location: 'NSW, Australia',
     status: 'available',
   };

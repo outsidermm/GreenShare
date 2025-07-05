@@ -2,6 +2,10 @@ import React from 'react';
 import ItemCard from '../../src/components/ItemCard';
 import { mockItem } from '../support/mocks/mockItem';
 
+before(() => {
+  document.body.classList.add('light');
+});
+
 describe('<ItemCard />', () => {
 
   it('renders item details correctly', () => {
