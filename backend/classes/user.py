@@ -86,7 +86,7 @@ class User:
         Returns:
             dict[str, User]: Dictionary mapping user emails to User instances.
         """
-        user_record: list[UserDB] = UserDB.query.all()
+        user_record = db.session.get(UserDB, {}).all()
         if not user_record:
             return {}
 
@@ -215,9 +215,7 @@ class User:
             bool: True if passwords match, False otherwise.
         """
         # Retrieve encrypted password from DB and compare after decryption and hashing
-        encrypted_pwd: str = (
-            UserDB.query.filter_by(id=self.get_user_pk()).first().password
-        )
+        encrypted_pwd: str = db.session.get(UserDB, self.get_user_pk()).password
         return self.decrypt_pwd(encrypted_pwd) == self.hash_pwd(pwd_input)
 
     def user_data(self) -> dict:
@@ -228,7 +226,7 @@ class User:
             dict: User data including email, first name, last name, and encrypted password.
         """
         # Return JSON representation of user from DB
-        return UserDB.query.filter_by(id=self.get_user_pk()).first().to_json()
+        return db.session.get(UserDB, self.get_user_pk()).to_json()
 
     # Getters and Setters for encapsulated fields
 
@@ -315,15 +313,6 @@ class User:
         """
         return db.session.get(UserDB, self.get_user_pk()).email
 
-    def get_password(self) -> str:
-        """
-        Returns the user's password.
-
-        Returns:
-            str: User's encrypted password.
-        """
-        return db.session.get(UserDB, self.get_user_pk()).password
-
     def set_password(self, new_pwd: str) -> None:
         """
         Sets the user's password.
@@ -334,36 +323,6 @@ class User:
         db.session.get(UserDB, self.get_user_pk()).password = self.encrypt_pwd(
             self.hash_pwd(new_pwd)
         )
-        db.session.commit()
-
-    def set_first_name(self, new_first_name: str) -> None:
-        """
-        Sets the user's first name.
-
-        Args:
-            new_first_name (str): New first name to set.
-        """
-        db.session.get(UserDB, self.get_user_pk()).first_name = new_first_name
-        db.session.commit()
-
-    def set_last_name(self, new_last_name: str) -> None:
-        """
-        Sets the user's last name.
-
-        Args:
-            new_last_name (str): New last name to set.
-        """
-        db.session.get(UserDB, self.get_user_pk()).last_name = new_last_name
-        db.session.commit()
-
-    def set_email(self, new_email: str) -> None:
-        """
-        Sets the user's email.
-
-        Args:
-            new_email (str): New email to set.
-        """
-        db.session.get(UserDB, self.get_user_pk()).email = new_email
         db.session.commit()
 
     def set_is_google_oauth(self, is_google_oauth: bool) -> None:
