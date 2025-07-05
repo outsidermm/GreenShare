@@ -22,11 +22,11 @@ def clear_data():
     users.clear()
     items.clear()
     exchange_offers.clear()
-    db.session.query(OfferedItemDB).delete()
-    db.session.query(ExchangeOfferDB).delete()
-    db.session.query(ItemImageDB).delete()
-    db.session.query(ItemDB).delete()
-    db.session.query(UserDB).delete()
+    db.session.delete(OfferedItemDB)
+    db.session.delete(ExchangeOfferDB)
+    db.session.delete(ItemImageDB)
+    db.session.delete(ItemDB)
+    db.session.delete(UserDB)
     db.session.commit()
 
 
@@ -38,17 +38,31 @@ def app_context():
 
 @pytest.mark.asyncio
 async def test_offer_cancellation_by_offer_maker():
+    """
+    Ensure an offer maker can cancel their own offer before it is accepted.
+
+    Steps:
+        - Register two users: offer maker and item owner
+        - Each user creates one item (requested and offered)
+        - Offer maker submits an offer
+        - Offer maker cancels it
+    Expected:
+        - Offer status becomes 'cancelled'
+    """
+    # Register users
     maker_token, maker_csrf = await user_auth_register(
         "cancelmaker@test.com", "Password1!", "Maker", "Cancel"
     )
     owner_token, owner_csrf = await user_auth_register(
         "cancelowner@test.com", "Password1!", "Owner", "Cancel"
     )
+    # Clean input
     maker_csrf = sanitize_input(maker_csrf)
     owner_csrf = sanitize_input(owner_csrf)
     maker_token = sanitize_input(maker_token)
     owner_token = sanitize_input(owner_token)
 
+    # Owner creates an item to be requested
     req_item = await user_create_item(
         new_title="Requested Cancel",
         new_description="Cancel test request",
@@ -61,6 +75,7 @@ async def test_offer_cancellation_by_offer_maker():
     )
     req_id = req_item.get_item_pk()
 
+    # Maker creates an item to offer
     offer_item = await user_create_item(
         new_title="Offered Cancel",
         new_description="Cancel test offer",
@@ -73,6 +88,7 @@ async def test_offer_cancellation_by_offer_maker():
     )
     offer_id = offer_item.get_item_pk()
 
+    # Maker submits an offer
     offer = await user_create_offer(
         requested_item_id=req_id,
         offered_item_ids=[offer_id],
@@ -82,16 +98,31 @@ async def test_offer_cancellation_by_offer_maker():
     )
     offer_key = offer.get_offer_pk()
 
+    # Maker cancels the offer
     await user_cancel_offer(
         offer_id=offer_key,
         session_token=maker_token,
         csrf_token=maker_csrf,
     )
+    # Offer should now be cancelled
     assert exchange_offers[offer_key].get_status() == "cancelled"
 
 
 @pytest.mark.asyncio
 async def test_unauthorised_offer_acceptance():
+    """
+    Ensure that only the item owner can accept an offer.
+
+    Steps:
+        - Register three users: owner, offer maker, and attacker
+        - Owner and maker each create an item
+        - Maker submits an offer to owner's item
+        - Attacker attempts to accept the offer
+    Expected:
+        - Acceptance attempt by attacker raises HTTPException
+        - Offer status remains 'pending'
+    """
+    # Register users
     owner_token, owner_csrf = await user_auth_register(
         "unauthowner@test.com", "Password1!", "Unauth", "Owner"
     )
@@ -101,6 +132,7 @@ async def test_unauthorised_offer_acceptance():
     attacker_token, attacker_csrf = await user_auth_register(
         "attacker@test.com", "Password1!", "Bad", "Guy"
     )
+    # Clean input
     owner_csrf = sanitize_input(owner_csrf)
     maker_csrf = sanitize_input(maker_csrf)
     attacker_csrf = sanitize_input(attacker_csrf)
@@ -108,6 +140,7 @@ async def test_unauthorised_offer_acceptance():
     maker_token = sanitize_input(maker_token)
     attacker_token = sanitize_input(attacker_token)
 
+    # Owner creates an item to be requested
     req_item = await user_create_item(
         new_title="Protected Request",
         new_description="Only owner can accept",
@@ -120,6 +153,7 @@ async def test_unauthorised_offer_acceptance():
     )
     req_id = req_item.get_item_pk()
 
+    # Maker creates an item to offer
     offer_item = await user_create_item(
         new_title="Offer to Protect",
         new_description="From Maker",
@@ -132,6 +166,7 @@ async def test_unauthorised_offer_acceptance():
     )
     offer_id = offer_item.get_item_pk()
 
+    # Maker submits an offer
     offer = await user_create_offer(
         requested_item_id=req_id,
         offered_item_ids=[offer_id],
@@ -141,6 +176,7 @@ async def test_unauthorised_offer_acceptance():
     )
     offer_key = offer.get_offer_pk()
 
+    # Attacker tries to accept the offer, which should fail
     with pytest.raises(HTTPException) as excinfo:
         await user_accept_offer(
             offer_id=(offer_key),
@@ -148,11 +184,25 @@ async def test_unauthorised_offer_acceptance():
             csrf_token=attacker_csrf,
         )
     assert "not authorised to accept" in excinfo.value.description
+    # Offer should remain pending
     assert exchange_offers[offer_key].get_status() == "pending"
 
 
 @pytest.mark.asyncio
 async def test_cancel_after_accept_fails():
+    """
+    Ensure an offer cannot be cancelled by the maker after it has been accepted.
+
+    Steps:
+        - Register two users: owner and offer maker
+        - Each creates an item
+        - Maker submits an offer
+        - Owner accepts the offer
+        - Maker tries to cancel the offer after acceptance
+    Expected:
+        - Cancellation attempt raises HTTPException
+    """
+    # Register users
     owner_token, owner_csrf = await user_auth_register(
         "cancelaccowner@test.com", "Password1!", "Owner", "Accept"
     )
@@ -164,6 +214,7 @@ async def test_cancel_after_accept_fails():
     owner_token = sanitize_input(owner_token)
     maker_token = sanitize_input(maker_token)
 
+    # Owner creates item
     req_item = await user_create_item(
         new_title="Cannot Cancel",
         new_description="Test accept cancel fail",
@@ -176,6 +227,7 @@ async def test_cancel_after_accept_fails():
     )
     req_id = req_item.get_item_pk()
 
+    # Maker creates item
     offer_item = await user_create_item(
         new_title="Attempt Cancel",
         new_description="Try cancelling",
@@ -188,6 +240,7 @@ async def test_cancel_after_accept_fails():
     )
     off_id = offer_item.get_item_pk()
 
+    # Maker submits offer
     offer = await user_create_offer(
         requested_item_id=req_id,
         offered_item_ids=[off_id],
@@ -197,12 +250,14 @@ async def test_cancel_after_accept_fails():
     )
     key = offer.get_offer_pk()
 
+    # Owner accepts the offer
     await user_accept_offer(
         offer_id=key,
         session_token=owner_token,
         csrf_token=owner_csrf,
     )
 
+    # Maker tries to cancel after acceptance, which should fail
     with pytest.raises(HTTPException) as excinfo:
         await user_cancel_offer(
             offer_id=key,
@@ -214,7 +269,20 @@ async def test_cancel_after_accept_fails():
 
 @pytest.mark.asyncio
 async def test_full_offer_flow():
-    # Register two users
+    """
+    Test the full lifecycle of an exchange offer, from creation to confirmation.
+
+    Steps:
+        - Register two users: owner and offerer
+        - Owner creates a requested item, offerer creates an offered item
+        - Offerer submits an offer
+        - Owner accepts the offer
+        - Offerer completes the offer
+        - Owner confirms the offer
+    Expected:
+        - Offer status transitions: pending -> accepted -> completed -> confirmed
+    """
+    # Register users
     owner_token, owner_csrf = await user_auth_register(
         "owner@test.com", "Password1!", "Owner", "User"
     )
@@ -227,7 +295,7 @@ async def test_full_offer_flow():
     owner_token = sanitize_input(owner_token)
     offerer_token = sanitize_input(offerer_token)
 
-    # Owner creates item to be requested
+    # Owner creates the item being requested
     req_item = await user_create_item(
         new_title="Request Item",
         new_description="An item to be requested",
@@ -240,7 +308,7 @@ async def test_full_offer_flow():
     )
     requested_item_id = req_item.get_item_pk()
 
-    # Offerer creates item to offer
+    # Offerer creates the item to offer
     offer_item = await user_create_item(
         new_title="Offered Item",
         new_description="An item to be offered",
@@ -253,7 +321,7 @@ async def test_full_offer_flow():
     )
     offered_item_id = offer_item.get_item_pk()
 
-    # Offerer creates offer
+    # Offerer submits an offer
     offer = await user_create_offer(
         requested_item_id=requested_item_id,
         offered_item_ids=[offered_item_id],
@@ -263,7 +331,7 @@ async def test_full_offer_flow():
     )
     offer_id = offer.get_offer_pk()
 
-    # Owner accepts offer
+    # Owner accepts the offer
     await user_accept_offer(
         offer_id=offer_id,
         session_token=owner_token,
@@ -271,7 +339,7 @@ async def test_full_offer_flow():
     )
     assert exchange_offers[offer_id].get_status() == "accepted"
 
-    # Offerer completes the offer
+    # Offerer marks the offer as completed
     await user_complete_offer(
         offer_id=offer_id,
         session_token=offerer_token,
@@ -279,7 +347,7 @@ async def test_full_offer_flow():
     )
     assert exchange_offers[offer_id].get_status() == "completed"
 
-    # Owner confirms offer
+    # Owner confirms the completion
     await user_confirm_offer(
         offer_id=offer_id,
         session_token=owner_token,
@@ -290,6 +358,19 @@ async def test_full_offer_flow():
 
 @pytest.mark.asyncio
 async def test_multiple_offers_conflict():
+    """
+    Ensure that only one offer can be accepted for a given requested item.
+
+    Steps:
+        - Register owner and two offerers
+        - Owner creates a requested item
+        - Each offerer creates and offers a different item to the same request
+        - Owner accepts the first offer
+        - Owner attempts to accept the second offer
+    Expected:
+        - First offer is accepted
+        - Second acceptance raises HTTPException
+    """
     # Register users
     owner_token, owner_csrf = await user_auth_register(
         "owner2@test.com", "Password1!", "Ownertwo", "User"
@@ -308,7 +389,7 @@ async def test_multiple_offers_conflict():
     offerer1_token = sanitize_input(offerer1_token)
     offerer2_token = sanitize_input(offerer2_token)
 
-    # Owner creates item to be requested
+    # Owner creates the requested item
     req_item = await user_create_item(
         new_title="Requested Item",
         new_description="One requested item",
@@ -321,7 +402,7 @@ async def test_multiple_offers_conflict():
     )
     requested_item_id = req_item.get_item_pk()
 
-    # Each offerer creates a different item
+    # Each offerer creates a unique item to offer
     offer_item_a = await user_create_item(
         new_title="Offer A",
         new_description="Offered by user A",
@@ -346,7 +427,7 @@ async def test_multiple_offers_conflict():
     )
     offer_b_id = offer_item_b.get_item_pk()
 
-    # Both users make offers
+    # Both users submit offers
     offer1 = await user_create_offer(
         requested_item_id=(requested_item_id),
         offered_item_ids=[offer_a_id],
@@ -365,7 +446,7 @@ async def test_multiple_offers_conflict():
     )
     offer2_id = offer2.get_offer_pk()
 
-    # Accepting first offer
+    # Owner accepts the first offer
     await user_accept_offer(
         offer_id=(offer1_id),
         session_token=owner_token,
@@ -373,7 +454,7 @@ async def test_multiple_offers_conflict():
     )
     assert exchange_offers[offer1_id].get_status() == "accepted"
 
-    # Trying to accept the second offer must fail
+    # Owner tries to accept the second offer, which should fail
     with pytest.raises(HTTPException) as excinfo:
         await user_accept_offer(
             offer_id=(offer2_id),
@@ -385,6 +466,18 @@ async def test_multiple_offers_conflict():
 
 @pytest.mark.asyncio
 async def test_unauthorised_offer_confirmation():
+    """
+    Ensure only the item owner can confirm an offer after completion.
+
+    Steps:
+        - Register owner, maker, and a stranger
+        - Owner and maker each create an item
+        - Maker submits an offer; owner accepts it
+        - Stranger attempts to confirm the offer
+    Expected:
+        - Confirmation attempt by stranger raises HTTPException
+        - Offer status remains 'accepted'
+    """
     owner_token, owner_csrf = await user_auth_register(
         "unauthcowner@test.com", "Password1!", "Owner", "Confirm"
     )
@@ -451,9 +544,20 @@ async def test_unauthorised_offer_confirmation():
     assert exchange_offers[offer_key].get_status() == "accepted"
 
 
-# New test: user cannot complete an offer before it is confirmed
 @pytest.mark.asyncio
 async def test_offer_confirmation_before_completion():
+    """
+    Ensure an offer cannot be confirmed before it is marked as completed.
+
+    Steps:
+        - Register owner and maker
+        - Owner and maker each create an item
+        - Maker submits an offer; owner accepts it
+        - Owner attempts to confirm before completion
+    Expected:
+        - Confirmation attempt raises HTTPException
+        - Offer status remains 'accepted'
+    """
     owner_token, owner_csrf = await user_auth_register(
         "compowner@test.com", "Password1!", "Owner", "Complete"
     )
@@ -517,6 +621,19 @@ async def test_offer_confirmation_before_completion():
 
 @pytest.mark.asyncio
 async def test_repeated_confirmation():
+    """
+    Ensure an offer cannot be confirmed more than once.
+
+    Steps:
+        - Register owner and maker
+        - Owner and maker each create an item
+        - Maker submits an offer; owner accepts it
+        - Maker completes the offer
+        - Owner confirms the offer
+        - Owner tries to confirm again
+    Expected:
+        - Second confirmation attempt raises HTTPException
+    """
     owner_token, owner_csrf = await user_auth_register(
         "reconfowner@test.com", "Password1!", "Owner", "Recon"
     )
@@ -569,6 +686,18 @@ async def test_repeated_confirmation():
 
 @pytest.mark.asyncio
 async def test_repeated_completion():
+    """
+    Ensure an offer cannot be completed more than once.
+
+    Steps:
+        - Register owner and maker
+        - Owner and maker each create an item
+        - Maker submits an offer; owner accepts it
+        - Maker completes the offer
+        - Maker tries to complete again
+    Expected:
+        - Second completion attempt raises HTTPException
+    """
     owner_token, owner_csrf = await user_auth_register(
         "recompowner@test.com", "Password1!", "Owner", "Recomp"
     )
@@ -620,6 +749,15 @@ async def test_repeated_completion():
 
 @pytest.mark.asyncio
 async def test_invalid_offer_id():
+    """
+    Ensure an error is raised when attempting to accept a non-existent offer.
+
+    Steps:
+        - Register a user
+        - Attempt to accept an offer with a made-up ID
+    Expected:
+        - Acceptance attempt raises HTTPException about non-existent offer
+    """
     user_token, user_csrf = await user_auth_register(
         "invalidid@test.com", "Password1!", "Invalid", "ID"
     )
@@ -632,6 +770,16 @@ async def test_invalid_offer_id():
 
 @pytest.mark.asyncio
 async def test_create_exchange_offer_missing_items():
+    """
+    Ensure exchange offers require at least one offered item.
+
+    Steps:
+        - Register owner and maker
+        - Owner creates an exchange item
+        - Maker attempts to create an offer with no offered items
+    Expected:
+        - Offer creation raises HTTPException about missing items
+    """
     owner_token, owner_csrf = await user_auth_register(
         "recompowner@test.com", "Password1!", "Owner", "Recomp"
     )
@@ -668,6 +816,16 @@ async def test_create_exchange_offer_missing_items():
 
 @pytest.mark.asyncio
 async def test_create_free_offer_having_items():
+    """
+    Ensure users can make a free offer (no items exchanged) for a 'Free' item.
+
+    Steps:
+        - Register owner and maker
+        - Owner creates a free item
+        - Maker creates a free offer (no items offered)
+    Expected:
+        - Offer is created successfully
+    """
     owner_token, owner_csrf = await user_auth_register(
         "recompowner@test.com", "Password1!", "Owner", "Recomp"
     )
@@ -700,6 +858,16 @@ async def test_create_free_offer_having_items():
 
 @pytest.mark.asyncio
 async def test_accepting_own_offer():
+    """
+    Ensure users cannot create an offer on their own item.
+
+    Steps:
+        - Register a user
+        - User creates two items
+        - User attempts to offer their own item for their own request
+    Expected:
+        - Offer creation raises HTTPException about self-exchange
+    """
     user_token, user_csrf = await user_auth_register(
         "selfaccept@test.com", "Password1!", "Self", "Accept"
     )
@@ -739,6 +907,17 @@ async def test_accepting_own_offer():
 
 @pytest.mark.asyncio
 async def test_offer_with_already_used_item():
+    """
+    Ensure an item already used in a completed exchange cannot be offered again.
+
+    Steps:
+        - Register owner, maker1, maker2
+        - Owner creates a request
+        - Maker1 creates an item and uses it in a completed/confirmed offer
+        - Maker2 attempts to offer the same item
+    Expected:
+        - Offer creation by maker2 raises HTTPException about item availability
+    """
     owner_token, owner_csrf = await user_auth_register(
         "reuseowner@test.com", "Password1!", "Reuse", "Owner"
     )
@@ -802,6 +981,18 @@ async def test_offer_with_already_used_item():
 
 @pytest.mark.asyncio
 async def test_user_get_offers_and_offer_details():
+    """
+    Ensure users can retrieve their outgoing offers and get offer details.
+
+    Steps:
+        - Register owner and maker
+        - Owner creates an item, maker creates another
+        - Maker submits an offer to owner's item
+        - Maker retrieves their outgoing offers and offer details
+    Expected:
+        - Outgoing offers contain the submitted offer
+        - Offer details match submitted data
+    """
     # Register users
     owner_token, owner_csrf = await user_auth_register(
         "getoffersowner@test.com", "Password1!", "Owner", "Get"
@@ -847,12 +1038,12 @@ async def test_user_get_offers_and_offer_details():
     )
     offer_key = offer.get_offer_pk()
 
-    # Maker retrieves all offers
+    # Maker retrieves all offers (should see their outgoing offer)
     outgoing_off, incoming_off = await user_get_offers(maker_token, maker_csrf)
     assert len(outgoing_off) == 1
     assert len(incoming_off) == 0
 
-    # Maker retrieves offer details
+    # Maker retrieves offer details and checks content
     offer_detail = await user_get_offer_details(maker_token, maker_csrf, (offer_key))
     assert offer_detail["id"] == offer_key
     assert offer_detail["message"] == "testing offer retrieval"

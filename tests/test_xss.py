@@ -15,11 +15,11 @@ def clear_users():
     users.clear()
     items.clear()
     exchange_offers.clear()
-    db.session.query(OfferedItemDB).delete()
-    db.session.query(ExchangeOfferDB).delete()
-    db.session.query(ItemImageDB).delete()
-    db.session.query(ItemDB).delete()
-    db.session.query(UserDB).delete()
+    db.session.delete(OfferedItemDB)
+    db.session.delete(ExchangeOfferDB)
+    db.session.delete(ItemImageDB)
+    db.session.delete(ItemDB)
+    db.session.delete(UserDB)
     db.session.commit()
 
 
@@ -43,42 +43,50 @@ def bypass_validations(monkeypatch):
 @pytest.mark.asyncio
 async def test_xss_escaping_all_fields():
     """
-    Register a user with malicious payloads in email, first name, last name,
-    and password. Verify that each field is normalized and escaped as expected.
+    Test that all user fields are properly escaped or normalised during registration to prevent XSS.
+
+    Steps:
+        - Attempt to register a user using malicious HTML/JavaScript payloads in the email, first name, last name, and password fields.
+        - Verify that:
+            - Email is normalised (lowercased) but not escaped.
+            - First and last names are capitalised and HTML-escaped.
+            - Password is accepted as-is since it is hashed and not rendered in plaintext.
+
+    Expected:
+        - The global `users` dictionary uses the normalised email as its key.
+        - The stored user's fields match the expected sanitised versions when accessed via class getters.
     """
-    # Malicious input values.
+
+    # Declare malicious input values to simulate XSS attempts.
     malicious_email = "evil<script>@example.com"
     malicious_first_name = "<script>alert('xss')</script>"
     malicious_last_name = "<img src=x onerror=alert('xss')>"
     malicious_password = "Pass<script>word1!"
 
-    # Expected values after normalization and sanitization:
-    # - The email is lowercased (no HTML escaping needed for emails)
+    # Define expected values after normalisation and sanitisation.
+    # Email is lowercased; first and last names are capitalised and escaped; password remains unchanged.
     expected_email = malicious_email.lower()
-    # - First and last names are capitalized then HTML escaped
     expected_first_name = str(escape(malicious_first_name.capitalize()))
     expected_last_name = str(escape(malicious_last_name.capitalize()))
-    # - Password is not escaped (it's hashed, not displayed)
     expected_password = malicious_password
 
-    # Register the user (auth.py performs validation, normalization, and sanitization).
+    # Register the user with malicious inputs; auth.py handles validation, normalisation, and sanitisation.
     tokens = await user_auth_register(
         email=malicious_email,
         pwd=malicious_password,
         first_name=malicious_first_name,
         last_name=malicious_last_name,
     )
-    # Tokens are returned as (session_token, csrf_token), but here we focus on stored values.
 
-    # The global users dictionary is keyed by the sanitized email.
+    # Assert that the sanitised email is used as the key in the global users dictionary.
     assert (
         expected_email in users
     ), "The sanitized email should be used as the key in users."
 
-    # Retrieve the stored User instance.
+    # Retrieve the stored User instance from the users dictionary.
     user: User = users[expected_email]
 
-    # Using the getters provided in the User class, assert that each field is stored as expected.
+    # Assert that the stored email matches the expected normalised email.
     assert (
         user.get_email() == expected_email
     ), "User email should be normalized (lowercased)."
