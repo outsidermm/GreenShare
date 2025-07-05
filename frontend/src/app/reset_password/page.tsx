@@ -6,17 +6,22 @@
 
 import { useEffect, useState } from "react";
 import PasswordInput from "@/components/PasswordInput";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import resetPwd from "@/services/user/resetPwd";
 import { extractErrorMessage } from "@/utils/extractErrorMsg";
 import swal from "sweetalert";
 
 export default function ResetPwdPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const token = searchParams.get("token");
+  const [token, setToken] = useState<string | null>(null);
   const [password, setPassword] = useState("");
   const [pwdChanged, setPwdChanged] = useState(false);
+
+  // Extract token from URL query string on mount
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    setToken(params.get("token"));
+  }, []);
 
   // Prefetch post-reset password pages for improved responsiveness
   useEffect(() => {

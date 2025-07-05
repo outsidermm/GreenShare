@@ -9,14 +9,13 @@ import Link from "next/link";
 import loginUser from "@/services/user/loginUser";
 import PasswordInput from "@/components/PasswordInput";
 import CredentialsInput from "@/components/CredentialsInput";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import swal from "sweetalert";
 import { FcGoogle } from "react-icons/fc";
 import { extractErrorMessage } from "@/utils/extractErrorMsg";
 
 export default function LoginPage() {
   const router = useRouter();
-  const params = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorType, setErrorType] = useState("");
@@ -24,14 +23,13 @@ export default function LoginPage() {
   const [emailChanged, setEmailChanged] = useState(false);
   const [pwdChanged, setPwdChanged] = useState(false);
 
-  // Prefetch post-login pages for improved responsiveness
+  // Prefetch post-login pages for improved responsiveness and handle URL params
   useEffect(() => {
     router.prefetch("/manage_offers");
     router.prefetch("/manage_products");
-  }, [router]);
 
-  useEffect(() => {
-    const error = params.get("error");
+    const searchParams = new URLSearchParams(window.location.search);
+    const error = searchParams.get("error");
     if (error) {
       // Display error message if present in URL parameters
       setErrorType(error);
@@ -40,7 +38,7 @@ export default function LoginPage() {
       setErrorType("");
     }
 
-    const csrfToken = params.get("csrfToken");
+    const csrfToken = searchParams.get("csrfToken");
     if (csrfToken) {
       localStorage.setItem("csrfToken", csrfToken);
       swal({
@@ -56,7 +54,7 @@ export default function LoginPage() {
       setPwdChanged(false);
       router.replace("/");
     }
-  }, [params, router]);
+  }, [router]);
 
   /**
    * Handles the login submission process, including authentication,
