@@ -80,7 +80,7 @@ class User:
         Returns:
             dict[str, User]: Dictionary mapping user emails to User instances.
         """
-        user_record = db.session.get(UserDB, {}).all()
+        user_record = db.session.query(UserDB).all()
         if not user_record:
             return {}
 

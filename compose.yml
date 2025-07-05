@@ -91,3 +91,11 @@ services:
       - flaskapp
     profiles:
       - tests
+  
+  # cypress:
+  #   networks:
+  #     - app-network
+  #   build: .
+  #   read_only: true
+  #   security_opt:
+  #     - no-new-privileges
