@@ -1,14 +1,16 @@
-import re
 import pytest
 from werkzeug.exceptions import HTTPException
 
 # Import the functions under test from your auth.py
 from backend.auth import (
+    generate_reset_token,
     user_auth_register,
     user_auth_login,
     user_auth_logout,
+    user_auth_reset_pwd,
     user_auth_validate_session_token,
     user_auth_validate_csrf_token,
+    verify_reset_token,
 )
 
 # Import the global users dictionary so we can reset it between tests.
@@ -164,13 +166,8 @@ async def test_user_auth_logout_and_token_validation():
     await user_auth_logout(session_token, csrf_token)
 
     # After logout, token validation should fail.
-    with pytest.raises(HTTPException) as excinfo:
-        await user_auth_validate_session_token(session_token)
-    assert "Session token does not exist" in excinfo.value.description
-
-    with pytest.raises(HTTPException) as excinfo:
-        await user_auth_validate_csrf_token(csrf_token)
-    assert "CSRF token does not exist" in excinfo.value.description
+    assert await user_auth_validate_session_token(session_token) is False
+    assert await user_auth_validate_csrf_token(csrf_token) is False
 
 
 @pytest.mark.asyncio
@@ -190,3 +187,33 @@ async def test_user_auth_logout_invalid_tokens():
     with pytest.raises(HTTPException) as excinfo:
         await user_auth_logout("invalid_session", "invalid_csrf")
     assert "Matching tokens do not exist" in excinfo.value.description
+
+@pytest.mark.asyncio
+async def test_user_password_reset_token():
+    """
+    Test that a user can reset their password successfully.
+    """
+    await user_auth_register(
+        email="pwdreset@domain.com",
+        pwd="Password1!",
+        first_name="Frank",
+        last_name="Miller",
+    )
+    
+    reset_token = generate_reset_token("pwdreset@domain.com".lower().strip())
+    email = verify_reset_token(reset_token)
+    
+    assert email == "pwdreset@domain.com"
+    
+    await user_auth_reset_pwd(reset_token, "NewPassword1!")
+    assert users[email].verify_pwd("NewPassword1!") == True
+
+
+@pytest.mark.asyncio
+async def test_user_password_reset_invalid_token():
+    """
+    Test that an invalid reset token raises an error.
+    """
+    with pytest.raises(HTTPException) as excinfo:
+        verify_reset_token("invalid_token")
+    assert "Invalid or expired token" in excinfo.value.description

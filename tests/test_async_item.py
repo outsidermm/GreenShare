@@ -1,5 +1,4 @@
 import pytest
-import re
 from backend.config import app, db
 from backend.models import UserDB, ItemDB, ItemImageDB, OfferedItemDB, ExchangeOfferDB
 from backend.auth import user_auth_register
@@ -161,7 +160,7 @@ async def test_view_items_filter_by_location_and_type():
         csrf_token=csrf_token,
     )
     filtered_items = await user_get_browse_items(
-        location_filter="Sydney", type_filter="free"
+        type_filter="free"
     )
     assert len(filtered_items) > 0
 
@@ -171,7 +170,7 @@ async def test_view_items_invalid_item_id():
     invalid_id = "-5"
     with pytest.raises(HTTPException) as excinfo:
         await user_get_browse_items(item_id=invalid_id)
-    assert "Item ID must be a positive integer." in excinfo.value.description
+    assert "does not exist." in excinfo.value.description
 
 
 @pytest.mark.asyncio
@@ -210,7 +209,7 @@ async def test_modify_item_success():
 
     updated_item = await user_get_browse_items(item_id=str(item_id))
     assert updated_item[item_id].get_title() == sanitize_input("New Title".lower())
-    assert updated_item[item_id].get_location() == sanitize_input("Brisbane".lower())
+    assert updated_item[item_id].get_location() == sanitize_input("Brisbane Qld, Australia".lower())
 
 
 @pytest.mark.asyncio

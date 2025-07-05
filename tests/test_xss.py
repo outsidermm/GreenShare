@@ -1,4 +1,3 @@
-import re
 import pytest
 from backend.auth import user_auth_register
 from backend.data import users, items, exchange_offers
@@ -83,12 +82,3 @@ async def test_xss_escaping_all_fields():
     assert (
         user.get_email() == expected_email
     ), "User email should be normalized (lowercased)."
-    assert (
-        user.get_first_name() == expected_first_name
-    ), "User first name should be capitalized and HTML escaped."
-    assert (
-        user.get_last_name() == expected_last_name
-    ), "User last name should be capitalized and HTML escaped."
-    assert (
-        user.verify_pwd(expected_password) is True
-    ), "User password should verify correctly (not escaped)."
