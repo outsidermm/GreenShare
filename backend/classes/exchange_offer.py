@@ -46,7 +46,7 @@ class ExchangeOffer:
         """
         Loads all exchange offers and returns them as a dictionary of ExchangeOffer instances.
         """
-        offer_records = db.session.get(ExchangeOfferDB, {}).all()
+        offer_records = db.session.query(ExchangeOfferDB).all()
         if not offer_records:
             return {}
 

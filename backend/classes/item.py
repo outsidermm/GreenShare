@@ -70,7 +70,7 @@ class Item:
         """
         Loads all items from the database and returns a dictionary of Item instances keyed by item ID.
         """
-        item_records = db.session.get(ItemDB, {}).all()
+        item_records = db.session.query(ItemDB).all()
         if not item_records:
             return {}
 
