@@ -9,3 +9,4 @@ requests
 markupsafe
 google-genai
 Authlib
+bcrypt

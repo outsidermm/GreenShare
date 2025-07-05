@@ -35,7 +35,6 @@ services:
       - 4000:4000
     environment:
       - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
-      - USER_FERNET_KEY=${USER_FERNET_KEY}
       - SECRET_KEY=${SECRET_KEY}
       - PLACES_API_KEY=${PLACES_API_KEY}
       - IMGUR_CLIENT_ID=${IMGUR_CLIENT_ID}
@@ -74,7 +73,6 @@ services:
       # Ensure absolute imports work by pointing PYTHONPATH to /app (the project root)
       - PYTHONPATH=/app
       - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
-      - USER_FERNET_KEY=${USER_FERNET_KEY}
       - SECRET_KEY=${SECRET_KEY}
       - PLACES_API_KEY=${PLACES_API_KEY}
       - IMGUR_CLIENT_ID=${IMGUR_CLIENT_ID}
