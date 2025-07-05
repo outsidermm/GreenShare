@@ -11,7 +11,7 @@ export default function ItemCard({ item }: { item: Item }) {
       prefetch={true}
       aria-label={`View details for ${item.title}`}
     >
-      <div className="bg-mono-contrast rounded-xl shadow-md p-4 cursor-pointer hover:shadow-lg transition-all h-full">
+      <div data-cy="item-card" className="bg-mono-contrast rounded-xl shadow-md p-4 cursor-pointer hover:shadow-lg transition-all h-full">
         <Image
           src={item.images[0]}
           alt={item.title}
