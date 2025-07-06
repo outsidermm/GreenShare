@@ -299,39 +299,6 @@ async def user_confirm_offer(
     offer.set_status("confirmed")
 
 
-async def user_get_offer_details(
-    session_token: str, csrf_token: str, offer_id: int
-) -> dict:
-    """
-    Retrieves the details of a specific exchange offer for the authenticated user.
-
-    Args:
-        session_token (str): The session token of the user.
-        csrf_token (str): The CSRF token for security.
-        offer_id (int): The ID of the offer to retrieve.
-
-    Returns:
-        dict: The JSON representation of the offer.
-
-    Raises:
-        403 Error: If the user is not authorized to view the offer.
-    """
-    # Authenticate and validate user
-    new_user_id: int = admin_retrieve_user_id(session_token, csrf_token)
-    validate_user_id(new_user_id)
-    validate_offer_id(offer_id)
-
-    offer: ExchangeOffer = exchange_offers[offer_id]
-
-    # Verify user authorization to view the offer
-    if offer.get_offered_by_id() != new_user_id and (
-        offer.get_requested_item_id() not in items
-        or items[offer.get_requested_item_id()].get_user_id() != new_user_id
-    ):
-        abort(403, "You are not authorised to view this offer.")
-
-    return offer.to_json()
-
 
 async def user_cancel_offer(
     session_token: str,
