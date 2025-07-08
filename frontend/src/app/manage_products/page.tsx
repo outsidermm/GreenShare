@@ -5,6 +5,7 @@ import logoutUser from "@/services/user/logoutUser";
 import NavBar from "@/components/NavBar";
 import HeaderBar from "@/components/HeaderBar";
 import useAuth from "@/hooks/useAuth";
+import { usePageReload } from "@/hooks/usePageReload";
 import { useState, useEffect } from "react";
 import swal from "sweetalert";
 import { extractErrorMessage } from "@/utils/extractErrorMsg";
@@ -20,6 +21,7 @@ export default function ManageProductsPage() {
   const router = useRouter();
   const pathname = usePathname();
   const { isAuthenticated, refreshAuth } = useAuth();
+  const { reloadPage, reloadWithDelay, forceReload } = usePageReload();
   const [ownedItems, setOwnedItems] = useState<Item[]>([]);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<Item>();
@@ -80,10 +82,10 @@ export default function ManageProductsPage() {
       await deleteItem(item_id);
       swal("Success!", "Product deleted successfully!", "success");
 
-      // Refresh the items list after deletion
+      // Refresh the items list after deletion and force reload
       const updatedItems = ownedItems.filter((item) => item.id !== item_id);
       setOwnedItems(updatedItems);
-      router.refresh();
+      reloadWithDelay(1500, { force: true });
     } catch (error) {
       console.error("Error deleting item:", error);
       if (error instanceof Error) {

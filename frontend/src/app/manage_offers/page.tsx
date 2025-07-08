@@ -8,6 +8,7 @@ import logoutUser from "@/services/user/logoutUser";
 import NavBar from "@/components/NavBar";
 import HeaderBar from "@/components/HeaderBar";
 import useAuth from "@/hooks/useAuth";
+import { usePageReload } from "@/hooks/usePageReload";
 import getUserOffers from "@/services/offer/getUserOffers";
 import { useState, useEffect } from "react";
 import { toTitleCase } from "@/utils/titleCase";
@@ -25,6 +26,7 @@ export default function ManageOffersPage() {
   const router = useRouter();
   const pathname = usePathname();
   const { isAuthenticated, refreshAuth } = useAuth();
+  const { reloadPage, reloadWithDelay, forceReload } = usePageReload();
   const [toggleOffer, setToggleOffer] = useState(false); // false for outgoing offers, true for incoming offers
   const [incomingOffers, setIncomingOffers] = useState<Offer[]>([]);
   const [outgoingOffers, setOutgoingOffers] = useState<Offer[]>([]);
@@ -126,7 +128,8 @@ export default function ManageOffersPage() {
           );
         }
       }
-      router.push("/manage_offers");
+      // Force reload after offer action
+      reloadWithDelay(1500, { force: true });
     } catch (error) {
       console.error("Error performing actions on your offer:", error);
       if (error instanceof Error) {
@@ -165,7 +168,8 @@ export default function ManageOffersPage() {
           return;
         }
         await cancelOffer({ offerId, message });
-        router.refresh();
+        // Force reload after canceling offer
+        reloadWithDelay(1500, { force: true });
       }
     } catch (error) {
       console.error("Error cancelling offer:", error);

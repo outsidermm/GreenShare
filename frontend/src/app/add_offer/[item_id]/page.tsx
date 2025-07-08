@@ -4,6 +4,7 @@ import logoutUser from "@/services/user/logoutUser";
 import NavBar from "@/components/NavBar";
 import HeaderBar from "@/components/HeaderBar";
 import useAuth from "@/hooks/useAuth";
+import { usePageReload } from "@/hooks/usePageReload";
 import { useState, useEffect } from "react";
 import { Item } from "@/types/item";
 import getItems from "@/services/item/getItems";
@@ -25,6 +26,7 @@ export default function AddOfferPage() {
     throw new Error("Invalid item ID in URL");
   }
   const { isAuthenticated, refreshAuth } = useAuth();
+  const { reloadPage, reloadWithDelay, forceReload } = usePageReload();
   const [offerMessage, setOfferMessage] = useState("");
   const [outgoingItems, setOutgoingItems] = useState<Item[]>([]);
   const [offerableItems, setOfferableItems] = useState<Item[]>([]);
@@ -128,6 +130,8 @@ export default function AddOfferPage() {
         }).then((response) => {
           if (response.message) {
             swal("Success!", "Offer submitted successfully!", "success");
+            // Force reload after offer submission
+            reloadWithDelay(1500, { force: true });
             router.push("/");
           }
         });
