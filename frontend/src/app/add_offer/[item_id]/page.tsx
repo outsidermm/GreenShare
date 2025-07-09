@@ -26,7 +26,7 @@ export default function AddOfferPage() {
     throw new Error("Invalid item ID in URL");
   }
   const { isAuthenticated, refreshAuth } = useAuth();
-  const { reloadPage, reloadWithDelay, forceReload } = usePageReload();
+  const { reloadWithDelay } = usePageReload();
   const [offerMessage, setOfferMessage] = useState("");
   const [outgoingItems, setOutgoingItems] = useState<Item[]>([]);
   const [offerableItems, setOfferableItems] = useState<Item[]>([]);

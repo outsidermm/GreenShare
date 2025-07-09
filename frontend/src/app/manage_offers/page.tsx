@@ -26,7 +26,7 @@ export default function ManageOffersPage() {
   const router = useRouter();
   const pathname = usePathname();
   const { isAuthenticated, refreshAuth } = useAuth();
-  const { reloadPage, reloadWithDelay, forceReload } = usePageReload();
+  const {reloadWithDelay } = usePageReload();
   const [toggleOffer, setToggleOffer] = useState(false); // false for outgoing offers, true for incoming offers
   const [incomingOffers, setIncomingOffers] = useState<Offer[]>([]);
   const [outgoingOffers, setOutgoingOffers] = useState<Offer[]>([]);

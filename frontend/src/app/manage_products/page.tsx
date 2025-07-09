@@ -21,7 +21,7 @@ export default function ManageProductsPage() {
   const router = useRouter();
   const pathname = usePathname();
   const { isAuthenticated, refreshAuth } = useAuth();
-  const { reloadPage, reloadWithDelay, forceReload } = usePageReload();
+  const { reloadWithDelay } = usePageReload();
   const [ownedItems, setOwnedItems] = useState<Item[]>([]);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<Item>();
