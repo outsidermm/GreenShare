@@ -12,18 +12,14 @@ from backend.auth import (
 from backend.config import app
 
 
-# -----------------------------------------------------------------------------
 # Fixtures
-# -----------------------------------------------------------------------------
 @pytest.fixture(scope="module", autouse=True)
 def app_context():
     with app.app_context():
         yield app
 
 
-# -----------------------------------------------------------------------------
 # Synchronous Validation Function Tests
-# -----------------------------------------------------------------------------
 def test_name_auth_valid():
     """
     Ensure that valid names pass the name_auth validation function.

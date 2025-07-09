@@ -100,21 +100,25 @@ async def item_categorisation(title: str, description: str) -> str:
     Raises:
         Exception: If the Gemini API call fails or returns an unexpected result.
     """
-    # Initialize Gemini client with API key
-    client: genai.Client = genai.Client(api_key=GENAI_API_KEY)
-    # Generate content classification using Gemini model
-    response = client.models.generate_content(
-        model="gemini-2.0-flash",
-        config=types.GenerateContentConfig(
-            system_instruction=(
-                "You are a product category classifier. "
-                "Only respond with one of the following categories: essentials, living, tools-tech, style-expression, leisure-learning."
-            )
-        ),
-        contents=(
-            f"Classify the following item into one of the categories: essentials, living, tools-tech, style-expression, leisure-learning. "
-            f"Title: {title} Description: {description} Only respond with the category name."
-        ),
-    )
-    # Return the category name in lowercase without extra whitespace
-    return response.text.strip().lower()
+    try:
+        # Initialize Gemini client with API key
+        client: genai.Client = genai.Client(api_key=GENAI_API_KEY)
+        # Generate content classification using Gemini model
+        response = client.models.generate_content(
+            model="gemini-2.0-flash",
+            config=types.GenerateContentConfig(
+                system_instruction=(
+                    "You are a product category classifier. "
+                    "Only respond with one of the following categories: essentials, living, tools-tech, style-expression, leisure-learning."
+                )
+            ),
+            contents=(
+                f"Classify the following item into one of the categories: essentials, living, tools-tech, style-expression, leisure-learning. "
+                f"Title: {title} Description: {description} Only respond with the category name."
+            ),
+        )
+        # Return the category name in lowercase without extra whitespace
+        return response.text.strip().lower()
+    except Exception as e:
+        # Raise an exception if the API call fails or returns an unexpected result
+        raise Exception(f"Failed to classify item: {e}") from e

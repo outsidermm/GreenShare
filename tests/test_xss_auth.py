@@ -21,9 +21,7 @@ def bypass_validations(monkeypatch):
     monkeypatch.setattr("backend.classes.user.unsanitize_output", lambda x: x)
 
 
-# -----------------------------------------------------------------------------
 # XSS Escaping Tests for auth.py using getters and setters from User class
-# -----------------------------------------------------------------------------
 @pytest.mark.asyncio
 async def test_xss_escaping_all_fields():
     """
