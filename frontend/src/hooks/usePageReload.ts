@@ -32,13 +32,8 @@ export const usePageReload = () => {
     }, delay);
   }, [reloadPage]);
 
-  const forceReload = useCallback(() => {
-    reloadPage({ force: true });
-  }, [reloadPage]);
-
   return {
     reloadPage,
     reloadWithDelay,
-    forceReload
   };
 };
