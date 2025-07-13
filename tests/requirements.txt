@@ -5,6 +5,7 @@ Flask-CORS
 cryptography
 asgiref
 pytest-asyncio
+pytest-cov
 requests
 markupsafe
 google-genai

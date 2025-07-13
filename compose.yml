@@ -85,7 +85,7 @@ services:
       - ./backend:/app/backend
       - ./tests:/app/tests
       - ./.env:/app/.env
-    command: ["pytest", "tests"]
+    command: ["pytest", "--cov=backend", "--cov-report=term-missing", "tests"]
     depends_on:
       - db
       - flaskapp

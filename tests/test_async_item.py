@@ -1,9 +1,8 @@
 import pytest
 from backend.config import app, db
-from backend.models import UserDB, ItemDB, ItemImageDB, OfferedItemDB, ExchangeOfferDB
 from backend.auth import user_auth_register
 from werkzeug.exceptions import HTTPException
-from backend.data import users, items, exchange_offers
+from backend.data import items
 from backend.items import (
     user_create_item,
     user_get_browse_items,

@@ -6,9 +6,7 @@ from backend.data import exchange_offers
 from backend.items import user_create_item
 from backend.offers import (
     user_create_offer,
-    user_get_offers,
     user_accept_offer,
-    user_get_offer_details,
     user_cancel_offer,
     user_complete_offer,
     user_confirm_offer,

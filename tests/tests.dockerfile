@@ -14,4 +14,4 @@ COPY . .
 ENV PYTHONPATH=/app
 
 # Default command (overridden by docker-compose) is to run tests
-CMD ["pytest", "tests"]
+CMD ["pytest", "--cov=backend", "--cov-report=term-missing", "tests"]

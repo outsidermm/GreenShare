@@ -15,15 +15,12 @@ from backend.auth import (
 
 # Import the global users dictionary so we can reset it between tests.
 from backend.data import users
-from backend.config import app, db
+from backend.config import app
 from backend.utils import sanitize_email, sanitize_input
 
 
-# -----------------------------------------------------------------------------
+
 # Fixtures
-# -----------------------------------------------------------------------------
-
-
 @pytest.fixture(scope="module", autouse=True)
 def app_context():
     """
@@ -34,9 +31,7 @@ def app_context():
         yield app
 
 
-# -----------------------------------------------------------------------------
 # Asynchronous Authentication Function Tests
-# -----------------------------------------------------------------------------
 @pytest.mark.asyncio
 async def test_user_auth_register_success():
     """

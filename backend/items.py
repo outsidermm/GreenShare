@@ -217,7 +217,10 @@ async def user_create_item(
         new_description, "Description", 10, 1000
     )
     # Categorise item using title and description
-    new_category_raw: str = await item_categorisation(safe_title, safe_description)
+    try:
+        new_category_raw: str = await item_categorisation(safe_title, safe_description)
+    except Exception as e:
+        new_category_raw: str = "essentials"  # Default category if categorisation fails
     new_category: str = validate_category(new_category_raw)
     safe_condition: str = validate_condition(new_condition)
     safe_type: str = validate_type(new_type)
