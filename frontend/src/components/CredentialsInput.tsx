@@ -51,7 +51,7 @@ export default function CredentialsInput(props: CredentialsInputProps) {
           value={credential}
           onChange={(e) => setCredential(e.target.value)}
           onFocus={() => setCredentialChanged(true)}
-          className={`border-mono-secondary text-mono-primary rounded py-2 px-3 w-full ${credentialChanged ? "invalid:border-alert-primary" : ""} border-2`}
+          className={`h-12 border-mono-secondary text-mono-primary rounded py-2 px-3 w-full ${credentialChanged ? "invalid:border-alert-primary" : ""} border-2`}
         />
         {credentialError != "" && (
           <div

@@ -247,7 +247,7 @@ export default function ManageOffersPage() {
                   key={offer.id}
                   role="region"
                   aria-label="Offer Card"
-                  className="bg-mono-contrast p-6 mb-6 rounded-lg shadow-xl flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4"
+                  className="bg-mono-contrast p-6 mb-6 rounded-xl shadow-xl flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4"
                   initial={{ opacity: 0, scale: 0.95, y: 20 }}
                   whileInView={{ opacity: 1, scale: 1, y: 0 }}
                   transition={{ duration: 0.5, ease: "easeOut" }}

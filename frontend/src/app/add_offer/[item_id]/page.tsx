@@ -236,7 +236,7 @@ export default function AddOfferPage() {
                             );
                           }}
                           className={
-                            "text-left p-2 text-mono-primary cursor-pointer rounded hover:bg-alert transition-all"
+                            "text-left p-2 text-mono-primary cursor-pointer rounded-full hover:bg-alert-light transition-all"
                           }
                           aria-label={`{Deselect item ${toTitleCase(item.title)} - ${toTitleCase(item.description)}`}
                         >

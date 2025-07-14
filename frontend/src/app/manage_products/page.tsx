@@ -116,9 +116,19 @@ export default function ManageProductsPage() {
         </div>
         <div className={`sm:ml-60 mt-40 p-6 sm:mt-16 pb-24`}>
           <header className="mt-96 sm:mt-0">
-            <h1 className="text-2xl font-bold mb-4 text-content px-4">
-              View Your Items
-            </h1>
+            <div className="flex items-center justify-between mb-4 px-4">
+              <h1 className="text-2xl font-bold text-content">Manage Your Items </h1>
+              <button
+                onClick={() => {
+                  setSelectedItem(undefined);
+                  setIsEditOpen(true);
+                }}
+                className="bg-main-light text-mono-primary px-4 py-2 rounded-full hover:bg-main-secondary active:bg-main-primary flex items-center gap-2 transition-all border-2 border-main-primary font-bold shadow-xl"
+                aria-label="Add New Item"
+              >
+                Add New Item
+              </button>
+            </div>
           </header>
 
           <div className="p-4" aria-live="polite">
@@ -126,7 +136,7 @@ export default function ManageProductsPage() {
               ownedItems.map((item) => (
                 <motion.div
                   key={item.id}
-                  className="bg-mono-contrast p-4 mb-4 rounded-lg shadow-xl flex justify-between gap-8 flex-col sm:flex-row"
+                  className="bg-mono-contrast p-4 mb-4 rounded-xl shadow-xl flex justify-between gap-8 flex-col sm:flex-row"
                   aria-label="User Item Card"
                   initial={{ opacity: 0, scale: 0.95, y: 20 }}
                   whileInView={{ opacity: 1, scale: 1, y: 0 }}
@@ -137,20 +147,20 @@ export default function ManageProductsPage() {
                     <ProductDetailCard item={item} />
                   </div>
                   {item.status === "available" && (
-                    <div className="flex-2">
+                    <div className="flex-2 flex flex-col items-center sm:items-start gap-4">
                       <button
                         onClick={() => {
                           setSelectedItem(item);
                           setIsEditOpen(true);
                         }}
                         className={
-                          "w-full rounded bg-main-light hover:bg-main-secondary active:bg-main-primary text-mono-primary border-main-primary font-bold py-2 px-4 border-solid border-2 transition-all mt-4"
+                          "w-full rounded-lg bg-main-light hover:bg-main-secondary active:bg-main-primary text-mono-primary border-main-primary font-bold py-2 border-solid border-2 transition-all px-4"
                         }
                       >
                         Edit
                       </button>
                       <button
-                        className="w-full rounded bg-alert-light hover:bg-alert-secondary active:bg-alert-primary text-mono-primary font-bold py-2 px-2 border-solid border-2 border-alert-primary transition-all mt-4"
+                        className="w-full rounded-lg bg-alert-light hover:bg-alert-secondary active:bg-alert-primary text-mono-primary font-bold py-2 border-solid border-2 border-alert-primary transition-all px-4"
                         onClick={() => handleDeleteItem(item.id)}
                       >
                         Delete
@@ -179,18 +189,6 @@ export default function ManageProductsPage() {
               </div>
             </div>
           )}
-          <div className="fixed bottom-4 right-4 z-50">
-            <button
-              onClick={() => {
-                setSelectedItem(undefined);
-                setIsEditOpen(true);
-              }}
-              className="bg-main-light text-mono-primary px-4 py-2 rounded-full hover:bg-main-secondary active:bg-main-primary flex items-center gap-2 transition-all border-2 border-main-primary font-bold shadow-xl"
-              aria-label="Add New Item"
-            >
-              Add New Item
-            </button>
-          </div>
         </div>
       </div>
     </main>

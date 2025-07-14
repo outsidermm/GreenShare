@@ -83,7 +83,7 @@ export default function LoginPage() {
             <button
               type="submit"
               aria-label="Submit Forget Password Form"
-              className="w-full rounded bg-hyperlink-light hover:bg-hyperlink-secondary text-mono-primary font-bold py-2 px-4 border-solid border-2 border-hyperlink-primary transition-all"
+              className="w-full h-12 rounded bg-hyperlink-light hover:bg-hyperlink-secondary text-mono-primary font-bold py-2 px-4 border-solid border-2 border-hyperlink-primary transition-all"
             >
               Request Password Reset
             </button>
