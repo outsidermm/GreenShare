@@ -28,9 +28,9 @@ export default function NavBar(props: NavBarProps) {
         <h2 className="font-bold mb-2">
           <Link
             href="/"
-            className={`block ml-2 px-2 py-1 rounded transition-all ${
+            className={`block ml-0 sm:ml-2 px-2 py-1 rounded transition-all ${
               pathname === "/"
-                ? "bg-mono-contrast-light border-l-4 border-main-primary text-main-secondary font-semibold hover:text-main-primary"
+                ? "bg-mono-contrast-light border-l-0 sm:border-l-4 border-main-primary text-main-secondary font-semibold hover:text-main-primary"
                 : "text-mono-primary hover:text-main-secondary"
             }`}
           >
@@ -44,9 +44,9 @@ export default function NavBar(props: NavBarProps) {
               <li key={path}>
                 <Link
                   href={path}
-                  className={`block ml-2 px-2 py-1 rounded transition-all ${
+                  className={`block ml-0 sm:ml-2 px-2 py-1 rounded transition-all ${
                     isActive
-                      ? "bg-mono-contrast-light border-l-4 border-main-primary text-main-secondary font-semibold hover:text-main-primary"
+                      ? "bg-mono-contrast-light border-l-0 sm:border-l-4 border-main-primary text-main-secondary font-semibold hover:text-main-primary"
                       : "text-mono-primary hover:text-main-secondary"
                   }`}
                 >
@@ -63,9 +63,9 @@ export default function NavBar(props: NavBarProps) {
           <h2 className="font-bold my-4">
             <Link
               href="/manage_products"
-              className={`block ml-2 px-2 py-1 rounded transition-all ${
+              className={`block ml-0 sm:ml-2 px-2 py-1 rounded transition-all ${
                 pathname === "/manage_products"
-                  ? "bg-mono-contrast-light border-l-4 border-main-primary text-main-secondary font-semibold hover:text-main-primary"
+                  ? "bg-mono-contrast-light border-l-0 sm:border-l-4 border-main-primary text-main-secondary font-semibold hover:text-main-primary"
                   : "text-mono-primary hover:text-main-secondary"
               }`}
             >
@@ -80,9 +80,9 @@ export default function NavBar(props: NavBarProps) {
           <h2 className="font-bold my-4">
             <Link
               href="/manage_offers"
-              className={`block ml-2 px-2 py-1 rounded transition-all ${
+              className={`block ml-0 sm:ml-2 px-2 py-1 rounded transition-all ${
                 pathname === "/manage_offers"
-                  ? "bg-mono-contrast-light border-l-4 border-main-primary text-main-secondary font-semibold hover:text-main-primary"
+                  ? "bg-mono-contrast-light border-l-0 sm:border-l-4 border-main-primary text-main-secondary font-semibold hover:text-main-primary"
                   : "text-mono-primary hover:text-main-secondary"
               }`}
             >

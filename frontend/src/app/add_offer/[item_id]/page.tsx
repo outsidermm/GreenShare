@@ -189,7 +189,7 @@ export default function AddOfferPage() {
           <div className="flex flex-col sm:flex-row gap-6">
             <div className="flex-1 flex justify-center items-center">
               {/* Carousel displaying images of the selected item */}
-              <ProductCarousel item={requestedItem} aspectRatio="5/3" />
+              <ProductCarousel item={requestedItem} mode="height-full" />
             </div>
             <div
               className="flex-1 justify-center flex-col flex"
@@ -236,7 +236,7 @@ export default function AddOfferPage() {
                             );
                           }}
                           className={
-                            "text-left p-2 text-mono-primary cursor-pointer rounded hover:bg-alert transition-all"
+                            "text-left p-2 text-mono-primary cursor-pointer rounded-full hover:bg-alert-light transition-all"
                           }
                           aria-label={`{Deselect item ${toTitleCase(item.title)} - ${toTitleCase(item.description)}`}
                         >

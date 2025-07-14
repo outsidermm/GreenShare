@@ -21,7 +21,7 @@ export default function ProductDetailCard({
         </div>
       </header>
 
-      <div className="border-l-2 border-main-secondary pl-4 space-y-1">
+      <div className="space-y-1">
         <p className="break-words whitespace-normal">
           {toTitleCase(item.description)}
         </p>

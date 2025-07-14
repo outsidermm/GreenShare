@@ -107,7 +107,7 @@ export default function LoginPage() {
           <Link href="http://localhost:4000/auth/google/login">
             <button
               aria-label="Sign In With Google"
-              className="w-full rounded bg-mono-contrast hover:bg-mono-contrast-light text-mono-primary font-bold py-2 px-4 border-solid border-2 border-mono-primary transition-all"
+              className="w-full h-12 rounded bg-mono-contrast hover:bg-mono-contrast-light text-mono-primary font-bold py-2 px-4 border-solid border-2 border-mono-primary transition-all"
             >
               <div className="flex items-center justify-center gap-2">
                 <FcGoogle />
@@ -168,7 +168,7 @@ export default function LoginPage() {
             <button
               type="submit"
               aria-label="Submit Login"
-              className="w-full rounded bg-hyperlink-light hover:bg-hyperlink-secondary text-mono-primary font-bold py-2 px-4 border-solid border-2 border-hyperlink-primary transition-all"
+              className="w-full h-12 rounded bg-hyperlink-light hover:bg-hyperlink-secondary text-mono-primary font-bold py-2 px-4 border-solid border-2 border-hyperlink-primary transition-all"
             >
               Login
             </button>

@@ -131,7 +131,7 @@ export default function HeaderBar(HeaderBarProps: HeaderBarProps) {
               router.push("/");
             }
           }}
-          className="absolute bg-main-ascent hover:bg-main-secondary active:bg-main-primary border border-main-primary px-3 py-2 rounded-r-xl text-mono-primary transition-all"
+          className="absolute bg-main-secondary hover:bg-main-primary border border-main-primary px-3 py-2 rounded-r-xl text-mono-primary transition-all"
           style={{ right: "1.04rem" }}
         >
           Search
@@ -161,7 +161,7 @@ export default function HeaderBar(HeaderBarProps: HeaderBarProps) {
         {/* Button to toggle between visual themes with accessible icon and label */}
         <button
           onClick={toggleTheme}
-          className="p-2 rounded-full text-xl bg-main-ascent hover:bg-main-secondary active:bg-main-primary border border-main-primary transition-all"
+          className="p-2 rounded-full text-xl bg-main-secondary hover:bg-main-primary border border-main-primary transition-all"
           title={`Current theme: ${theme}`}
           aria-label="Toggle visual theme"
         >
@@ -176,7 +176,7 @@ export default function HeaderBar(HeaderBarProps: HeaderBarProps) {
         <div className="px-4">
           <button
             onClick={handleLogin}
-            className="text-mono-primary bg-main-ascent hover:bg-main-secondary active:bg-main-primary border border-main-primary px-3 py-1 rounded transition-all"
+            className="text-mono-primary bg-main-secondary hover:bg-main-primary border border-main-primary px-3 py-1 rounded transition-all"
             aria-label="Login to GreenShare"
           >
             Login

@@ -102,7 +102,7 @@ export default function ViewProductPage() {
           <div className="flex flex-col sm:flex-row gap-6">
             <div className="flex-1 flex justify-center items-center">
               {/* Carousel displaying images of the selected item */}
-              <ProductCarousel item={item} aspectRatio="4/3" />
+              <ProductCarousel item={item} mode="width-full" />
             </div>
             <div
               className="flex-1 flex flex-col gap-4 justify-center"

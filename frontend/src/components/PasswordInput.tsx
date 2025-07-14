@@ -41,13 +41,13 @@ export default function PasswordInput(props: PasswordInputProps) {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             onFocus={() => setPwdChanged(true)}
-            className={`border-mono-secondary text-mono-primary rounded py-2 px-3 w-full ${pwdChanged ? "invalid:border-alert-primary" : ""} border-2`}
+            className={`h-12 border-mono-secondary text-mono-primary rounded py-2 px-3 w-full ${pwdChanged ? "invalid:border-alert-primary" : ""} border-2`}
             aria-describedby="password-error"
           />
           <button
             type="button"
             onClick={() => setIsPwdHidden(!isPwdHidden)}
-            className="text-sm text-mono-primary hover:underline mt-2 absolute top-1.5 right-3"
+            className="text-mono-primary mt-2 absolute top-1.5 right-3"
             aria-label="Toggle password visibility"
           >
             {isPwdHidden ? <RiEyeOffFill /> : <RiEyeFill />}

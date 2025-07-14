@@ -197,7 +197,7 @@ export default function RegisterPage() {
           <div className="pt-2">
             <button
               type="submit"
-              className="w-full rounded bg-hyperlink-light hover:bg-hyperlink-secondary text-mono-primary font-bold py-2 px-4 border-solid border-2 border-hyperlink-primary transition-all"
+              className="w-full h-12 rounded bg-hyperlink-light hover:bg-hyperlink-secondary text-mono-primary font-bold py-2 px-4 border-solid border-2 border-hyperlink-primary transition-all"
             >
               Create an Account
             </button>
