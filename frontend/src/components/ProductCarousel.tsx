@@ -5,11 +5,17 @@ import { Item } from "@/types/item";
 
 interface ProductCarouselProps {
   item: Item;
-  aspectRatio: string;
+  mode?: "width-full" | "height-full";
+  maxHeight?: string; // for width-full mode
+  containerHeight?: string; // for height-full mode
 }
 
 export default function ProductCarousel(input: ProductCarouselProps) {
-  const { item, aspectRatio } = input;
+  const { item, mode = "width-full", maxHeight = "500px", containerHeight = "100%" } = input;
+  
+  const isWidthFullMode = mode === "width-full";
+  const isHeightFullMode = mode === "height-full";
+
   return (
     <Carousel
       showArrows={item.images.length > 1}
@@ -18,7 +24,7 @@ export default function ProductCarousel(input: ProductCarouselProps) {
       dynamicHeight={false}
       showThumbs={false}
       showStatus={false}
-      className="w-full rounded-xl"
+      className={`rounded-xl ${isWidthFullMode ? "w-full" : "h-full flex items-center justify-center"}`}
       renderArrowPrev={(onClickHandler, hasPrev, label) =>
         hasPrev && (
           <button
@@ -64,15 +70,44 @@ export default function ProductCarousel(input: ProductCarouselProps) {
       {item.images.map((image, index) => (
         <div
           key={index}
-          className={`relative w-full aspect-[${aspectRatio}] bg-mono-contrast-light overflow-hidden rounded-xl`}
+          className={`relative bg-mono-contrast-light overflow-hidden rounded-xl ${
+            isWidthFullMode 
+              ? `w-full` 
+              : `h-full flex items-center justify-center`
+          }`}
+          style={
+            isWidthFullMode 
+              ? { maxHeight, height: maxHeight }
+              : { height: containerHeight }
+          }
         >
           <Image
             src={image}
             alt={item.title}
-            fill
-            sizes="(min-width: 1024px) 50vw, 100vw"
-            className="object-contain"
+            fill={isWidthFullMode}
+            width={isHeightFullMode ? undefined : 0}
+            height={isHeightFullMode ? undefined : 0}
+            sizes={
+              isWidthFullMode 
+                ? "(min-width: 1024px) 50vw, 100vw"
+                : "auto"
+            }
+            className={`${
+              isWidthFullMode 
+                ? "object-contain w-full h-full" 
+                : "object-contain max-h-full max-w-full h-auto w-auto"
+            }`}
             priority={true}
+            style={
+              isHeightFullMode 
+                ? { 
+                    maxHeight: "100%", 
+                    maxWidth: "100%", 
+                    height: "auto", 
+                    width: "auto" 
+                  }
+                : undefined
+            }
           />
         </div>
       ))}
