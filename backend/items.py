@@ -158,7 +158,7 @@ async def validate_location(location: str) -> str:
     return sanitize_input(formatted_address.lower())
 
 
-def title_matches(user_input: str, item_title: str, threshold: float = 0.3) -> bool:
+def title_matches(user_input: str, item_title: str, threshold: float = 0.4) -> bool:
     """
     Determines if the user input matches the item title by substring or similarity.
 
@@ -299,7 +299,7 @@ async def user_get_browse_items(
     safe_type_filter: str | None = None
 
     if title_filter is not None:
-        safe_title_filter = validate_string_length(title_filter, "Title filter", 3, 100)
+        safe_title_filter = sanitize_input(title_filter.lower())
     if category_filter is not None:
         safe_category_filter = validate_category(category_filter)
     if condition_filter is not None:
@@ -438,7 +438,7 @@ async def user_delete_item(
 
 
 async def search_item_similarity_pg(
-    search_query: str, threshold: float = 0.3, limit: int = 6
+    search_query: str, threshold: float = 0.2, limit: int = 6
 ) -> list[str]:
     """
     Search items using PostgreSQL trigram similarity.
