@@ -36,6 +36,7 @@ export default function LoginPage() {
       );
       setEmail("");
       setEmailChanged(false);
+      router.push("/login");
     } catch (error: unknown) {
       if (error instanceof Error) {
         swal("Error", extractErrorMessage(error.message), "error");
