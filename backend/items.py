@@ -401,7 +401,8 @@ async def user_modify_item(
             abort(400, "Images must be a list of URLs.")
         if len(new_images) > 10:
             abort(400, "You can only upload up to 10 images.")
-        items[item_id_int].set_images(new_images)
+        if len(new_images) > 0:
+            items[item_id_int].set_images(new_images)
     # Return the modified item object
     return items[item_id_int]
 
