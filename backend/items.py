@@ -257,6 +257,7 @@ async def user_view_item(session_token: str, csrf_token: str) -> list[Item]:
     safe_session_token: str = sanitize_input(session_token)
     safe_csrf_token: str = sanitize_input(csrf_token)
     user_id: int = admin_retrieve_user_id(safe_session_token, safe_csrf_token)
+    validate_user_id(user_id)  # Ensure the user ID is valid
     owned_items: list[Item] = []
     # Iterate through all items and collect those that are available and owned by the user
     for item in items.values():
