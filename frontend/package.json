@@ -20,7 +20,7 @@
     "react-responsive-carousel": "^3.2.23",
     "react-select": "^5.10.1",
     "sweetalert": "^2.1.2",
-    "swiper": "^11.2.8"
+    "swiper": "^12.1.2"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
