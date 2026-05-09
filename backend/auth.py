@@ -159,7 +159,7 @@ async def user_auth_register(
         abort(409, description="Email already exists")
 
     # Create new user with sanitized data
-    print(f"Creating new user: {safe_email}, Google OAuth: {is_google_oauth}")
+    print("Creating new user account")
     new_user: User = User(
         safe_email, safe_first_name, safe_last_name, safe_pwd, is_google_oauth
     )
