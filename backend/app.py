@@ -567,8 +567,8 @@ async def view_exchange_offers() -> Response:
             ),
             200,
         )
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    except Exception:
+        return jsonify({"error": "An internal error has occurred."}), 500
 
 
 @app.route("/offer/accept", methods=["POST"])
