@@ -647,8 +647,8 @@ async def confirm_exchange_offer() -> Response:
             offer_id,
         )
         return jsonify({"message": "Offer completion confirmed successfully."}), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    except Exception:
+        return jsonify({"error": "An internal error has occurred."}), 500
 
 
 @app.route("/offer/details", methods=["GET"])
@@ -676,8 +676,10 @@ async def get_offer_details() -> Response:
 
         offer = exchange_offers[offer_id_int]
         return jsonify(offer.to_json()), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    except ValueError:
+        return jsonify({"error": "Invalid offer ID."}), 400
+    except Exception:
+        return jsonify({"error": "An internal error has occurred."}), 500
 
 
 @app.route("/offer/cancel", methods=["POST"])
@@ -705,8 +707,8 @@ async def cancel_exchange_offer() -> Response:
             message,
         )
         return jsonify({"message": "Offer cancelled successfully"}), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    except Exception:
+        return jsonify({"error": "An internal error has occurred."}), 500
 
 
 @app.route("/api/autocomplete", methods=["POST"])
