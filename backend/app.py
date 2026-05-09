@@ -6,6 +6,7 @@ It includes endpoints for user authentication, item management, exchange offers,
 and auxiliary services such as autocomplete and item search.
 """
 
+import logging
 import requests
 from urllib.parse import quote
 from flask import redirect, request, jsonify, make_response, Response
@@ -751,7 +752,8 @@ async def search_items() -> Response:
         recommendation_list: list = await search_item_similarity_pg(search)
         return jsonify({"predictions": recommendation_list}), 200
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        logging.exception("Unexpected error while searching items: %s", e)
+        return jsonify({"error": "An internal error has occurred."}), 500
 
 
 # Entry point to run the Flask app
