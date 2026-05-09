@@ -6,12 +6,15 @@ It includes endpoints for user authentication, item management, exchange offers,
 and auxiliary services such as autocomplete and item search.
 """
 
+import logging
 import requests
 from urllib.parse import quote
 from flask import redirect, request, jsonify, make_response, Response
 
 # Application config and database
 from backend.config import app, db, google_oauth, limiter
+
+logger = logging.getLogger(__name__)
 
 # Auth-related imports
 from backend.auth import (
@@ -566,8 +569,8 @@ async def view_exchange_offers() -> Response:
             ),
             200,
         )
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    except Exception:
+        return jsonify({"error": "An internal error has occurred."}), 500
 
 
 @app.route("/offer/accept", methods=["POST"])
@@ -708,8 +711,8 @@ async def cancel_exchange_offer() -> Response:
             message,
         )
         return jsonify({"message": "Offer cancelled successfully"}), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    except Exception:
+        return jsonify({"error": "An internal error has occurred"}), 500
 
 
 @app.route("/api/autocomplete", methods=["POST"])
@@ -754,7 +757,8 @@ async def search_items() -> Response:
         recommendation_list: list = await search_item_similarity_pg(search)
         return jsonify({"predictions": recommendation_list}), 200
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        logging.exception("Unexpected error while searching items: %s", e)
+        return jsonify({"error": "An internal error has occurred."}), 500
 
 
 # Entry point to run the Flask app
