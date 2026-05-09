@@ -647,8 +647,9 @@ async def confirm_exchange_offer() -> Response:
             offer_id,
         )
         return jsonify({"message": "Offer completion confirmed successfully."}), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    except Exception:
+        app.logger.exception("Error while confirming exchange offer")
+        return jsonify({"error": "An internal error occurred."}), 500
 
 
 @app.route("/offer/details", methods=["GET"])
