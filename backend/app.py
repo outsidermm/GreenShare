@@ -706,8 +706,8 @@ async def cancel_exchange_offer() -> Response:
             message,
         )
         return jsonify({"message": "Offer cancelled successfully"}), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    except Exception:
+        return jsonify({"error": "An internal error has occurred"}), 500
 
 
 @app.route("/api/autocomplete", methods=["POST"])
