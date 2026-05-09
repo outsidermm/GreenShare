@@ -6,12 +6,15 @@ It includes endpoints for user authentication, item management, exchange offers,
 and auxiliary services such as autocomplete and item search.
 """
 
+import logging
 import requests
 from urllib.parse import quote
 from flask import redirect, request, jsonify, make_response, Response
 
 # Application config and database
 from backend.config import app, db, google_oauth, limiter
+
+logger = logging.getLogger(__name__)
 
 # Auth-related imports
 from backend.auth import (
@@ -593,8 +596,9 @@ async def accept_exchange_offer() -> Response:
             offer_id,
         )
         return jsonify({"message": "Offer accepted successfully."}), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    except Exception:
+        logger.exception("Failed to accept exchange offer")
+        return jsonify({"error": "An internal error has occurred."}), 500
 
 
 @app.route("/offer/exchange_complete", methods=["POST"])
