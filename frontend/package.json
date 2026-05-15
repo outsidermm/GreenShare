@@ -30,7 +30,7 @@
     "autoprefixer": "^10.5.0",
     "cypress": "^15.14.2",
     "eslint": "^10",
-    "eslint-config-next": "16.2.4",
+    "eslint-config-next": "16.2.6",
     "next-transpile-modules": "^10.0.1",
     "postcss": "^8.5.14",
     "prettier": "3.8.3",
