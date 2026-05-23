@@ -28,11 +28,11 @@
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
     "autoprefixer": "^10.5.0",
-    "cypress": "^15.14.2",
+    "cypress": "^15.15.0",
     "eslint": "^10",
     "eslint-config-next": "16.2.6",
     "next-transpile-modules": "^10.0.1",
-    "postcss": "^8.5.14",
+    "postcss": "^8.5.15",
     "prettier": "3.8.3",
     "tailwindcss": "^4.3.0",
     "typescript": "^6"
